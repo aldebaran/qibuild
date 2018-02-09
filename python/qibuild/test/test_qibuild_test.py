@@ -13,6 +13,7 @@ import qibuild.worktree
 from qitest.test.conftest import qitest_action  # pylint: disable=unused-import
 
 # pylint: disable=redefined-outer-name
+# pylint: disable=unused-variable
 
 
 def test_various_outcomes(qibuild_action, record_messages):

@@ -56,7 +56,7 @@ def get_pml_projects(pml_paths):
 
 
 def get_linguist_builder(args, with_projects=True):
-    worktree = get_linguist_worktree(args)
+    __worktree = get_linguist_worktree(args)  # pylint: disable=unused-variable
     builder = qilinguist.builder.QiLinguistBuilder()
     if with_projects:
         projects = get_linguist_projects(args)

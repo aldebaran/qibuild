@@ -239,7 +239,7 @@ Error when parsing {pml_path}
         # Make sure self.stage_path exists and is empty
         qisys.sh.rm(self.stage_path)
         qisys.sh.mkdir(self.stage_path, recursive=True)
-        res = list()
+
         if not output:
             output = os.path.join(os.getcwd(), self.pkg_name + ".pkg")
 

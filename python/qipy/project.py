@@ -82,7 +82,7 @@ in the qiproject.xml file
         """ Returns all the .py files in the given package"""
         res = list()
         full_package_path = os.path.join(self.path, package.src, package.name)
-        for root, directories, filenames in os.walk(full_package_path):
+        for root, __directories, filenames in os.walk(full_package_path):  # pylint: disable=unused-variable
             init_py = os.path.join(root, "__init__.py")
             if not os.path.exists(init_py):
                 continue

@@ -12,6 +12,8 @@ import qibuild.profile
 
 from qibuild.test.conftest import TestBuildWorkTree
 
+# pylint: disable=unused-variable
+
 
 def test_clean_build_dir(qibuild_action):
     world_proj = qibuild_action.add_test_project("world")

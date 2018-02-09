@@ -11,6 +11,8 @@ import qisys.sh
 from qidoc.test.conftest import find_link
 import qidoc.builder
 
+# pylint: disable=unused-variable
+
 
 def test_no_templates(doc_worktree):
     foo_sphinx = doc_worktree.create_sphinx_project("foo")

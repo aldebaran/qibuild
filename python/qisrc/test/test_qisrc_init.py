@@ -13,6 +13,7 @@ from qisrc.test.conftest import TestGitWorkTree
 
 # allow the existing foo/bar/baz names
 # pylint: disable=blacklisted-name
+# pylint: disable=unused-variable
 
 
 def test_in_new_directory(cd_to_tmpdir, git_server):  # pylint: disable=unused-argument

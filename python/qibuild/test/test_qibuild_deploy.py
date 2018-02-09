@@ -6,6 +6,8 @@ import os
 import qisys.command
 import qibuild.find
 
+# pylint: disable=unused-variable
+
 
 def check_ssh_connection():
     # check we can log in to locahost, and that

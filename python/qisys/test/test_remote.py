@@ -5,6 +5,8 @@ import pytest
 
 from qisys.remote import URL, URLParseError, deploy
 
+# pylint: disable=unused-variable
+
 
 def test_simple_url():
     url = URL("foo@bar")

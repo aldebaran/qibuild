@@ -250,7 +250,7 @@ def find_program(executable, env=None, raises=False):
     import qibuild.config
     if executable in _FIND_PROGRAM_CACHE:
         return _FIND_PROGRAM_CACHE[executable]
-    full_path = None
+
     res = None
     if not env:
         env = qibuild.config.get_build_env()

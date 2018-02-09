@@ -19,6 +19,8 @@ from qisys.archive import extract, guess_algo  # pylint: disable=unused-import
 # all the features `tar` has and is slower, so all tar tests
 # are disabled on Windows
 
+# pylint: disable=unused-variable
+
 
 def test_create_extract_zip_simple(tmpdir):
     tmpdir.ensure("foo/a/b.txt", file=True)

@@ -136,7 +136,7 @@ def dump_symbols_from_directory(root_dir, pool_dir, strip=True,
     in $PATH)
 
     """
-    for (root, directories, filenames) in os.walk(root_dir):
+    for (root, __directories, filenames) in os.walk(root_dir):  # pylint: disable=unused-variable
         for filename in filenames:
             full_path = os.path.join(root_dir, root, filename)
             if os.path.islink(full_path):

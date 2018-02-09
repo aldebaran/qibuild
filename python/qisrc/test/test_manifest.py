@@ -8,6 +8,7 @@ import qisrc.review
 
 # allow the existing foo/bar/baz names
 # pylint: disable=blacklisted-name
+# pylint: disable=unused-variable
 
 
 def test_simple_read(tmpdir):

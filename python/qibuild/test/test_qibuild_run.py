@@ -11,6 +11,8 @@ from qibuild.test.conftest import QiBuildAction  # pylint: disable=unused-import
 from qibuild.actions import run  # pylint: disable=unused-import
 from qitoolchain.test.conftest import QiToolchainAction  # pylint: disable=unused-import
 
+# pylint: disable=unused-variable
+
 
 def test_run_target(qibuild_action):
     project = qibuild_action.add_test_project("testme")

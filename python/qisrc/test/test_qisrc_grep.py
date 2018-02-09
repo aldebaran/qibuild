@@ -5,6 +5,8 @@ import py
 
 import qisrc.git
 
+# pylint: disable=unused-variable
+
 
 def setup_projects(qisrc_action):
     """ Create two git projects with one match for the

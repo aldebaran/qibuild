@@ -394,8 +394,9 @@ def _get_console_size_windows():  # pylint: disable=too-many-locals
 
     if res:
         import struct
-        (bufx, bufy, curx, cury, wattr,
-         left, top, right, bottom, maxx, maxy) = struct.unpack("hhhhHhhhhhh", csbi.raw)
+        # pylint: disable=unused-variable
+        (__bufx, __bufy, __curx, __cury, __wattr,
+         left, top, right, bottom, __maxx, __maxy) = struct.unpack("hhhhHhhhhhh", csbi.raw)
         sizex = right - left + 1
         sizey = bottom - top + 1
         return sizex, sizey

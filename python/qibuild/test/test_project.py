@@ -9,6 +9,8 @@ import qisys.qixml
 import qisrc.git
 import qibuild.config
 
+# pylint: disable=unused-variable
+
 
 def test_dependencies_cmake(build_worktree):
     hello_proj = build_worktree.create_project("hello")

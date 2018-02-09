@@ -5,6 +5,8 @@ import mock
 
 from qidoc.builder import DocBuilder
 
+# pylint: disable=unused-variable
+
 
 def test_doc_builder_solve_deps_by_default(doc_worktree):
     qibuild_doc = doc_worktree.create_sphinx_project("qibuild")

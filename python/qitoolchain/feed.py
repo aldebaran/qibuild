@@ -146,7 +146,7 @@ class ToolchainFeedParser(object):
 
         feeds = tree.findall("feed")
         for feed_tree in feeds:
-            feed_name = feed_tree.get("name")
+            # feed_name = feed_tree.get("name")
             feed_url = feed_tree.get("url")
             feed_path = feed_tree.get("path")
             assert feed_path or feed_url, "Either 'url' or 'path' attributes must be set in a 'feed' non-root element"

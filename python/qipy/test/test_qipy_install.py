@@ -2,6 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
 
+# pylint: disable=unused-variable
+
 
 def test_install(qipy_action, tmpdir):
     big_project = qipy_action.add_test_project("big_project")

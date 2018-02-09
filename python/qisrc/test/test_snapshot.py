@@ -4,6 +4,8 @@
 import qisrc.snapshot
 from qisrc.test.conftest import TestGitWorkTree  # pylint: disable=unused-import
 
+# pylint: disable=unused-variable
+
 
 def test_dump_load(tmpdir):
     snapshot = qisrc.snapshot.Snapshot()

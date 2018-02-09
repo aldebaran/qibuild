@@ -6,6 +6,8 @@ import pytest
 from qisrc.test.conftest import TestGitWorkTree
 from qisrc.test.conftest import TestGit
 
+# pylint: disable=unused-variable
+
 
 def test_happy_rebase(git_server, qisrc_action):
     git_server.create_repo("foo")

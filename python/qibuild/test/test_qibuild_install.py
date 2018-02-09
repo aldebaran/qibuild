@@ -12,6 +12,8 @@ import qibuild.find
 from qibuild.test.conftest import QiBuildAction
 from qitoolchain.test.conftest import QiToolchainAction
 
+# pylint: disable=unused-variable
+
 
 def create_foo_toolchain_with_world_package(qibuild_action, qitoolchain_action):
     build_worktree = qibuild_action.build_worktree

@@ -7,6 +7,8 @@ import qibuild.cmake_builder
 import qibuild.config
 import qibuild.parsers
 
+# pylint: disable=unused-variable
+
 
 def test_check_configure_has_been_called_before_building(build_worktree):
     hello_proj = build_worktree.create_project("hello")

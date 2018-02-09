@@ -4,6 +4,8 @@
 
 import qibuild.config
 
+# pylint: disable=unused-variable
+
 
 def test_simple(qitoolchain_action, record_messages):
     foo_tc = qitoolchain_action("create", "foo")

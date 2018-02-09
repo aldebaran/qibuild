@@ -29,7 +29,7 @@ class PythonTestCollector(object):
     @staticmethod
     def get_list_of_pytest(rep):
         pytest_list = list()
-        for root, dirnames, filenames in os.walk(rep):
+        for root, __dirnames, __filenames in os.walk(rep):  # pylint: disable=unused-variable
             pytest_list.extend(glob.glob(root + "/test_*.py"))
         return pytest_list
 

@@ -143,7 +143,7 @@ def convert_to_qibuild(package, package_metadata=None,  # pylint: disable=too-ma
         _fix_package_tree(root_dir)
         package_xml_path = os.path.join(root_dir, "package.xml")
         package_xml_root = etree.Element("package")
-        package_xml_tree = etree.ElementTree(package_xml_root)
+        # package_xml_tree = etree.ElementTree(package_xml_root)
         package_xml_root.set("name", package_name)
         version = metadata.get("version")
         if version:

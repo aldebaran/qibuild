@@ -6,6 +6,8 @@ import qisys.sh
 import qisrc.git
 from qisrc.test.conftest import TestGit
 
+# pylint: disable=unused-variable
+
 
 def test_name_from_url_common():
     examples = [

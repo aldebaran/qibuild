@@ -11,6 +11,8 @@ import qibuild.find
 from qibuild.find import library_name
 from qibuild.find import binary_name
 
+# pylint: disable=unused-variable
+
 
 def test_library_name():
     assert library_name("foo", debug=False, shared=True, os_name="Windows") == "foo.dll"

@@ -8,6 +8,7 @@ import qisys.worktree
 
 # allow the existing foo/bar/baz names
 # pylint: disable=blacklisted-name
+# pylint: disable=unused-variable
 
 
 def test_guess_woktree(worktree, args):

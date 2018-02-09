@@ -8,6 +8,8 @@ import pytest
 import qisys.sh
 import qibuild.parsers
 
+# pylint: disable=unused-variable
+
 
 def test_parse_one_arg(build_worktree, args):
     world = build_worktree.create_project("world")

@@ -7,6 +7,7 @@ from qibuild.test.conftest import TestBuildWorkTree
 
 # allow the existing foo/bar/baz names
 # pylint: disable=blacklisted-name
+# pylint: disable=unused-variable
 
 
 def test_git_server_creates_valid_urls(tmpdir, git_server):

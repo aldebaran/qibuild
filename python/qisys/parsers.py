@@ -28,6 +28,7 @@ def cpu_count():
         default = multiprocessing.cpu_count()
     except NotImplementedError:
         default = 1
+    return default
 
 
 def parallel_parser(parser, default=cpu_count()):

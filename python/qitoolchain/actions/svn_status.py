@@ -33,7 +33,7 @@ def do(args):
         sys.stdout.write(to_write + "\r")
         sys.stdout.flush()
         svn = qisrc.svn.Svn(svn_package.path)
-        rc, out = svn.call("status", raises=False)
+        __rc, out = svn.call("status", raises=False)  # pylint: disable=unused-variable
         if out:
             not_clean.append((svn_package.name, out))
     if not not_clean:

@@ -216,7 +216,7 @@ This path does not exist
         src = self.normalize_path(path)
         new_src = self.normalize_path(new_path)
 
-        project = self.get_project(src, raises=True)
+        __project = self.get_project(src, raises=True)  # pylint: disable=unused-variable
 
         if self.has_project(new_src):
             mess = "Could not move project\n"

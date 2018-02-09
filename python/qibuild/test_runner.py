@@ -14,6 +14,8 @@ import qisys.command
 import qitest.conf
 import qitest.runner
 
+# pylint: disable=unused-variable
+
 
 class ProjectTestRunner(qitest.runner.TestSuiteRunner):
     """ Implements :py:class:`.TestSuiteRunner` for a qibuild/cmake project """

@@ -8,6 +8,7 @@ from qisrc.test.conftest import TestGitWorkTree
 
 # allow the existing foo/bar/baz names
 # pylint: disable=blacklisted-name
+# pylint: disable=unused-variable
 
 
 def test_untracked(qisrc_action, record_messages):

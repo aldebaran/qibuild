@@ -8,6 +8,8 @@ import qisys.sh
 import qidoc.convert
 from qidoc.test.conftest import TestDocWorkTree
 
+# pylint: disable=unused-variable
+
 
 def test_convert_handle_src(worktree):
     foo_proj = worktree.create_project("foo")

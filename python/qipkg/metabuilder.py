@@ -61,7 +61,7 @@ class MetaPMLBuilder(object):
                                with breakpad
 
         """
-        output = kwargs.get('output', None)
+        # output = kwargs.get('output', None)
         force = kwargs.get('force', False)
         with_breakpad = kwargs.get('with_breakpad', False)
         all_packages = list()

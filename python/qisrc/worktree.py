@@ -96,7 +96,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         group_names = groups
         for git_project in self.git_projects:
             git_project_names[git_project.name] = git_project
-        projects = list()
+
         groups = qisrc.groups.get_groups(self.worktree)
         for group_name in group_names:
             warn_for_group = True
@@ -259,7 +259,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         ui.info(ui.green, ":: Checkout projects ...")
         errors = list()
         manifest_xml = os.path.join(self.syncer.manifest_repo, "manifest.xml")
-        manifest = qisrc.manifest.Manifest(manifest_xml)
+        manifest = qisrc.manifest.Manifest(manifest_xml)  # pylint: disable=unused-variable
         to_checkout = list()
         for project in self.git_projects:
             if project.default_branch is None:

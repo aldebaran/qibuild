@@ -10,6 +10,8 @@ import pytest
 import qisys.sh
 from qisrc.test.conftest import TestGit
 
+# pylint: disable=unused-variable
+
 
 def test_install_ro(tmpdir):
     tmp = tmpdir.strpath

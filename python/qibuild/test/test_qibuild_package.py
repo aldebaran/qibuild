@@ -13,6 +13,8 @@ from qibuild.test.conftest import QiBuildAction
 import qitoolchain.qipackage
 from qitoolchain.test.conftest import QiToolchainAction
 
+# pylint: disable=unused-variable
+
 
 def test_simple(qibuild_action):
     qibuild_action.add_test_project("world")

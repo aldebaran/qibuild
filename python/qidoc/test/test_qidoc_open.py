@@ -5,6 +5,8 @@ import os
 
 import mock
 
+# pylint: disable=unused-variable
+
 
 def test_simple(qidoc_action):
     world_proj = qidoc_action.add_test_project("world")

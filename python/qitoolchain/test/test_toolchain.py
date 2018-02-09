@@ -8,6 +8,7 @@ from qisrc.test.conftest import git_server, svn_server  # pylint: disable=unused
 import qitoolchain.toolchain
 
 # pylint: disable=redefined-outer-name
+# pylint: disable=unused-variable
 
 
 def get_tc_file_contents(tc):

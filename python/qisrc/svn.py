@@ -40,7 +40,7 @@ class Svn(object):
             qisys.command.call(cmd, **kwargs)
 
     def commit_all(self, message):
-        rc, out = self.call("status", raises=False)
+        __rc, out = self.call("status", raises=False)  # pylint: disable=unused-variable
         for line in out.splitlines():
             line = line.strip()
             filename = line[8:]

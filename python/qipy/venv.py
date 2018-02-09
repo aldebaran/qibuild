@@ -13,7 +13,7 @@ import qisys.command
 def _create_virtualenv(config, python_worktree, site_packages=True, python_executable=None, env=None):
     python_worktree.config = config
     venv_path = python_worktree.venv_path
-    pip = python_worktree.pip
+    # pip = python_worktree.pip
 
     if not python_executable:
         python_executable = sys.executable

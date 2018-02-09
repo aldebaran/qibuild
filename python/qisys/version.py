@@ -24,11 +24,10 @@ def compare(a_str, b_str):  # pylint: disable=too-many-branches
     v_a = explode_version(a_str)
     v_b = explode_version(b_str)
 
-    res = 0
     a_sep = 0
     b_sep = 0
-    c_a = ""
-    c_b = ""
+    c_a = ""  # pylint: disable=unused-variable
+    c_b = ""  # pylint: disable=unused-variable
 
     return_code = 0
     while True:

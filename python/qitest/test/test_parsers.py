@@ -9,6 +9,8 @@ import qitest.parsers
 
 from qibuild.test.conftest import TestBuildWorkTree
 
+# pylint: disable=unused-variable
+
 
 def test_nothing_specified_json_in_cwd(args, tmpdir, monkeypatch):
     monkeypatch.chdir(tmpdir)

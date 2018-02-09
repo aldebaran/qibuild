@@ -9,6 +9,8 @@ import qidoc.doxygen
 import qidoc.builder
 from qidoc.test.conftest import find_link
 
+# pylint: disable=unused-variable
+
 
 def test_read_doxyfile(tmpdir):
     doxyfile = tmpdir.join("Doxyfile")

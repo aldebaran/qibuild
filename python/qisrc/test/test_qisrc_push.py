@@ -9,6 +9,8 @@ import qisrc.git
 
 from qisrc.test.conftest import TestGitWorkTree, TestGit
 
+# pylint: disable=unused-variable
+
 
 def test_not_under_code_review_ask_user(qisrc_action, git_server, interact):
     foo_repo = git_server.create_repo("foo.git")

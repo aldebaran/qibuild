@@ -21,6 +21,7 @@ from qipy.test.conftest import qipy_action  # pylint: disable=unused-import
 # pylint: disable=blacklisted-name
 
 # pylint: disable=redefined-outer-name
+# pylint: disable=unused-variable
 
 
 # This module also serves as a test for the

@@ -86,7 +86,7 @@ def _generate_run_gdbserver_binary(dest, host, gdb, gdb_listen, remote_dir,
 
 def _get_subfolder(directory):
     res = list()
-    for root, dirs, files in os.walk(directory):
+    for root, __dirs, __files in os.walk(directory):  # pylint: disable=unused-variable
         new_root = os.path.abspath(root)
         if not os.path.basename(new_root).startswith(".debug"):
             res.append(new_root)

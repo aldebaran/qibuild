@@ -202,7 +202,7 @@ Or configure the project with no config
         """ Build the projects (in parallel) in the correct order """
         projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
         # do the prebuild step here (it is fast enough)
-        for i, project in enumerate(projects):
+        for project in projects:
             self.pre_build(project)
 
         parallel_builder = ParallelBuilder()

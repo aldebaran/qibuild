@@ -83,7 +83,7 @@ def get_forked_projects(git_projects, upstream_projects, branch):
             continue
         if not git_project.default_branch:
             continue
-        local_branch = git_project.default_branch.name
+        # local_branch = git_project.default_branch.name
         remote_branch = git_project.default_branch.remote_branch
         remote_name = git_project.default_remote.name
         remote_ref = "%s/%s" % (remote_name, remote_branch)
@@ -166,11 +166,11 @@ def check_local_branch(git_project):
 
 
 def display_changes(git, remote_ref, branch_name):
-    rc, out = git.call("log", "--color", "--graph", "--abbrev-commit",
-                       "--pretty=format:%Cred%h%Creset " +
-                       "-%C(yellow)%d%Creset " +
-                       "%s %Cgreen(%cr) %C(bold blue) " +
-                       "<%an>%Creset",
-                       remote_ref, branch_name,
-                       raises=False)
+    __rc, out = git.call("log", "--color", "--graph", "--abbrev-commit",  # pylint: disable=unused-variable
+                         "--pretty=format:%Cred%h%Creset " +
+                         "-%C(yellow)%d%Creset " +
+                         "%s %Cgreen(%cr) %C(bold blue) " +
+                         "<%an>%Creset",
+                         remote_ref, branch_name,
+                         raises=False)
     ui.info(out)

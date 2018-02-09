@@ -9,6 +9,7 @@ import qisrc.worktree
 import qisrc.manifest
 
 # pylint: disable=redefined-outer-name
+# pylint: disable=unused-variable
 
 
 class TestGitWorkTree(qisrc.worktree.GitWorkTree):
@@ -317,7 +318,7 @@ class TestGit(qisrc.git.Git):
 
     def initialize(self, branch="master"):
         """ Make sure there is at least one commit and one branch """
-        rc, out = self.call("show", raises=False)
+        rc, __out = self.call("show", raises=False)  # pylint: disable=unused-variable
         if rc == 0:
             return
         self.init()

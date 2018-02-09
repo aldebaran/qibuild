@@ -2,6 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
 
+# pylint: disable=unused-variable
+
 
 def test_add_test_project(build_worktree):
     world = build_worktree.add_test_project("world")

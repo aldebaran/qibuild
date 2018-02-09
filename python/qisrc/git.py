@@ -215,7 +215,7 @@ class Git(object):
         """Check if the worktree is a valid git tree."""
         if not os.path.isdir(self.repo):
             return False
-        (status, out) = self.call("rev-parse", "--is-inside-work-tree", raises=False)
+        (status, out) = self.call("rev-parse", "--is-inside-work-tree", raises=False)  # pylint: disable=unused-variable
         return status == 0
 
     def require_clean_worktree(self):
