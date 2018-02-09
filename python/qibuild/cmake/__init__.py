@@ -91,7 +91,7 @@ def get_cached_var(build_dir, var, default=None):
     return res.get(var, default)
 
 
-def cmake(source_dir, build_dir, cmake_args, env=None,  # pylint: disable=too-many-branches
+def cmake(source_dir, build_dir, cmake_args, env=None,  # pylint: disable=too-many-branches,too-many-locals
           clean_first=True, profiling=False, debug_trycompile=False,
           trace_cmake=False, summarize_options=False):
     """Call cmake with from a build dir for a source dir.

@@ -210,7 +210,7 @@ Or configure the project with no config
         parallel_builder.build(*args, **kwargs)
 
     @need_configure
-    def install(self, dest, *args, **kwargs):
+    def install(self, dest, *args, **kwargs):  # pylint: disable=too-many-locals
         """ Install the projects and the packages to the dest dir """
         installed = list()
         projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
@@ -273,7 +273,7 @@ Or configure the project with no config
 
     @need_configure
     def deploy(self, url, split_debug=False, with_tests=False, install_tc_packages=True):
-        # pylint: disable=too-many-branches
+        # pylint: disable=too-many-branches,too-many-locals
         """ Deploy the project and the packages it depends to a remote url """
         to_deploy = list()
         dep_projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)

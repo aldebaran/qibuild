@@ -453,7 +453,7 @@ class QiBuildConfig(object):  # pylint: disable=too-many-instance-attributes
         # A dict of worktree, key being the path
         self.worktrees = dict()
 
-    def read(self, cfg_path=None, create_if_missing=False):
+    def read(self, cfg_path=None, create_if_missing=False):  # pylint: disable=too-many-locals
         """ Read from a config location
 
         """
@@ -681,7 +681,7 @@ class QiBuildConfig(object):  # pylint: disable=too-many-instance-attributes
             if config.host:
                 return name
 
-    def write(self, xml_path=None):
+    def write(self, xml_path=None):  # pylint: disable=too-many-locals
         """ Write back the new config
 
         """

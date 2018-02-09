@@ -47,7 +47,7 @@ def parse_cmake_log(input_file, qibuild_dir):
     return profile
 
 
-def gen_annotations(profile, out, qibuild_dir):
+def gen_annotations(profile, out, qibuild_dir):  # pylint: disable=too-many-locals
     """ Write the files with the same layout , the same
     contents, and just a percentage of hits in the first
     column

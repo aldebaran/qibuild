@@ -44,7 +44,7 @@ class Profile(object):
         return not self.__eq__(other)
 
 
-def parse_profiles(xml_path):
+def parse_profiles(xml_path):  # pylint: disable=too-many-locals
     """ Parse .qi/qibuild.xml. Return a dict
     name -> Profile
     """

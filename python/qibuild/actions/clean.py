@@ -47,7 +47,7 @@ def _get_clean_selection(remove_known_configs, remove_unknown_configs):
 
 
 @ui.timer("qibuild clean")
-def do(args):  # pylint: disable=too-many-branches
+def do(args):  # pylint: disable=too-many-branches,too-many-locals
     """Main entry point."""
     build_worktree = qibuild.parsers.get_build_worktree(args)
     projects = qibuild.parsers.get_build_projects(build_worktree, args,

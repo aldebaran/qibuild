@@ -61,7 +61,7 @@ class GentooPackage(GentooNoPortagePackage):
     def __init__(self, package_path):
         GentooNoPortagePackage.__init__(self, package_path)
 
-    def _load(self):
+    def _load(self):  # pylint: disable=too-many-locals
         """ Read the metadata from the binary package and store them in the
         instance.
 

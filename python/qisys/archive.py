@@ -72,7 +72,7 @@ def _check_algo(algo):
 # http://www.mail-archive.com/python-list@python.org/msg34223.html
 
 
-def _compress_zip(directory, quiet=True, verbose=False, display_progress=False,
+def _compress_zip(directory, quiet=True, verbose=False, display_progress=False,  # pylint: disable=too-many-locals
                   flat=False, output=None):
     """Compress directory in a .zip file
 

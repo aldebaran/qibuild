@@ -319,7 +319,7 @@ class Git(object):
                         "refs/heads/%s" % remote_branch)
         return True
 
-    def sync_branch(self, branch, fetch_first=True):
+    def sync_branch(self, branch, fetch_first=True):  # pylint: disable=too-many-locals
         """ git pull --rebase on steroids:
 
         * do not try anything if the worktree is not clean

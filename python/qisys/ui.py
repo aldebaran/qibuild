@@ -378,7 +378,7 @@ def get_console_size():
     return tuple_xy
 
 
-def _get_console_size_windows():
+def _get_console_size_windows():  # pylint: disable=too-many-locals
     try:
         from ctypes import windll, create_string_buffer
 

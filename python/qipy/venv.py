@@ -42,9 +42,10 @@ def _update_pip(pip_binary, remote_packages, env):
     qisys.command.call(cmd, env=env)
 
 
-def configure_virtualenv(config, python_worktree, build_worktree=None,  # pylint: disable=too-many-branches
+def configure_virtualenv(config, python_worktree, build_worktree=None,
                          remote_packages=None, site_packages=True,
                          python_executable=None, env=None):
+    # pylint: disable=too-many-branches,too-many-locals
     """ Main entry point. Called by ``qipy bootstrap``
 
     :param: remote_packages List of third-party packages to add in the virtualenv

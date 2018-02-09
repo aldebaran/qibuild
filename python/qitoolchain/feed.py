@@ -121,7 +121,7 @@ class ToolchainFeedParser(object):
                 self.packages.append(qitoolchain.qipackage.from_xml(package_tree))
                 self._versions[name] = version
 
-    def parse(self, feed, branch=None, name=None, first_pass=True):
+    def parse(self, feed, branch=None, name=None, first_pass=True):  # pylint: disable=too-many-locals
         """ Recursively parse the feed, filling the self.packages
 
         """

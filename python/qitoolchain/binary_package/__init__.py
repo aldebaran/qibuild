@@ -104,7 +104,7 @@ def _fix_package_tree(root_dir):
     qisys.sh.rm(usr_dir)
 
 
-def convert_to_qibuild(package, package_metadata=None,
+def convert_to_qibuild(package, package_metadata=None,  # pylint: disable=too-many-locals
                        output_dir=None, output_name=None):
     """ Convert a binary package into a qiBuild package.
 

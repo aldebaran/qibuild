@@ -139,6 +139,7 @@ def setup_project(project):
 
 
 def push(project, branch, bypass_review=False, dry_run=False, reviewers=None, topic=None):
+    # pylint: disable=too-many-locals
     """ Push the changes for review.
 
     Unless review is False, in this case, simply update

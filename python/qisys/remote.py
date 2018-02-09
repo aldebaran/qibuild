@@ -110,7 +110,7 @@ def open_remote_location(location, timeout=10):
         return authenticated_urlopen(location)
 
 
-def download(url, output_dir, output_name=None,  # pylint: disable=redefined-outer-name,too-many-branches
+def download(url, output_dir, output_name=None,
              callback=callback, clobber=True,
              message=None):
     """ Download a file from an url, and save it
@@ -131,6 +131,7 @@ def download(url, output_dir, output_name=None,  # pylint: disable=redefined-out
     :return: the path to the downloaded file
 
     """
+    # pylint: disable=redefined-outer-name,too-many-branches,too-many-locals
     qisys.sh.mkdir(output_dir, recursive=True)
     if output_name:
         dest_name = os.path.join(output_dir, output_name)

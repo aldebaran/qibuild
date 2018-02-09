@@ -8,7 +8,7 @@ import qitoolchain.qipackage
 # pylint: disable=blacklisted-name
 
 
-def test_simple(qibuild_action, toolchains, tmpdir, record_messages):
+def test_simple(qibuild_action, toolchains, tmpdir, record_messages):  # pylint: disable=too-many-locals
     test_tc = toolchains.create("test")
     qibuild.config.add_build_config("test", toolchain="test")
     foo = tmpdir.mkdir("foo")

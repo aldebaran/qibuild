@@ -175,7 +175,7 @@ def _dump_arguments(name, args):
     ui.debug("[%s] arguments:\n%s" % (name, output))
 
 
-def root_command_main(name, parser, modules, args=None):
+def root_command_main(name, parser, modules, args=None):  # pylint: disable=too-many-locals
     """name : name of the main program
        parser : an instance of ArgumentParser class
        modules : list of Python modules

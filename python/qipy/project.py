@@ -31,7 +31,7 @@ class PythonProject(object):  # pylint: disable=too-many-instance-attributes
                 res.append(to_add)
         return res
 
-    def install(self, dest):
+    def install(self, dest):  # pylint: disable=too-many-locals
         """ Install scripts, modules and packages to the given destination """
         empty = (not self.setup_with_distutils) and \
             (not self.scripts) and \

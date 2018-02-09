@@ -9,7 +9,7 @@ from qisys import ui
 import qisrc.git
 
 
-def diff_worktree(git_worktree, git_projects, branch, cmd=None):
+def diff_worktree(git_worktree, git_projects, branch, cmd=None):  # pylint: disable=too-many-locals
     """ Run  `git <cmd> local_branch..remote_branch` for every project
 
     """

@@ -26,7 +26,7 @@ def configure_parser(parser):
                             "(Force CMAKE_BUILD_TYPE=RelWithDebInfo)")
 
 
-def do(args):
+def do(args):  # pylint: disable=too-many-locals
     """Main entry point"""
     standalone = args.standalone
     breakpad = args.breakpad

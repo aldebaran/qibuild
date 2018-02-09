@@ -54,7 +54,7 @@ def can_be_dumped(filename):
         return is_exe(filename)
 
 
-def dump_symbols_from_binary(binary, pool_dir):
+def dump_symbols_from_binary(binary, pool_dir):  # pylint: disable=too-many-locals
     """ Dump sympobls from the binary.
     Results can be found in
     <pool_dir>/<binary name>/<id>/<binary name>.sym
