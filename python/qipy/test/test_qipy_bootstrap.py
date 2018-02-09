@@ -4,6 +4,8 @@ import qisys.sh
 
 from qibuild.test.conftest import qibuild_action
 
+# pylint: disable=redefined-outer-name
+
 
 def test_simple(qipy_action):
     a_project = qipy_action.add_test_project("a_lib")

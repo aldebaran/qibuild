@@ -13,6 +13,8 @@ from qibuild.test.conftest import TestBuildWorkTree
 from qitoolchain.test.conftest import toolchains
 from qipy.test.conftest import qipy_action
 
+# pylint: disable=redefined-outer-name
+
 
 def test_read_deps(build_worktree):
     build_worktree.create_project("world")

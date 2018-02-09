@@ -15,6 +15,8 @@ import qitoolchain.feed
 from qisrc.test.conftest import svn_server
 from qisrc.test.conftest import git_server
 
+# pylint: disable=redefined-outer-name
+
 
 def test_persistent(toolchain_db):
     foo_package = qitoolchain.qipackage.QiPackage("foo", version="1.3")

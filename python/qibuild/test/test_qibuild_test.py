@@ -12,6 +12,8 @@ import qibuild.worktree
 
 from qitest.test.conftest import qitest_action
 
+# pylint: disable=redefined-outer-name
+
 
 def test_various_outcomes(qibuild_action, record_messages):
     qibuild_action.add_test_project("testme")

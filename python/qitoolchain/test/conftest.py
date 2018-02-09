@@ -13,6 +13,8 @@ import qitoolchain.qipackage
 import qitoolchain.database
 import qitoolchain.toolchain
 
+# pylint: disable=redefined-outer-name
+
 
 class Toolchains(object):
     """ A class to help qitoolchain testing """

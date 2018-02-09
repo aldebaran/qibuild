@@ -10,6 +10,8 @@ from qisrc.test.conftest import git_server
 import qitoolchain.qipackage
 from qitoolchain.test.conftest import QiToolchainAction
 
+# pylint: disable=redefined-outer-name
+
 
 def test_simple(qitoolchain_action):
     foo_tc = qitoolchain_action("create", "foo")

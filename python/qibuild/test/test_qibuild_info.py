@@ -4,6 +4,8 @@
 
 from qisrc.test.conftest import git_server, qisrc_action
 
+# pylint: disable=redefined-outer-name
+
 
 def test_info(qibuild_action, qisrc_action, git_server, record_messages):
     git_server.create_repo("foo.git")

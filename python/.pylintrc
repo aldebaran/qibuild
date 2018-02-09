@@ -130,7 +130,11 @@ disable=print-statement,
         # custom disable warnings
         missing-docstring,
         broad-except,
+        # ignore redefined-outer-name pylint warning due to py.test fixtures design
+        # check https://github.com/PyCQA/pylint/issues/1535 some times to see if feature to restrict ignores from regex is developed
+        # redefined-outer-name,  # set loccaly in each test files to beginning with due to real bad practice outside the tests: activate it globally if too harsh to maintain
         invalid-name  # regex seems to be buggy
+
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

@@ -6,6 +6,8 @@ import qitoolchain.qipackage
 
 from qisrc.test.conftest import git_server
 
+# pylint: disable=redefined-outer-name
+
 
 def test_update_local_ctc(qitoolchain_action, tmpdir):
     ctc_path = tmpdir.join("ctc").ensure(dir=True)

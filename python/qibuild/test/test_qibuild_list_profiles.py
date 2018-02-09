@@ -7,6 +7,8 @@ import qibuild.profile
 from qibuild.test.conftest import TestBuildWorkTree
 from qisrc.test.conftest import qisrc_action, git_server
 
+# pylint: disable=redefined-outer-name
+
 
 def test_list_profiles(qibuild_action, qisrc_action, git_server, record_messages):
     git_server.add_build_profile("foo", [("WITH_FOO", "ON")])

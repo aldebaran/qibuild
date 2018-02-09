@@ -14,6 +14,7 @@ from qisys import ui
 import qisys.command
 import qisys.parsers
 import qisys.sh
+import qibuild
 import qibuild.cmake
 import qibuild.build
 import qibuild.breakpad
@@ -250,7 +251,6 @@ endif()
             custom_cmake_code=custom_cmake_code
         )
 
-        import qibuild
         qibuild_python = os.path.join(qibuild.__file__, "..", "..")
         qibuild_python = os.path.abspath(qibuild_python)
         qibuild_python = qisys.sh.to_posix_path(qibuild_python)

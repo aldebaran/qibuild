@@ -21,6 +21,8 @@ import qisys.sh
 
 import qibuild.config
 
+# pylint: disable=redefined-outer-name
+
 
 def callback(total, done):
     """ Called during download """
@@ -109,7 +111,7 @@ def open_remote_location(location, timeout=10):
         return authenticated_urlopen(location)
 
 
-def download(url, output_dir, output_name=None,
+def download(url, output_dir, output_name=None,  # pylint: disable=redefined-outer-name
              callback=callback, clobber=True,
              message=None):
     """ Download a file from an url, and save it

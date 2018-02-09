@@ -9,6 +9,8 @@ from qibuild.test.conftest import TestBuildWorkTree
 
 from qisrc.test.conftest import qisrc_action, git_server
 
+# pylint: disable=redefined-outer-name
+
 
 def test_read_build_profiles(tmpdir):
     qibuild_xml = tmpdir.join("qibuild.xml")

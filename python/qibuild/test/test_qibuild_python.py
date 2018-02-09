@@ -14,6 +14,8 @@ import qisys.sh
 from qipy.test.conftest import qipy_action
 from qitest.test.conftest import qitest_action
 
+# pylint: disable=redefined-outer-name
+
 
 def test_finding_qi_python_modules(qipy_action, qibuild_action, qitest_action):
     qipy_action.add_test_project("foomodules")

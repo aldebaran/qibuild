@@ -11,6 +11,8 @@ from qitoolchain.test.conftest import *
 
 import qibuild.worktree
 
+# pylint: disable=redefined-outer-name
+
 
 class TestBuildWorkTree(qibuild.worktree.BuildWorkTree):
     """ A subclass of qisrc.worktree.WorkTree that

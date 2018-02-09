@@ -7,6 +7,9 @@ from qitoolchain.feed import *
 
 from qisrc.test.conftest import git_server
 
+# pylint: disable=redefined-outer-name
+
+
 #
 # Commons variables
 #

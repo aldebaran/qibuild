@@ -16,6 +16,8 @@ import qisys.script
 import qisys.interact
 import qisys.worktree
 
+# pylint: disable=redefined-outer-name
+
 
 class TestNamespace(object):
     """ A class that behaves like a argparse.Namespace

@@ -9,6 +9,8 @@ from qisrc.test.conftest import git_server
 from qisys import ui
 import qitoolchain.toolchain
 
+# pylint: disable=redefined-outer-name
+
 
 def get_tc_file_contents(tc):
     """ get the contents of the toolchain file of a toolchain

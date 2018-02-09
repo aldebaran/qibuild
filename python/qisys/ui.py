@@ -107,10 +107,10 @@ def configure_logging(args):
 
 
 def config_title(fp):
-    config_title = CONFIG["title"]
-    if config_title.lower() == "never":
+    _config_title = CONFIG["title"]
+    if _config_title.lower() == "never":
         return False
-    if config_title.lower() == "always":
+    if _config_title.lower() == "always":
         return True
     if os.name == 'nt':
         return fp.isatty() and _console is not None

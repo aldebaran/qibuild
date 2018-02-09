@@ -9,6 +9,8 @@ import qisys.qixml
 
 import qidoc.worktree
 
+# pylint: disable=redefined-outer-name
+
 
 class TestDocWorkTree(qidoc.worktree.DocWorkTree):
     """ A subclass of DocWorkTree that can create doc projects """

@@ -8,6 +8,8 @@ import qitoolchain.svn_package
 
 from qisrc.test.conftest import svn_server
 
+# pylint: disable=redefined-outer-name
+
 
 def test_svn_update(svn_server, feed, toolchains):
     boost_url = svn_server.create_repo("boost")

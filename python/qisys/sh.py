@@ -90,9 +90,9 @@ def username():
         pw_info = pwd.getpwuid(uid)
         if pw_info:
             return pw_info.pw_name
-    username = os.environ.get("USERNAME")
-    if username:
-        return username
+    _username = os.environ.get("USERNAME")
+    if _username:
+        return _username
 
 
 def mkdir(dest_dir, recursive=False):

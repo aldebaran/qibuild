@@ -5,6 +5,8 @@
 from qisys.test.conftest import *
 import qipy.worktree
 
+# pylint: disable=redefined-outer-name
+
 
 class QiPyAction(TestAction):
     def __init__(self):

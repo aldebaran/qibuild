@@ -8,6 +8,8 @@ from qibuild.test.conftest import build_worktree
 
 import qitoolchain.parsers
 
+# pylint: disable=redefined-outer-name
+
 
 def test_using_dash_c(toolchains, args):
     foo_tc = toolchains.create("foo")

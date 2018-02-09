@@ -8,6 +8,8 @@ import qisrc.git
 import qisrc.worktree
 import qisrc.manifest
 
+# pylint: disable=redefined-outer-name
+
 
 class TestGitWorkTree(qisrc.worktree.GitWorkTree):
     """ A subclass of qisrc.worktree.WorkTree that

@@ -9,6 +9,7 @@ import qibuild.find
 from qisys.test.conftest import TestAction
 
 # pylint: disable-msg=E1103
+# pylint: disable=redefined-outer-name
 
 
 @pytest.fixture

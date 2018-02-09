@@ -9,6 +9,8 @@ import qitoolchain.toolchain
 
 from qisrc.test.conftest import svn_server
 
+# pylint: disable=redefined-outer-name
+
 
 def test_simple(qitoolchain_action, svn_server, feed, record_messages):
     toolchain = qitoolchain.toolchain.Toolchain("foo")
