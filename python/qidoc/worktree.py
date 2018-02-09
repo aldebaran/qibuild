@@ -142,7 +142,7 @@ def _new_doc_project_2(doc_worktree, project):
     return _new_doc_project(doc_worktree, project, doc_elem, doc_type)
 
 
-def _new_doc_project(doc_worktree, project, xml_elem, doc_type):
+def _new_doc_project(doc_worktree, project, xml_elem, doc_type):  # pylint: disable=too-many-branches
     qiproject_xml = project.qiproject_xml
     if doc_type == "template":
         return TemplateProject(doc_worktree, project)

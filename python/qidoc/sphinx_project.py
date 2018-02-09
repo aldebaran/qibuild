@@ -147,7 +147,7 @@ class SphinxProject(qidoc.project.DocProject):
         res += '\nextensions.append("%s")' % extension_name
         return res
 
-    def build(self, build_type=None, language=None,  # pylint: disable=arguments-differ
+    def build(self, build_type=None, language=None,  # pylint: disable=arguments-differ,too-many-branches
               spellcheck=False, werror=False, pdb=False):
         """ Run sphinx.main() with the correct arguments """
         try:

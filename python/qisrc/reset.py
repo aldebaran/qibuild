@@ -8,7 +8,7 @@ from qisys import ui
 import qisrc.git
 
 
-def clever_reset_ref(git_project, ref, raises=True):  # pylint: disable=too-many-return-statements
+def clever_reset_ref(git_project, ref, raises=True):  # pylint: disable=too-many-return-statements,too-many-branches
     """ Resets only if needed, fetches only if needed """
     try:
         remote_name = git_project.default_remote.name

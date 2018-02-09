@@ -89,7 +89,7 @@ def name_from_cmakelists(cmakelists):
     return res
 
 
-def fix_root_cmake(cmakelists, project_name, dry_run=True):
+def fix_root_cmake(cmakelists, project_name, dry_run=True):  # pylint: disable=too-many-branches
     """ Fix the root CMakeLists.txt file
 
     If not found, create a new one

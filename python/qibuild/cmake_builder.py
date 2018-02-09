@@ -273,6 +273,7 @@ Or configure the project with no config
 
     @need_configure
     def deploy(self, url, split_debug=False, with_tests=False, install_tc_packages=True):
+        # pylint: disable=too-many-branches
         """ Deploy the project and the packages it depends to a remote url """
         to_deploy = list()
         dep_projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)

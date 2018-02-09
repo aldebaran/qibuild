@@ -8,7 +8,7 @@
 import re
 
 
-def compare(a_str, b_str):
+def compare(a_str, b_str):  # pylint: disable=too-many-branches
     """ Compare two versions
 
     >>> compare("1.2.3", "1.2.3")

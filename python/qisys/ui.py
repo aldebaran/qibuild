@@ -166,7 +166,7 @@ def _update_title_windows(mystr):
         _console.title(txt=mystr)
 
 
-def _msg(*tokens, **kwargs):
+def _msg(*tokens, **kwargs):  # pylint: disable=too-many-branches
     """ Helper method for error, warning, info, debug
 
     """
@@ -181,8 +181,8 @@ def _msg(*tokens, **kwargs):
     if CONFIG["timestamp"]:
         now = datetime.datetime.now()
         res.append(now.strftime("[%Y-%m-%d %H:%M:%S] "))
+    should_add_sep = True
     for i, token in enumerate(tokens):
-        should_add_sep = True
         if isinstance(token, _Color):
             if with_color:
                 res.append(token.code)

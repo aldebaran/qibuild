@@ -137,6 +137,7 @@ Please set only one of these two options to 'True'
 
 # pylint: disable-msg=R0914
 # pylint: disable=too-many-statements
+# pylint: disable=too-many-branches
 def _extract_zip(archive, directory, quiet, verbose, strict_mode=True):
     """Extract a zip archive into directory
 
@@ -308,7 +309,7 @@ Please set only one of these two options to 'True'
     return output
 
 
-def _extract_tar(archive, directory, algo, quiet, verbose, output_filter=None):
+def _extract_tar(archive, directory, algo, quiet, verbose, output_filter=None):  # pylint: disable=too-many-branches
     """Extract a .tar.* archive into directory
 
     :param archive:   path of the archive

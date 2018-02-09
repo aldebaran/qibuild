@@ -96,7 +96,7 @@ class DataBase(object):
                 res.append(self.packages[name])
         return res
 
-    def update(self, feed, branch=None, name=None):
+    def update(self, feed, branch=None, name=None):  # pylint: disable=too-many-branches
         """ Update a toolchain given a feed
 
         ``feed`` can be:

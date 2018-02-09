@@ -42,7 +42,7 @@ def _update_pip(pip_binary, remote_packages, env):
     qisys.command.call(cmd, env=env)
 
 
-def configure_virtualenv(config, python_worktree, build_worktree=None,
+def configure_virtualenv(config, python_worktree, build_worktree=None,  # pylint: disable=too-many-branches
                          remote_packages=None, site_packages=True,
                          python_executable=None, env=None):
     """ Main entry point. Called by ``qipy bootstrap``

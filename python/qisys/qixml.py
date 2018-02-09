@@ -247,7 +247,7 @@ class XMLParser(object):
                                                              attribute_name)
             raise Exception(mess)
 
-    def xml_elem(self, node_name=None):
+    def xml_elem(self, node_name=None):  # pylint: disable=too-many-branches
         """ Get the xml representation of the target
 
         Will set attributes of the node using attributes of the target,

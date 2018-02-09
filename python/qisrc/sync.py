@@ -292,7 +292,7 @@ Please run `qisrc init MANIFEST_URL`
         if not transaction.ok:
             raise Exception("Update failed\n" + transaction.output)
 
-    def _sync_repos(self, old_repos, new_repos, force=False):
+    def _sync_repos(self, old_repos, new_repos, force=False):  # pylint: disable=too-many-branches
         """ Sync the remote repo configurations with the git worktree """
         res = True
         ##
@@ -419,7 +419,7 @@ class LocalManifest(object):
 # Compute updates
 
 
-def compute_repo_diff(old_repos, new_repos):
+def compute_repo_diff(old_repos, new_repos):  # pylint: disable=too-many-branches
     """ Compute the work that needs to be done
 
     :returns: a tuple (to_add, to_move, to_rm, to_update)
@@ -434,10 +434,9 @@ def compute_repo_diff(old_repos, new_repos):
         for old_repo in old_repos:
             common_url = find_common_url(old_repo, new_repo)
             if common_url:
-                if new_repo.src == old_repo.src:
-                    pass  # nothing to do
-                else:
+                if new_repo.src != old_repo.src:
                     to_move.append((old_repo, new_repo.src))
+                # else: nothing to do
                 break
         else:
             # actually we are adding repos that
@@ -454,6 +453,7 @@ def compute_repo_diff(old_repos, new_repos):
                             to_update.append((old_repo, new_repo))
                     else:
                         to_update.append((old_repo, new_repo))
+                    # else: nothing to do
                 else:
                     to_update.append((old_repo, new_repo))
                 break
