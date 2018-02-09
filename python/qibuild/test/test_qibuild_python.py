@@ -11,8 +11,8 @@ import os
 
 import qisys.sh
 
-from qipy.test.conftest import qipy_action
-from qitest.test.conftest import qitest_action
+from qipy.test.conftest import qipy_action  # pylint: disable=unused-import
+from qitest.test.conftest import qitest_action  # pylint: disable=unused-import
 
 # pylint: disable=redefined-outer-name
 

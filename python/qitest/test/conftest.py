@@ -1,9 +1,8 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-import pytest
 
-from qibuild.test.conftest import *
+from qibuild.test.conftest import *  # pylint: disable=wildcard-import
 import qibuild.find
 
 from qisys.test.conftest import TestAction

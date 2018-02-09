@@ -5,7 +5,6 @@
 import os
 import json
 import glob
-import qisrc
 import qisys.ui as ui
 import qisys.command
 import qipy.venv

@@ -4,7 +4,6 @@
 
 import os
 import sys
-import subprocess
 import virtualenv
 
 from qisys import ui

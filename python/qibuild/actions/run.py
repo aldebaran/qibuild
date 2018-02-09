@@ -6,9 +6,6 @@
 
 """
 
-import sys
-
-from qisys import ui
 import qisys.parsers
 import qisys.command
 import qisys.envsetter

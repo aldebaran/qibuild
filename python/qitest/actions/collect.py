@@ -4,7 +4,6 @@
 """ Collect all python test in worktree """
 
 from qisys import ui
-import qisys.parsers
 import qipy.parsers
 import qibuild.parsers
 from qitest.collector import PythonTestCollector

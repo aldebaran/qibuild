@@ -2,12 +2,10 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
 
-import subprocess
-
-from qisys.test.conftest import *
+from qisys.test.conftest import *  # pylint: disable=wildcard-import
 import qisys.worktree
 
-from qitoolchain.test.conftest import *
+from qitoolchain.test.conftest import *  # pylint: disable=wildcard-import
 
 import qibuild.worktree
 

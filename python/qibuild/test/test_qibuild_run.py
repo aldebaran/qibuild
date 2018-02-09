@@ -4,13 +4,12 @@
 import os
 
 import mock
-import pytest
 
 import qibuild.find
 
-from qibuild.test.conftest import QiBuildAction
-from qibuild.actions import run
-from qitoolchain.test.conftest import QiToolchainAction
+from qibuild.test.conftest import QiBuildAction  # pylint: disable=unused-import
+from qibuild.actions import run  # pylint: disable=unused-import
+from qitoolchain.test.conftest import QiToolchainAction  # pylint: disable=unused-import
 
 
 def test_run_target(qibuild_action):

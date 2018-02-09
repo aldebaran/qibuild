@@ -2,10 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
 
-import qitest.project
-import qisys.command
-import qibuild.test_runner
-
 from qibuild.test_runner import get_cpu_list
 
 

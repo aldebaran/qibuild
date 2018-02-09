@@ -4,8 +4,6 @@
 """ Remove a complete virtualenv
 
 """
-import sys
-import os
 
 from qisys import ui
 import qisys.sh

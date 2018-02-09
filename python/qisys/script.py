@@ -15,9 +15,6 @@ import operator
 from qisys import ui
 
 
-import qisys.command
-
-
 class InvalidAction(Exception):
     """Just a custom exception """
 

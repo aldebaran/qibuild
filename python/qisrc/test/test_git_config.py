@@ -6,7 +6,6 @@ import os
 import mock
 
 from qisrc.git_config import Remote
-import qisrc.review
 
 
 def test_url_filepath():

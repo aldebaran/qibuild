@@ -4,7 +4,6 @@
 """ Run a python script from the virtualenv"""
 
 import os
-import subprocess
 import virtualenv
 
 from qisys import ui

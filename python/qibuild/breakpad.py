@@ -10,7 +10,6 @@ import stat
 from qisys import ui
 import qisys.archive
 import qisys.sh
-import qibuild.cmake
 
 
 def is_elf(filename):

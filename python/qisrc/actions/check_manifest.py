@@ -8,7 +8,6 @@ Useful to check everything is ok before pushing the manifest
 """
 import sys
 
-from qisys import ui
 import qisrc.parsers
 
 

@@ -4,7 +4,6 @@
 """ Display info about the current git worktree
 
 """
-import sys
 
 from qisys import ui
 import qisrc.parsers

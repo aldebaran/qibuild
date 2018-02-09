@@ -1,13 +1,11 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-import os
 
 import pytest
 
 import qisys.command
 import qibuild.find
-import qitoolchain.qipackage
 
 
 def test_running_from_build_dir(qibuild_action):

@@ -4,7 +4,7 @@
 
 import bs4
 
-from qisys.test.conftest import *
+from qisys.test.conftest import *  # pylint: disable=wildcard-import
 import qisys.qixml
 
 import qidoc.worktree

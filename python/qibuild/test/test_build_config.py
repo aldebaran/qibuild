@@ -5,7 +5,6 @@
 import os
 
 import qisys.sh
-from qisys.qixml import etree
 import qibuild.build_config
 import qibuild.config
 from qibuild.test.conftest import TestBuildWorkTree

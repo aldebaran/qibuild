@@ -3,8 +3,6 @@
 # found in the COPYING file.
 import os
 
-import pytest
-
 import qisrc.git
 from qisrc.test.conftest import TestGitWorkTree
 from qisrc.test.conftest import TestGit

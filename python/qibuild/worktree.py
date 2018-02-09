@@ -3,7 +3,6 @@
 # found in the COPYING file.
 import os
 import sys
-import difflib
 
 from qisys import ui
 import qisys.command

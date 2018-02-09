@@ -4,8 +4,6 @@
 
 """ Generate a binary package, ready to be used for a behavior """
 
-from qisys import ui
-import qisys.parsers
 import qipkg.parsers
 import qipkg.metapackage
 

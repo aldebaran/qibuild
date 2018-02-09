@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
 
-from qisrc.test.conftest import git_server, qisrc_action
+from qisrc.test.conftest import git_server, qisrc_action  # pylint: disable=unused-import
 
 # pylint: disable=redefined-outer-name
 

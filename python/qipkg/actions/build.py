@@ -4,8 +4,6 @@
 
 """ Build all the projects of the given pml file
 """
-
-import qisys.parsers
 import qibuild.parsers
 import qipkg.parsers
 

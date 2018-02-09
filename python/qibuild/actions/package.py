@@ -7,7 +7,6 @@
 import os
 import sys
 
-from qisys.qixml import etree
 from qisys import ui
 import qisys.archive
 import qisys.sh

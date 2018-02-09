@@ -10,8 +10,6 @@ import os
 import unittest
 from StringIO import StringIO
 
-import qisys
-import qisys.sh
 import qibuild
 import qibuild.config
 

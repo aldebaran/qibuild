@@ -12,7 +12,6 @@ import sys
 from qisys import ui
 import qisys
 import qibuild
-import qitoolchain
 
 
 def guess_cmake(qibuild_cfg):

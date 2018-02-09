@@ -4,9 +4,7 @@
 import os
 
 import qisrc.git
-from qisrc.test.conftest import svn_server
-from qisrc.test.conftest import git_server
-from qisys import ui
+from qisrc.test.conftest import git_server, svn_server  # pylint: disable=unused-import
 import qitoolchain.toolchain
 
 # pylint: disable=redefined-outer-name

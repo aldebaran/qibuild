@@ -12,11 +12,10 @@ import contextlib
 import subprocess
 import signal
 import threading
-import Queue
 
 from qisys import ui
-import qisys
-import qisys.envsetter
+import qisys.envsetter  # pylint: disable=unused-import
+
 
 # Cache for find_program()
 _FIND_PROGRAM_CACHE = dict()

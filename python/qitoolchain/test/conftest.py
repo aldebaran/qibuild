@@ -2,16 +2,14 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
 
-from qisys.test.conftest import *
+import tempfile
 
+import qibuild
+import qitoolchain
+
+from qisys.test.conftest import *  # pylint: disable=wildcard-import
 import qisys.qixml
 from qisys.qixml import etree
-import qibuild.config
-import qibuild.deps
-import qitoolchain
-import qitoolchain.qipackage
-import qitoolchain.database
-import qitoolchain.toolchain
 
 # pylint: disable=redefined-outer-name
 

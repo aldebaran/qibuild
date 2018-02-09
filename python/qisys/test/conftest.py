@@ -4,7 +4,6 @@
 
 import os
 import re
-import tempfile
 
 import py
 import pytest

@@ -5,7 +5,6 @@
 
 import os
 import py_compile
-import sys
 import re
 
 from qisys import ui

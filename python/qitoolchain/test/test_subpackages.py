@@ -1,5 +1,3 @@
-import os
-
 import qisys
 import qitoolchain.toolchain
 

@@ -5,20 +5,16 @@
 
 """
 
-
 import os
-import sys
-import hashlib
 import urlparse
 from xml.etree import ElementTree
 
-from qisys import ui
+import qisrc.git
 import qisys
 import qisys.archive
 import qisys.remote
 import qisys.version
-import qisrc.git
-import qibuild.config
+from qisys import ui
 import qitoolchain
 
 

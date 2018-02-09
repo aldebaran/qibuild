@@ -12,7 +12,6 @@ import os
 import ntpath
 import posixpath
 import operator
-import difflib
 
 import qisys.project
 import qisys.command

@@ -3,9 +3,7 @@
 # found in the COPYING file.
 """ List the tests"""
 
-import os
 import re
-import sys
 from qisys import ui
 
 import qisys.parsers

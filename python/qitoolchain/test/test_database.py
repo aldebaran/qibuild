@@ -4,7 +4,6 @@
 import os
 
 import mock
-import pytest
 
 import qisys.archive
 import qitoolchain.database
@@ -12,8 +11,7 @@ import qitoolchain.qipackage
 import qitoolchain.svn_package
 import qitoolchain.feed
 
-from qisrc.test.conftest import svn_server
-from qisrc.test.conftest import git_server
+from qisrc.test.conftest import git_server, svn_server  # pylint: disable=unused-import
 
 # pylint: disable=redefined-outer-name
 

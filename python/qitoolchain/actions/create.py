@@ -13,7 +13,6 @@ import sys
 
 from qisys import ui
 import qisys.parsers
-import qibuild.parsers
 import qitoolchain
 
 

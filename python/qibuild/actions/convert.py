@@ -15,8 +15,6 @@ from xml.etree import ElementTree as etree
 from qisys import ui
 import qisys.parsers
 
-import qibuild
-
 
 def guess_project_name(source_dir):
     """ Try to guess the project name

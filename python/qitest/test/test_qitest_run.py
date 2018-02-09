@@ -6,7 +6,6 @@ import sys
 import json
 
 import qisys.command
-import qibuild.find
 
 # allow the existing foo/bar/baz names
 # pylint: disable=blacklisted-name

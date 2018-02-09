@@ -3,17 +3,12 @@
 # found in the COPYING file.
 
 """ Generate a binary package, ready to be used for a behavior """
-import copy
-
-from qisys import ui
-import qisys.parsers
-import qipkg.builder
-import qipkg.metapackage
-import qipkg.metabuilder
 
 import qibuild.parsers
-import qipy.parsers
-import qilinguist.parsers
+import qipkg.builder
+import qipkg.metabuilder
+import qipkg.metapackage
+import qisys.parsers
 
 
 def pml_parser(parser):

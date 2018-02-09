@@ -7,7 +7,6 @@
 
 import os
 import sys
-import zipfile
 
 from qisys import ui
 import qisys.command

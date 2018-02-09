@@ -4,10 +4,6 @@
 
 import os
 
-import qisys.sh
-import qibuild.test
-import qibuild.find
-
 
 def test_perf(qibuild_action):
     proj = qibuild_action.add_test_project("perf")

@@ -9,7 +9,6 @@ downloading package or reading configs from URLs
 
 import os
 import re
-import sys
 import ftplib
 import urlparse
 import urllib2

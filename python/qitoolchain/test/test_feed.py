@@ -3,9 +3,9 @@
 # found in the COPYING file.
 import pytest
 
-from qitoolchain.feed import *
+from qitoolchain.feed import is_url, tree_from_feed, ToolchainFeedParser
 
-from qisrc.test.conftest import git_server
+from qisrc.test.conftest import git_server  # pylint: disable=unused-import
 
 # pylint: disable=redefined-outer-name
 

@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
 
-from qisys.test.conftest import *
+from qisys.test.conftest import *  # pylint: disable=wildcard-import
 import qipy.worktree
 
 # pylint: disable=redefined-outer-name

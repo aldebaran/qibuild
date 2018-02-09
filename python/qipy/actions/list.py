@@ -7,7 +7,6 @@ import operator
 
 from qisys import ui
 
-import qisys.parsers
 import qipy.parsers
 import qibuild.parsers
 

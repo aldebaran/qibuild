@@ -9,7 +9,6 @@ in the worktree
 """
 import sys
 
-from qisys import ui
 import qisrc.parsers
 
 

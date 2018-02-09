@@ -10,7 +10,6 @@ from xml.etree import ElementTree as etree
 
 from qisys import ui
 import qisys.qixml
-import qisrc.git
 
 
 class ProjectXML(qisys.qixml.XMLParser):

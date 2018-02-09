@@ -5,7 +5,7 @@
 import qibuild.profile
 
 from qibuild.test.conftest import TestBuildWorkTree
-from qisrc.test.conftest import qisrc_action, git_server
+from qisrc.test.conftest import qisrc_action, git_server  # pylint: disable=unused-import
 
 # pylint: disable=redefined-outer-name
 

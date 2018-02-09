@@ -10,7 +10,6 @@ from qisys import ui
 import qisys.worktree
 import qisys.parsers
 import qitoolchain
-import qibuild.parsers
 
 
 def configure_parser(parser):

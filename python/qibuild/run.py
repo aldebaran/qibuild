@@ -6,8 +6,6 @@
 
 """
 import os
-import sys
-import subprocess
 
 from qisys import ui
 import qisys.command

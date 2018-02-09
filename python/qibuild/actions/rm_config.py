@@ -4,7 +4,6 @@
 
 """Remove the given build config"""
 
-from qisys import ui
 import qisys.parsers
 import qibuild.worktree
 

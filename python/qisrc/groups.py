@@ -7,8 +7,6 @@ import xml.etree.ElementTree as etree
 
 import qisys.qixml
 
-from qisys import ui
-
 
 class Groups(object):
     def __init__(self):

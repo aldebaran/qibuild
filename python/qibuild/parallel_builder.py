@@ -7,7 +7,6 @@ import threading
 import sys
 import StringIO
 import traceback
-import time
 
 import qibuild.project
 

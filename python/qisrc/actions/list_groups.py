@@ -4,11 +4,8 @@
 """ List the available groups
 
 """
-import os
-import sys
 
 from qisys import ui
-import qisys.qixml
 import qisrc.parsers
 
 

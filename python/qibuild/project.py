@@ -6,7 +6,6 @@ import argparse
 import json
 import os
 import platform
-import re
 import sys
 from xml.etree import ElementTree as etree
 
@@ -25,7 +24,6 @@ import qibuild.dlls
 import qibuild.test_runner
 import qisrc.worktree
 import qisrc.git
-import qitoolchain.toolchain
 import qitest.conf
 import qitest.project
 

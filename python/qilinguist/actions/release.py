@@ -6,8 +6,6 @@
 
 """
 
-import os
-
 import qisys.parsers
 import qilinguist.parsers
 

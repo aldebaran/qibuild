@@ -5,10 +5,6 @@
 """ Launch automatic tests -- deprecated, use `qitest run` instead
 """
 
-import argparse
-import os
-import sys
-
 from qisys import ui
 import qisys.script
 import qisys.parsers

@@ -13,7 +13,6 @@ from qisys import ui
 import qisys.qixml
 import qisrc.git
 import qisrc.manifest
-import qibuild.profile
 
 
 class WorkTreeSyncer(object):

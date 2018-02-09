@@ -8,7 +8,6 @@ Useful when using a toolchain containing plugins
 
 """
 
-from qisys import ui
 import qibuild.parsers
 
 

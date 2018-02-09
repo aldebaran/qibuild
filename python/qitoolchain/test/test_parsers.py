@@ -4,7 +4,7 @@
 import pytest
 
 import qibuild.config
-from qibuild.test.conftest import build_worktree
+from qibuild.test.conftest import build_worktree  # pylint: disable=unused-import
 
 import qitoolchain.parsers
 

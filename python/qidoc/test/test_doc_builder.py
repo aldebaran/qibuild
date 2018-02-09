@@ -3,7 +3,6 @@
 # found in the COPYING file.
 import mock
 
-from qidoc.test.conftest import TestDocWorkTree
 from qidoc.builder import DocBuilder
 
 

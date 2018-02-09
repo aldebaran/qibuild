@@ -4,7 +4,6 @@
 
 """ Tools to deploy files to remote targets"""
 
-import urlparse
 import os
 
 from collections import OrderedDict

@@ -3,8 +3,6 @@
 # found in the COPYING file.
 import os
 
-import pytest
-
 import qisys.sh
 import qisrc.snapshot
 

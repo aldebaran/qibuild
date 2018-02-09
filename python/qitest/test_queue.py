@@ -3,7 +3,6 @@
 # found in the COPYING file.
 
 import os
-import contextlib
 import collections
 import datetime
 import json

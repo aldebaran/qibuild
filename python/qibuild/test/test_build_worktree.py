@@ -10,8 +10,8 @@ import pytest
 import qibuild.config
 
 from qibuild.test.conftest import TestBuildWorkTree
-from qitoolchain.test.conftest import toolchains
-from qipy.test.conftest import qipy_action
+from qitoolchain.test.conftest import toolchains  # pylint: disable=unused-import
+from qipy.test.conftest import qipy_action  # pylint: disable=unused-import
 
 # pylint: disable=redefined-outer-name
 

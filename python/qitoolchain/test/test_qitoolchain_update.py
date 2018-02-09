@@ -4,7 +4,7 @@
 
 import qitoolchain.qipackage
 
-from qisrc.test.conftest import git_server
+from qisrc.test.conftest import git_server  # pylint: disable=unused-import
 
 # pylint: disable=redefined-outer-name
 

@@ -5,8 +5,6 @@
 """ Collection of parser fonctions for qibuild actions
 """
 
-import os
-
 from qisys import ui
 import qisys.parsers
 import qibuild.worktree

@@ -3,7 +3,6 @@
 # found in the COPYING file.
 
 import os
-import py
 import pytest
 import mock
 

@@ -7,7 +7,6 @@ import qisys.sh
 
 import qidoc.convert
 from qidoc.test.conftest import TestDocWorkTree
-from qibuild.test.conftest import TestBuildWorkTree
 
 
 def test_convert_handle_src(worktree):

@@ -126,10 +126,10 @@ def config_title(fp):
 
 
 def config_color(fp):
-    config_color = CONFIG["color"]
-    if config_color.lower() == "never":
+    _config_color = CONFIG["color"]
+    if _config_color.lower() == "never":
         return False
-    if config_color.lower() == "always":
+    if _config_color.lower() == "always":
         return True
 
     # else: auto

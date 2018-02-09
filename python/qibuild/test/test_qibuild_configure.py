@@ -15,7 +15,7 @@ from qibuild.test.conftest import TestBuildWorkTree
 import qisrc.git
 import qitoolchain
 
-from qipy.test.conftest import qipy_action
+from qipy.test.conftest import qipy_action  # pylint: disable=unused-import
 
 # allow the existing foo/bar/baz names
 # pylint: disable=blacklisted-name

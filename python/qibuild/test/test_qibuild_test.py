@@ -10,7 +10,7 @@ import xml.etree.ElementTree as etree
 import qisys.worktree
 import qibuild.worktree
 
-from qitest.test.conftest import qitest_action
+from qitest.test.conftest import qitest_action  # pylint: disable=unused-import
 
 # pylint: disable=redefined-outer-name
 

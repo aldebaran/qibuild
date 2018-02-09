@@ -7,7 +7,6 @@ It will be usable both with qidoc2 and qidoc3 by default
 
 """
 
-from qisys import ui
 import qisys.parsers
 
 import qidoc.convert
