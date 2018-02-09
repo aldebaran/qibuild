@@ -136,6 +136,7 @@ disable=print-statement,
         fixme,
         too-few-public-methods,
         inconsistent-return-statements,  # remove it when dealing with #13
+        duplicate-code,  # remove it when dealing with #14
         invalid-name  # regex seems to be buggy
 
 
