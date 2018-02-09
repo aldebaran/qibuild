@@ -32,9 +32,9 @@ class BuildJob(object):
     def add_dependency(self, job):
         with self.lock:
             self.deps.append(job)
-            job._add_back_dependency(self)
+            job.add_back_dependency(self)
 
-    def _add_back_dependency(self, job):
+    def add_back_dependency(self, job):
         self.back_deps.append(job)
 
     def execute(self, *args, **kwargs):

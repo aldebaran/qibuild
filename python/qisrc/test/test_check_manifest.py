@@ -48,7 +48,7 @@ def test_check_configures_review(qisrc_action, git_server):
     qisrc_action("init", manifest_url)
 
     git_server.create_repo("foo.git")
-    git_server._create_repo("foo.git", review=True)
+    git_server._create_repo("foo.git", review=True)  # pylint: disable=protected-access
 
     # Create a foo repo, but without code review set
     foo_proj = qisrc_action.create_git_project("foo")

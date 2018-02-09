@@ -120,21 +120,21 @@ def record_messages(request):
 class MessageRecorder(object):
     def __init__(self):
         ui.CONFIG["record"] = True
-        ui._MESSAGES = list()
+        ui._MESSAGES = list()  # pylint: disable=protected-access
 
     @staticmethod
     def stop():
         ui.CONFIG["record"] = False
-        ui._MESSAGES = list()
+        ui._MESSAGES = list()  # pylint: disable=protected-access
 
     @staticmethod
     def reset():
-        ui._MESSAGES = list()
+        ui._MESSAGES = list()  # pylint: disable=protected-access
 
     @staticmethod
     def find(pattern):
         regexp = re.compile(pattern)
-        for message in ui._MESSAGES:
+        for message in ui._MESSAGES:  # pylint: disable=protected-access
             if re.search(regexp, message):
                 return message
 

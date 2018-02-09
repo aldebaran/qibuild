@@ -294,7 +294,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         res.out = re.sub('\x1b[^m]*m', "", res.out)
 
         message_as_string = " ".join(str(x) for x in res.message
-                                     if not isinstance(x, ui._Color))
+                                     if not isinstance(x, ui._Color))  # pylint: disable=protected-access
         # Windows output is most likely code page 850
         if sys.platform.startswith("win"):
             encoding = "ascii"

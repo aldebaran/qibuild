@@ -265,7 +265,7 @@ def from_xml(element):
     res.version = element.get("version")
     res.path = element.get("path")
     res.directory = element.get("directory")
-    res._post_add = element.get("post-add")
+    res._post_add = element.get("post-add")  # pylint: disable=protected-access
     res.subpkg = element.get("subpkg")
     if res.url and res.directory:
         mess = """\

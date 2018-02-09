@@ -18,7 +18,7 @@ def configure_parser(parser):
 
 def do(args):
     git_worktree = qisrc.parsers.get_git_worktree(args)
-    local_groups = git_worktree._syncer.manifest.groups
+    local_groups = git_worktree.syncer.manifest.groups
 
     all_groups = list()
     groups_elem = qisrc.groups.get_root(git_worktree)

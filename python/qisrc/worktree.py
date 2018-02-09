@@ -39,25 +39,25 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         worktree.register(self)
         self.git_projects = list()
         self.load_git_projects()
-        self._syncer = qisrc.sync.WorkTreeSyncer(self)
+        self.syncer = qisrc.sync.WorkTreeSyncer(self)
 
     def configure_manifest(self, manifest_url, groups=None, all_repos=False,
                            branch="master", ref=None, review=None, force=False):
         """ Add a new manifest to this worktree """
-        return self._syncer.configure_manifest(manifest_url, groups=groups,
-                                               branch=branch, ref=ref, review=review,
-                                               force=force, all_repos=all_repos)
+        return self.syncer.configure_manifest(manifest_url, groups=groups,
+                                              branch=branch, ref=ref, review=review,
+                                              force=force, all_repos=all_repos)
 
     def configure_projects(self, projects):
-        self._syncer.configure_projects(projects)
+        self.syncer.configure_projects(projects)
 
     def check_manifest(self, xml_path):
         """ Run a sync using just the xml file given as parameter """
-        return self._syncer.sync_from_manifest_file(xml_path)
+        return self.syncer.sync_from_manifest_file(xml_path)
 
     def sync(self):
         """ Delegates to WorkTreeSyncer """
-        return self._syncer.sync()
+        return self.syncer.sync()
 
     def load_git_projects(self):
         """ Build a list of git projects using the
@@ -133,7 +133,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
 
     @property
     def manifest(self):
-        return self._syncer.manifest
+        return self.syncer.manifest
 
     def snapshot(self):
         """ Return a :py:class`.Snapshot` of the current worktree state
@@ -141,7 +141,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         """
         snapshot = qisrc.snapshot.Snapshot()
         snapshot.manifest = self.manifest
-        git = qisrc.git.Git(self._syncer.manifest_repo)
+        git = qisrc.git.Git(self.syncer.manifest_repo)
         rc, out = git.call("rev-parse", "HEAD", raises=False)
         snapshot.manifest.ref = out
         for git_project in self.git_projects:
@@ -258,7 +258,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         """
         ui.info(ui.green, ":: Checkout projects ...")
         errors = list()
-        manifest_xml = os.path.join(self._syncer.manifest_repo, "manifest.xml")
+        manifest_xml = os.path.join(self.syncer.manifest_repo, "manifest.xml")
         manifest = qisrc.manifest.Manifest(manifest_xml)
         to_checkout = list()
         for project in self.git_projects:
@@ -302,10 +302,10 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         """
         res = dict()
         ref = "origin/" + branch
-        manifest = qisrc.manifest.from_git_repo(self._syncer.manifest_repo, ref)
+        manifest = qisrc.manifest.from_git_repo(self.syncer.manifest_repo, ref)
         if not manifest:
             raise Exception("Could not read manifest on %s" % ref)
-        groups = self._syncer.manifest.groups
+        groups = self.syncer.manifest.groups
         repos = manifest.get_repos(groups=groups)
         for repo in repos:
             project = self.find_repo(repo)
