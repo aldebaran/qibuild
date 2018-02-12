@@ -446,17 +446,15 @@ def compute_repo_diff(old_repos, new_repos):  # pylint: disable=too-many-branche
 
     for old_repo in old_repos:
         for new_repo in new_repos:
-            if old_repo.src == new_repo.src:
-                if new_repo.remotes == old_repo.remotes:
-                    if new_repo.default_branch == old_repo.default_branch:
-                        if new_repo.fixed_ref != old_repo.fixed_ref:
-                            to_update.append((old_repo, new_repo))
-                    else:
-                        to_update.append((old_repo, new_repo))
-                    # else: nothing to do
-                else:
-                    to_update.append((old_repo, new_repo))
-                break
+            if old_repo.src != new_repo.src:
+                continue
+
+            if new_repo.remotes != old_repo.remotes\
+                    or new_repo.default_branch != old_repo.default_branch\
+                    or new_repo.fixed_ref != old_repo.fixed_ref:
+                to_update.append((old_repo, new_repo))
+
+            break
         else:
             if old_repo not in [x[0] for x in to_move]:
                 to_rm.append(old_repo)
