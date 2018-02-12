@@ -373,3 +373,170 @@ def test_removing_group_keep_warning_user(qisrc_action, git_server,
     record_messages.reset()
     qisrc_action("sync")
     assert record_messages.find("Group foo not found in the manifest")
+
+
+def test_switching_to_fixed_ref_happy(qisrc_action, git_server, record_messages):
+    git_server.create_repo("foo.git")
+    git_server.push_file("foo.git", "a.txt", "a")
+    git_server.push_tag("foo.git", "v0.1")
+    git_server.push_file("foo.git", "b.txt", "b")
+    qisrc_action("init", git_server.manifest_url)
+    git_server.set_fixed_ref("foo.git", "v0.1")
+    qisrc_action("sync")
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    git = qisrc.git.Git(foo_proj.path)
+    _, sha1 = git.call("rev-parse", "HEAD", raises=False)
+    expected = git.get_ref_sha1("refs/tags/v0.1")
+    assert sha1 == expected
+    # qisrc.reset.clever_reset_ref should do nothing, so there should be
+    # no output
+    record_messages.reset()
+    qisrc_action("sync")
+    assert not record_messages.find("HEAD is now at")
+
+
+def test_switching_to_fixed_ref_long_name_happy(qisrc_action, git_server, record_messages):
+    git_server.create_repo("foo.git")
+    git_server.push_file("foo.git", "a.txt", "a")
+    git_server.push_tag("foo.git", "v0.1")
+    git_server.push_file("foo.git", "b.txt", "b")
+    qisrc_action("init", git_server.manifest_url)
+    git_server.set_fixed_ref("foo.git", "refs/tags/v0.1")
+    qisrc_action("sync")
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    git = qisrc.git.Git(foo_proj.path)
+    _, sha1 = git.call("rev-parse", "HEAD", raises=False)
+    expected = git.get_ref_sha1("refs/tags/v0.1")
+    assert sha1 == expected
+    # qisrc.reset.clever_reset_ref should do nothing, so there should be
+    # no output
+    record_messages.reset()
+    qisrc_action("sync")
+    assert not record_messages.find("HEAD is now at")
+
+
+def test_fixed_ref_local_changes(qisrc_action, git_server, record_messages):
+    git_server.create_repo("foo.git")
+    git_server.push_file("foo.git", "a.txt", "a")
+    qisrc_action("init", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    git = TestGit(foo_proj.path)
+    git.write_file("a.txt", "unstaged changes")
+    git_server.push_tag("foo.git", "v.01")
+    record_messages.reset()
+    rc = qisrc_action("sync", retcode=True)
+    assert rc != 0
+    assert record_messages.find("unstaged changes")
+
+
+def test_fixed_ref_no_such_ref(qisrc_action, git_server, record_messages):
+    git_server.create_repo("foo.git")
+    qisrc_action("init", git_server.manifest_url)
+    git_server.set_fixed_ref("foo.git", "v0.1")
+    rc = qisrc_action("sync", retcode=True)
+    assert rc != 0
+    assert record_messages.find("Could not parse v0.1 as a valid ref")
+
+
+def test_switching_to_new_fixed_ref(qisrc_action, git_server, record_messages):
+    git_server.create_repo("foo.git")
+    git_server.push_file("foo.git", "a.txt", "a")
+    git_server.push_tag("foo.git", "v0.1")
+    git_server.push_file("foo.git", "b.txt", "b")
+    git_server.push_tag("foo.git", "v0.2")
+    git_server.push_file("foo.git", "c.txt", "c")
+    git_server.set_fixed_ref("foo.git", "v0.1")
+    qisrc_action("init", git_server.manifest_url)
+    git_server.set_fixed_ref("foo.git", "v0.2")
+    qisrc_action("sync", retcode=True)
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    git = qisrc.git.Git(foo_proj.path)
+    _, sha1 = git.call("rev-parse", "HEAD", raises=False)
+    expected = git.get_ref_sha1("refs/tags/v0.2")
+    assert sha1 == expected
+    _, msg = git.branch("--no-color", raises=False)
+    assert not msg.find('2') == -1
+
+
+def test_switching_to_new_fixed_ref_local_changes(qisrc_action, git_server, record_messages):
+    git_server.create_repo("foo.git")
+    git_server.push_file("foo.git", "a.txt", "a")
+    git_server.push_tag("foo.git", "v0.1")
+    git_server.push_file("foo.git", "b.txt", "b")
+    git_server.push_tag("foo.git", "v0.2")
+    git_server.push_file("foo.git", "c.txt", "c")
+    git_server.set_fixed_ref("foo.git", "v0.1")
+    qisrc_action("init", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    git = TestGit(foo_proj.path)
+    git.write_file("a.txt", "unstaged changes")
+    git_server.set_fixed_ref("foo.git", "v0.2")
+    record_messages.reset()
+    rc = qisrc_action("sync", retcode=True)
+    # ERROR message must be displayed to warn user
+    assert rc != 0
+    assert record_messages.find("unstaged changes")
+    _, sha1 = git.call("rev-parse", "HEAD", raises=False)
+    expected = git.get_ref_sha1("refs/tags/v0.1")
+    # git repo unchanged
+    assert sha1 == expected
+    git.call("reset", "--hard")
+    rc = qisrc_action("sync", retcode=True)
+    _, sha1 = git.call("rev-parse", "HEAD", raises=False)
+    expected = git.get_ref_sha1("refs/tags/v0.2")
+    # if modification is revert sync must be successful
+    assert rc != 0
+    assert sha1 == expected
+
+
+def test_switching_from_fixed_ref_to_branch(qisrc_action, git_server, record_messages):
+    git_server.create_repo("foo.git")
+    git_server.push_file("foo.git", "a.txt", "a")
+    git_server.push_tag("foo.git", "v0.1")
+    git_server.push_file("foo.git", "b.txt", "b")
+    qisrc_action("init", git_server.manifest_url)
+    git_server.set_fixed_ref("foo.git", "v0.1")
+    qisrc_action("sync")
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    git = qisrc.git.Git(foo_proj.path)
+    _, sha1 = git.call("rev-parse", "HEAD", raises=False)
+    expected = git.get_ref_sha1("refs/tags/v0.1")
+    assert sha1 == expected
+    git_server.set_branch("foo.git", "master")
+    qisrc_action("sync")
+    assert git.get_current_branch() == "master"
+
+
+def test_switching_from_fixed_ref_to_branch_local_changes(qisrc_action, git_server, record_messages):
+    git_server.create_repo("foo.git")
+    git_server.push_file("foo.git", "a.txt", "a")
+    git_server.push_tag("foo.git", "v0.1")
+    git_server.push_file("foo.git", "b.txt", "b")
+    git_server.push_tag("foo.git", "v0.2")
+    git_server.push_file("foo.git", "c.txt", "c")
+    git_server.set_fixed_ref("foo.git", "v0.1")
+    qisrc_action("init", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    git = TestGit(foo_proj.path)
+    git.write_file("a.txt", "unstaged changes")
+    git_server.set_branch("foo.git", "master")
+    record_messages.reset()
+    rc = qisrc_action("sync", retcode=True)
+    # ERROR message must be displayed to warn user
+    assert rc != 0
+    assert record_messages.find("unstaged changes")
+    _, sha1 = git.call("rev-parse", "HEAD", raises=False)
+    expected = git.get_ref_sha1("refs/tags/v0.1")
+    # git repo unchanged
+    assert sha1 == expected
+    git.call("reset", "--hard")
+    qisrc_action("sync", retcode=True)
+    # if modification is revert sync must be successful
+    assert git.get_current_branch() == "master"

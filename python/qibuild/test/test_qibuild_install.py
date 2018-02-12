@@ -171,7 +171,10 @@ def test_install_returns(qibuild_action, tmpdir):
                               'share/recurse/a_dir/a_file',
                               'share/sub/bar.dat',
                               'share/qi/path.conf',
-                              'lib/python2.7/site-packages/py/foo.py'}
+                              'lib/python2.7/site-packages/py/foo.py',
+                              'lib/python2.7/site-packages/sub/py/foo.py',
+                              'lib/python2.7/site-packages/sub_swig/_foo.so',
+                              'lib/python2.7/site-packages/sub_swig/foo.py'}
 
 
 def test_install_test_libs(qibuild_action, tmpdir):

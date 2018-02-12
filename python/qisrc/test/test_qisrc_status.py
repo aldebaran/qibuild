@@ -59,3 +59,29 @@ def test_not_on_any_branch(qisrc_action, record_messages):
     foo_git.checkout(out)
     qisrc_action("status")
     assert record_messages.find("not on any branch")
+
+
+def test_fixed_ref_up_to_date(qisrc_action, git_server, record_messages):
+    git_server.create_repo("foo.git")
+    git_server.push_tag("foo.git", "v0.1")
+    git_server.set_fixed_ref("foo.git", "v0.1")
+    qisrc_action("init", git_server.manifest_url)
+    qisrc_action("status")
+    assert record_messages.find("foo fixed ref v0.1")
+    record_messages.reset()
+    qisrc_action("status", "--short")
+    assert not record_messages.find("fixed ref")
+
+
+def test_fixed_ref_behind(qisrc_action, git_server, record_messages):
+    git_server.create_repo("foo.git")
+    git_server.push_file("foo.git", "a.txt", "a")
+    git_server.push_tag("foo.git", "v0.1")
+    git_server.set_fixed_ref("foo.git", "v0.1")
+    qisrc_action("init", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    git = qisrc.git.Git(foo_proj.path)
+    git.call("reset", "--hard", "HEAD~1")
+    qisrc_action("status")
+    assert record_messages.find("fixed ref v0.1 -1")

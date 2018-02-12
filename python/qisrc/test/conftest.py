@@ -227,11 +227,27 @@ class TestGitServer(object):
         self.push_manifest("%s on %s" % (repo.project, new_branch))
         self.manifest.load()
 
+    def set_fixed_ref(self, project, ref):
+        repo = self.get_repo(project)
+        repo.fixed_ref = ref
+        repo.default_branch = None
+        self.manifest.dump()
+        self.push_manifest("%s using fixed ref %s" % (repo.project, ref))
+        self.manifest.load()
+
+    def set_branch(self, project, branch):
+        repo = self.get_repo(project)
+        repo.fixed_ref = None
+        repo.default_branch = branch
+        self.manifest.dump()
+        self.push_manifest("%s using branch %s" % (repo.project, branch))
+        self.manifest.load()
+
     def push_file(self, project, filename, contents,
                   branch="master", fast_forward=True,
                   message=None):
         """ Push a new file with the given contents to the given project
-        It is assumed that the project has beed created
+        It is assumed that the project has been created
 
         """
         src = project.replace(".git", "")
@@ -312,6 +328,10 @@ class TestGit(qisrc.git.Git):
     def read_file(self, path):
         """ Read the contents of a file """
         return self.root.join(path).read()
+
+    def write_file(self, path, contents):
+        """ Write the given contents to the file """
+        self.root.join(path).write(contents)
 
     def commit_file(self, path, contents, message=None):
         """ Commit a file. Path will be created if it does not exits """

@@ -1,4 +1,4 @@
-## Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+## Copyright (c) 2012-2018 Softbank. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
@@ -6,7 +6,6 @@ cmake_minimum_required(VERSION 2.8)
 project(installme)
 
 find_package(qibuild)
-include(qibuild/swig/python)
 
 qi_install_data(data/* SUBFOLDER data_star)
 
@@ -33,5 +32,4 @@ qi_install_python("py" SUBFOLDER sub)
 
 # test
 qi_create_test_lib(foo foo.cpp)
-qi_swig_wrap_python(foo foo.i foo.cpp SUBFOLDER sub_swig)
 qi_install_test_data(test_data.dat)

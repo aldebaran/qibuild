@@ -10,14 +10,32 @@ from qisys import ui
 
 def stat_tracking_remote(git, branch, tracking):
     """Check if branch is ahead and / or behind tracking."""
+    if branch is None or tracking is None:
+        return 0, 0
+    _, local_ref = git.call("rev-parse", branch, raises=False)
+    _, remote_ref = git.call("rev-parse", tracking, raises=False)
+    return stat_ahead_behind(git, local_ref, remote_ref)
+
+
+def stat_fixed_ref(git, remote_ref):
+    """ Check is HEAD is and and / or behind given ref. """
+    _, local_ref = git.call("rev-parse", "HEAD", raises=False)
+    return stat_ahead_behind(git, local_ref, remote_ref)
+
+
+def stat_ahead_behind(git, local_ref, remote_ref):
+    """ Returns a tuple (ahead, behind) describing how far
+    from the remote ref the local ref is
+
+    """
     behind = 0
     ahead = 0
     (ret, out) = git.call("rev-list", "--left-right",
-                          "%s..%s" % (tracking, branch), raises=False)
+                          "%s..%s" % (remote_ref, local_ref), raises=False)
     if ret == 0:
         ahead = len(out.split())
     (ret, out) = git.call("rev-list", "--left-right",
-                          "%s..%s" % (branch, tracking), raises=False)
+                          "%s..%s" % (local_ref, remote_ref), raises=False)
     if ret == 0:
         behind = len(out.split())
     return ahead, behind
@@ -28,6 +46,7 @@ class ProjectState:
 
     def __init__(self, project):
         self.project = project
+        self.fixed_ref = None
         self.not_on_a_branch = False
         self.incorrect_proj = False
         self.clean = True
@@ -63,6 +82,12 @@ def check_state(project, untracked):
         return state_project
 
     state_project.clean = git.is_clean(untracked=untracked)
+    if project.fixed_ref:
+        state_project.ahead, state_project.behind = stat_fixed_ref(git, project.fixed_ref)
+        state_project.fixed_ref = project.fixed_ref
+        _set_status(git, state_project, untracked=untracked)
+        return state_project
+
     state_project.current_branch = git.get_current_branch()
     state_project.tracking = git.get_tracking_branch()
     if project.default_remote and project.default_branch:
@@ -85,13 +110,20 @@ def check_state(project, untracked):
             git, state_project.current_branch, "%s/%s" % (
                 project.default_remote.name, project.default_branch.name))
 
+        _set_status(git, state_project, untracked=untracked)
+    return state_project
+
+
+def _set_status(git, state_project, untracked=False):
+    """ When project is not clean, display git status
+    (untracked files and the like)
+
+    """
     if not state_project.sync_and_clean:
         out = git.get_status(untracked)
         if out is not None:
             state_project.status = [x for x in out.splitlines() if
                                     len(x.strip()) > 0]
-
-    return state_project
 
 
 def _print_behind_ahead(behind, ahead):
@@ -110,15 +142,29 @@ def print_state(project, max_len):
     if project.valid:
         if project.ahead or project.behind:
             numcommits = _print_behind_ahead(project.behind, project.ahead)
-            ui.info(ui.green, "*", ui.reset,
-                    ui.blue, project.project.src.ljust(max_len), ui.reset,
-                    ui.green, ":", project.current_branch,
-                    "tracking", ui.reset, ui.bold, ui.red, numcommits, ui.green, project.tracking)
+            if project.fixed_ref:
+                ui.info(ui.green, "*", ui.reset,
+                        ui.blue, project.project.src.ljust(max_len), ui.reset,
+                        ui.green, "fixed ref", project.fixed_ref,
+                        ui.reset, ui.bold, ui.red,
+                        numcommits)
+            else:
+                ui.info(ui.green, "*", ui.reset,
+                        ui.blue, project.project.src.ljust(max_len), ui.reset,
+                        ui.green, ":", project.current_branch,
+                        "tracking",
+                        ui.reset, ui.bold, ui.red,
+                        numcommits, ui.green, project.tracking)
         else:
-            ui.info(ui.green, "*", ui.reset,
-                    ui.blue, project.project.src.ljust(max_len), ui.reset,
-                    ui.green, ":", project.current_branch,
-                    "tracking", project.tracking)
+            if project.fixed_ref:
+                ui.info(ui.green, "*", ui.reset,
+                        ui.blue, project.project.src.ljust(max_len), ui.reset,
+                        ui.green, "fixed ref", project.fixed_ref)
+            else:
+                ui.info(ui.green, "*", ui.reset,
+                        ui.blue, project.project.src.ljust(max_len), ui.reset,
+                        ui.green, ":", project.current_branch,
+                        "tracking", project.tracking)
         if project.ahead_manifest or project.behind_manifest:
             numcommits = _print_behind_ahead(project.behind_manifest, project.ahead_manifest)
             ui.info(ui.bold, "Your branch", ui.green, project.current_branch,
