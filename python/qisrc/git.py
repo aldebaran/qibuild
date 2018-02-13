@@ -161,7 +161,7 @@ class Git(object):
         whitelist = ("add", "branch", "checkout", "clean", "commit", "config",
                      "diff", "fetch", "init", "log", "merge", "pull", "push",
                      "rebase", "remote", "reset", "stash",
-                     "status", "submodule")
+                     "status", "submodule", "tag")
         if name in whitelist:
             return functools.partial(self.call, name)
         raise AttributeError("Git instance has no attribute '%s'" % name)

@@ -291,6 +291,15 @@ class TestGitServer(object):  # pylint: disable=too-many-instance-attributes
         else:
             git.push("origin", "--force", tag)
 
+    def push_branch(self, project, branch):
+        """ push branch on project """
+        src = project.replace(".git", "")
+        repo_src = self.src.join(src)
+        git = qisrc.git.Git(repo_src.strpath)
+        # create the branch
+        git.call("branch", branch)
+        git.push("origin", branch)
+
     def delete_file(self, project, filename):
         """ Delete a file from the repository """
         src = project.replace(".git", "")
