@@ -2,19 +2,19 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
 
-from qisys.test.conftest import *
+import tempfile
 
+import qibuild
+import qitoolchain
+
+from qisys.test.conftest import *  # pylint: disable=wildcard-import,unused-wildcard-import
 import qisys.qixml
 from qisys.qixml import etree
-import qibuild.config
-import qibuild.deps
-import qitoolchain
-import qitoolchain.qipackage
-import qitoolchain.database
-import qitoolchain.toolchain
+
+# pylint: disable=redefined-outer-name
 
 
-class Toolchains():
+class Toolchains(object):
     """ A class to help qitoolchain testing """
 
     def __init__(self):
@@ -25,7 +25,8 @@ class Toolchains():
     def clean(self):
         self.tmp.remove()
 
-    def create(self, name):
+    @staticmethod
+    def create(name):
         toolchain = qitoolchain.toolchain.Toolchain(name)
         return toolchain
 
@@ -50,7 +51,7 @@ class Toolchains():
         return package
 
 
-class TestFeed():
+class TestFeed(object):
     def __init__(self, tmp):
         self.tmp = tmp
         self.packages_path = tmp.ensure("packages", dir=True)
@@ -132,7 +133,7 @@ def toolchains(request):
 
 
 @pytest.fixture
-def qitoolchain_action(cd_to_tmpdir):
+def qitoolchain_action(cd_to_tmpdir):  # pylint: disable=unused-argument
     res = QiToolchainAction()
     return res
 
@@ -152,7 +153,8 @@ class QiToolchainAction(TestAction):
     def __init__(self):
         super(QiToolchainAction, self).__init__("qitoolchain.actions")
 
-    def get_test_package(self, name):
+    @staticmethod
+    def get_test_package(name):
         # FIXME: handle mac, windows
         this_dir = os.path.dirname(__file__)
         return os.path.join(this_dir, "packages", name + ".zip")

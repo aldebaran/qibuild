@@ -12,11 +12,10 @@ import contextlib
 import subprocess
 import signal
 import threading
-import Queue
 
 from qisys import ui
-import qisys
-import qisys.envsetter
+import qisys.envsetter  # pylint: disable=unused-import
+
 
 # Cache for find_program()
 _FIND_PROGRAM_CACHE = dict()
@@ -24,7 +23,7 @@ _FIND_PROGRAM_CACHE = dict()
 SIGINT_EVENT = threading.Event()
 
 
-class Process(object):
+class Process(object):  # pylint: disable=too-many-instance-attributes
     """ A simple way to run commands.
 
     Command will be started by run according to timeout parameter (not
@@ -61,6 +60,9 @@ class Process(object):
         self.exception = None
         self.return_type = Process.FAILED
         self.capture = capture
+        self._thread = None
+        self._should_stop_reading = False
+        self._reading_thread = None
 
     def run(self, timeout=None):
         def target():
@@ -109,8 +111,9 @@ class Process(object):
 
         self._thread = threading.Thread(target=target)
         self._thread.start()
-        while ((timeout is None or 0 < timeout) and self._thread.is_alive() and
-               not SIGINT_EVENT.is_set()):
+        while ((timeout is None or timeout > 0)
+               and self._thread.is_alive()
+               and not SIGINT_EVENT.is_set()):
             self._thread.join(1)
             if timeout is not None:
                 timeout -= 1
@@ -174,6 +177,7 @@ class CommandFailedException(Exception):
     """Custom exception """
 
     def __init__(self, cmd, returncode, cwd=None, stdout=None, stderr=None):
+        super(CommandFailedException, self).__init__()
         self.cmd = cmd
         self.cwd = cwd
         if cwd is None:
@@ -207,6 +211,7 @@ class ProcessCrashedError(Exception):
     """An other custom exception, used by call_background """
 
     def __init__(self, cmd):
+        super(ProcessCrashedError, self).__init__()
         self.cmd = cmd
 
     def __str__(self):
@@ -219,6 +224,7 @@ class NotInPath(Exception):
     """Custom exception """
 
     def __init__(self, executable, env=None):
+        super(NotInPath, self).__init__()
         self.executable = executable
         self.env = env
 
@@ -244,7 +250,7 @@ def find_program(executable, env=None, raises=False):
     import qibuild.config
     if executable in _FIND_PROGRAM_CACHE:
         return _FIND_PROGRAM_CACHE[executable]
-    full_path = None
+
     res = None
     if not env:
         env = qibuild.config.get_build_env()
@@ -279,8 +285,8 @@ def _find_program_in_path_win(executable, path):
 def _find_program_in_path(executable, path):
     if os.name == 'nt':
         return _find_program_in_path_win(executable, path)
-    else:
-        return _check_access(executable, path)
+
+    return _check_access(executable, path)
 
 
 def _check_access(executable, path):
@@ -378,7 +384,7 @@ def check_output_error(*popenargs, **kwargs):
         if cmd is None:
             cmd = popenargs[0]
         raise CommandFailedException(cmd, retcode, stdout=output, stderr=error)
-    return (output, error)
+    return output, error
 
 
 def check_is_in_path(executable, env=None):

@@ -1,13 +1,12 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-
 import sys
+
+import mock
 
 import qisys.interact
 from qisys.test.fake_interact import FakeInteract
-
-import mock
 
 
 def test_ask_yes_no():
@@ -47,7 +46,7 @@ def test_ask_string():
 
 def test_ask_program(record_messages):
     with mock.patch('__builtin__.raw_input') as m:
-        m.side_effect = ["doesnotexists", "y",  __file__, "y", sys.executable]
+        m.side_effect = ["doesnotexists", "y", __file__, "y", sys.executable]
         res = qisys.interact.ask_program("path to program")
         assert res == qisys.sh.to_native_path(sys.executable)
         assert record_messages.find("does not exist")

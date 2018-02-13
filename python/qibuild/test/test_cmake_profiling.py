@@ -30,7 +30,7 @@ def test_simple_parse(tmpdir):
         out = out.replace("@worktree@", "c:/path/to/worktree")
     else:
         out = out.replace("@worktree@", "/path/to/worktree")
-    out = out.replace("@qibuild_root@",  qibuild_dir)
+    out = out.replace("@qibuild_root@", qibuild_dir)
     cmake_log = tmpdir.join("cmake.log")
     cmake_log.write(out)
 

@@ -1,14 +1,13 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-
 import os
 
-import qisys.script
-import qisrc.git
-from qisys.test.conftest import TestWorkTree
-
 import pytest
+
+import qisys.script
+from qisys.test.conftest import TestWorkTree
+import qisrc.git
 
 
 def test_simple(qisrc_action):
@@ -76,7 +75,7 @@ def test_no_worktree(tmpdir):
     assert dest.join("helloworld", "hello_world.txt").check(file=True)
 
 
-def test_create_inside_template(qisrc_action, tmpdir):
+def test_create_inside_template(tmpdir):
     tmpl = tmpdir.mkdir("tmpl")
     tmpl.join("@project_name@.txt").write("")
 

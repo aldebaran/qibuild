@@ -3,8 +3,9 @@
 # found in the COPYING file.
 import mock
 
-from qidoc.test.conftest import TestDocWorkTree
 from qidoc.builder import DocBuilder
+
+# pylint: disable=unused-variable
 
 
 def test_doc_builder_solve_deps_by_default(doc_worktree):

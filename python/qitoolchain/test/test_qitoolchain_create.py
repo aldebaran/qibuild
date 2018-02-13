@@ -2,12 +2,11 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
 
+from qisrc.test.conftest import git_server  # pylint: disable=unused-import
+
 import qitoolchain.qipackage
 
-from qibuild.test.conftest import QiBuildAction
-from qitoolchain.test.conftest import QiToolchainAction
-
-from qisrc.test.conftest import git_server
+# pylint: disable=redefined-outer-name
 
 
 def test_simple(qitoolchain_action):

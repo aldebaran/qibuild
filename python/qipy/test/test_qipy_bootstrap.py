@@ -2,7 +2,10 @@ import os
 
 import qisys.sh
 
-from qibuild.test.conftest import qibuild_action
+from qibuild.test.conftest import qibuild_action  # pylint: disable=unused-import
+
+# pylint: disable=redefined-outer-name
+# pylint: disable=unused-variable
 
 
 def test_simple(qipy_action):

@@ -1,3 +1,7 @@
+
+# pylint: disable=unused-variable
+
+
 def test_list(qibuild_action, toolchains, record_messages):
     toolchains.create("foo")
     qibuild_action("add-config", "foo", "--toolchain", "foo")

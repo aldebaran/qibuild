@@ -5,10 +5,8 @@
 """ Collection of parser fonctions for qitests actions
 """
 
-import copy
 import os
 
-from qisys import ui
 import qisys.parsers
 import qibuild.parsers
 import qitest.project

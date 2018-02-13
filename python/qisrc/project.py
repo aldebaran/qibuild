@@ -10,7 +10,7 @@ import qisys.qixml
 import qisrc.git_config
 
 
-class GitProject(object):
+class GitProject(object):  # pylint: disable=too-many-instance-attributes
     def __init__(self, git_worktree, worktree_project):
         self.git_worktree = git_worktree
         self.src = worktree_project.src
@@ -152,11 +152,7 @@ class GitProject(object):
             # Project is now under code review, try to setup
             # gerrit and save success in self.review
             # (so that we can retry if gerrit setup did not work)
-            ok = qisrc.review.setup_project(self)
-            if ok:
-                self.review = True
-            else:
-                self.review = False
+            self.review = bool(qisrc.review.setup_project(self))
         if not repo.review and self.review:
             # Project was under code review, but no longer is,
             # simply set self.review to False so that `qisrc push`
@@ -180,6 +176,9 @@ class GitProject(object):
            therefore it must not cause any side-effect on the global state
            outside of this repo.
         """
+        # pylint: disable=too-many-return-statements
+        # pylint: disable=too-many-instance-attributes
+        # pylint: disable=unused-argument
         git = qisrc.git.Git(self.path)
         branch = self.default_branch
         if not branch:
@@ -190,7 +189,7 @@ class GitProject(object):
             return False, "fetch failed\n" + out
 
         if self.fixed_ref:
-            return self.safe_reset_ref(self.fixed_ref)
+            return self.safe_reset_to_ref(self.fixed_ref)
 
         current_branch = git.get_current_branch()
         if not current_branch:
@@ -206,7 +205,7 @@ class GitProject(object):
         # Here current_branch == branch.name
         return git.sync_branch(branch, fetch_first=False)
 
-    def safe_reset_ref(self, ref):
+    def safe_reset_to_ref(self, ref):
         """ Read a fixed ref from the remote config.
         Make sure to not discard any local changes
 
@@ -218,7 +217,7 @@ class GitProject(object):
         ok, mess = qisrc.reset.clever_reset_ref(self, ref, raises=False)
         return ok, mess
 
-    def safe_reset_to_branch(self, ref, branch):
+    def safe_reset_to_branch(self, branch):
         """ Switch from a ref to a branch
         Make sure to not discard any local changes
 
@@ -294,7 +293,7 @@ class GitProject(object):
                 git.set_tracking_branch(branch.name, branch.tracks,
                                         remote_branch=branch.remote_branch)
         if self.switch_ref_to_branch:
-            ok, mess = self.safe_reset_to_branch(self.fixed_ref, self.default_branch.name)
+            ok, mess = self.safe_reset_to_branch(self.default_branch.name)
             if not ok:
                 ui.error("%s\n %s" % (self.name, mess))
             else:
@@ -302,7 +301,7 @@ class GitProject(object):
                 self.switch_ref_to_branch = False
 
         if self.fixed_ref:
-            ok, mess = self.safe_reset_ref(self.fixed_ref)
+            ok, mess = self.safe_reset_to_ref(self.fixed_ref)
             if not ok:
                 ui.error("%s\n %s" % (self.name, mess))
 

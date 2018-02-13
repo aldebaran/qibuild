@@ -70,7 +70,7 @@ def add_maintainer(project, args):
     qisrc.maintainers.add(project, name=name, email=email)
 
 
-def remove_maintainer(project, args):
+def remove_maintainer(project, args):  # pylint: disable=unused-argument
     maintainers = qisrc.maintainers.get(project)
     if not maintainers:
         ui.info("No maintainer configured for this project")
@@ -89,14 +89,14 @@ def remove_maintainer(project, args):
             ui.reset, "removed from maintainers")
 
 
-def clear_maintainers(project, *unused_args):
+def clear_maintainers(project, *unused_args):  # pylint: disable=unused-argument
     if qisrc.maintainers.clear(project):
         ui.info("All maintainers removed")
     else:
         ui.info("No maintainer configured for this project")
 
 
-def list_maintainers(project, *unused_args):
+def list_maintainers(project, *unused_args):  # pylint: disable=unused-argument
     maintainers = qisrc.maintainers.get(project)
 
     if maintainers:

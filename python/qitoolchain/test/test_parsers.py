@@ -4,9 +4,11 @@
 import pytest
 
 import qibuild.config
+from qibuild.test.conftest import build_worktree  # pylint: disable=unused-import
 
 import qitoolchain.parsers
-from qibuild.test.conftest import build_worktree
+
+# pylint: disable=redefined-outer-name
 
 
 def test_using_dash_c(toolchains, args):

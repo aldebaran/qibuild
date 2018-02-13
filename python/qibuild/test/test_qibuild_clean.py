@@ -12,6 +12,8 @@ import qibuild.profile
 
 from qibuild.test.conftest import TestBuildWorkTree
 
+# pylint: disable=unused-variable
+
 
 def test_clean_build_dir(qibuild_action):
     world_proj = qibuild_action.add_test_project("world")
@@ -53,7 +55,7 @@ def test_cleaning_all_build_dirs(qibuild_action):
     assert not os.path.exists(world_proj.build_directory)
 
 
-def test_cleaning_unknown_configs(qibuild_action, toolchains, interact):
+def test_cleaning_unknown_configs(qibuild_action, toolchains, interact):  # pylint: disable=unused-argument
     qibuild.config.add_build_config("a")
     qibuild.config.add_build_config("b")
     world_proj = qibuild_action.add_test_project("world")

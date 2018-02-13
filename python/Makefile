@@ -17,7 +17,7 @@ PYMODULES =  \
 PYTHON    ?= python
 PIP       ?= pip
 
-all: pycodestyle pylint-error check
+all: pycodestyle pylint-full check
 
 pycodestyle:
 	@echo ":: Running pycodestyle on root folder"
@@ -25,14 +25,14 @@ pycodestyle:
 
 pylint-full:
 	@echo ":: Running pylint: $(PYMODULES)"
-	@pylint --rcfile pylint.rc $(PYMODULES) 2>&1 || exit 1 || exit 0
+	@pylint $(PYMODULES) 2>&1 || exit 1 || exit 0
 
 pylint-error:
 	@echo ":: Running pylint --errors-only: $(PYMODULES)"
-	@pylint --errors-only --rcfile pylint.rc $(PYMODULES) 2>&1 || \
+	@pylint --errors-only $(PYMODULES) 2>&1 || \
 		exit 1 || exit 0
 	@echo " => Checked only for pylint errors"
-	@echo "    Use make check-all for running a full pylint check"
+	@echo "    Use make pylint-full for running a full pylint check"
 
 check:
 	@echo ":: Running tests:"

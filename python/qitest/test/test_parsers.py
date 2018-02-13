@@ -9,6 +9,8 @@ import qitest.parsers
 
 from qibuild.test.conftest import TestBuildWorkTree
 
+# pylint: disable=unused-variable
+
 
 def test_nothing_specified_json_in_cwd(args, tmpdir, monkeypatch):
     monkeypatch.chdir(tmpdir)
@@ -109,7 +111,7 @@ def test_qitest_json_from_worktree(args, build_worktree, monkeypatch):
     assert test_runner.cwd == testme_proj.sdk_directory
 
 
-def test_nothing_to_test(args, cd_to_tmpdir):
+def test_nothing_to_test(args, cd_to_tmpdir):  # pylint: disable=unused-argument
     # pylint:disable-msg=E1101
     with pytest.raises(Exception) as e:
         qitest.parsers.get_test_runners(args)

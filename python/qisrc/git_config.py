@@ -16,7 +16,7 @@ import qisrc.git
 import qisrc.review
 
 
-class Remote(object):
+class Remote(object):  # pylint: disable=too-many-instance-attributes
     def __init__(self):
         self.name = None
         self.url = None
@@ -33,6 +33,56 @@ class Remote(object):
         self.server = None
         self.port = None
 
+    def _match_full_url(self, match):
+        self.protocol = "ssh"
+        groupdict = match.groupdict()
+        self.server = groupdict["server"]
+        port = groupdict.get("port")
+        if port:
+            self.port = int(port)
+        username = groupdict.get("username")
+        if username:
+            self.username = username
+        else:
+            username = qisrc.review.get_gerrit_username(self.server,
+                                                        ssh_port=self.port)
+            if not username:
+                raise Exception("Could not guess ssh username")
+            self.username = username
+        prefix = "ssh://%s@%s" % (username, self.server)
+        if self.port:
+            prefix += ":%i" % self.port
+        subfolder = groupdict.get("subfolder", "")
+        prefix += subfolder
+        if not prefix.endswith("/"):
+            prefix += "/"
+        self.prefix = prefix
+        return
+
+    def _match_ssh_url(self, match):
+        groupdict = match.groupdict()
+        self.protocol = "ssh"
+        self.username = groupdict["username"]
+        self.server = groupdict["server"]
+        sep = groupdict["sep"] or ":"
+        subfolder = groupdict.get("subfolder", "")
+        self.prefix = "%s@%s%s%s" % (self.username, self.server, sep, subfolder)
+        return
+
+    def _match_other_url(self, match):
+        groupdict = match.groupdict()
+        self.protocol = groupdict["protocol"]
+        if self.protocol == "file://":
+            self.prefix = "foo"
+        self.server = groupdict["server"]
+        port = groupdict.get("port")
+        if port:
+            self.port = int(port)
+        self.prefix = self.url
+        if not self.prefix.endswith("/"):
+            self.prefix += "/"
+        return
+
     def parse_url(self):
         if self.url.startswith("file://"):
             prefix = self.url
@@ -45,78 +95,36 @@ class Remote(object):
             self.prefix = prefix
             return
 
-        full_ssh = re.compile("""
+        full_ssh = re.compile(r"""
                         ssh://
                         ((?P<username>[^@]+)@)?
                         (?P<server>[^:/]+)
                         (:(?P<port>\d+))?
                         (?P<subfolder>.*)
                         """, re.VERBOSE)
-        ssh_url = re.compile("""
+        ssh_url = re.compile(r"""
                         (?P<username>.*?)
                         @
                         (?P<server>.*)
                         (?P<sep>[:/])?
                         (?P<subfolder>)
                         """, re.VERBOSE)
-        other_url = re.compile("""
+        other_url = re.compile(r"""
                         ((?P<protocol>(git|http|https))://)
                         (?P<server>[^:/]+)
                         (:(?P<port>\d+))?
                         """, re.VERBOSE)
         match = re.match(full_ssh, self.url)
         if match:
-            self.protocol = "ssh"
-            groupdict = match.groupdict()
-            self.server = groupdict["server"]
-            port = groupdict.get("port")
-            if port:
-                self.port = int(port)
-            username = groupdict.get("username")
-            if username:
-                self.username = username
-            else:
-                username = qisrc.review.get_gerrit_username(self.server,
-                                                            ssh_port=self.port)
-                if not username:
-                    raise Exception("Could not guess ssh username")
-                self.username = username
-            prefix = "ssh://%s@%s" % (username, self.server)
-            if self.port:
-                prefix += ":%i" % self.port
-            subfolder = groupdict.get("subfolder", "")
-            prefix += subfolder
-            if not prefix.endswith("/"):
-                prefix += "/"
-            self.prefix = prefix
-            return
+            return self._match_full_url(match)
 
         match = re.match(ssh_url, self.url)
         if match:
-            groupdict = match.groupdict()
-            self.protocol = "ssh"
-            self.username = groupdict["username"]
-            self.server = groupdict["server"]
-            sep = groupdict["sep"] or ":"
-            subfolder = groupdict.get("subfolder", "")
-            self.prefix = "%s@%s%s%s" % (self.username, self.server, sep,
-                                         subfolder)
-            return
+            return self._match_ssh_url(match)
 
         match = re.match(other_url, self.url)
         if match:
-            groupdict = match.groupdict()
-            self.protocol = groupdict["protocol"]
-            if self.protocol == "file://":
-                self.prefix = "foo"
-            self.server = groupdict["server"]
-            port = groupdict.get("port")
-            if port:
-                self.port = int(port)
-            self.prefix = self.url
-            if not self.prefix.endswith("/"):
-                self.prefix += "/"
-            return
+            return self._match_other_url(match)
 
         if os.path.exists(self.url):
             prefix = qisys.sh.to_native_path(self.url)

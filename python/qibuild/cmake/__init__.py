@@ -91,7 +91,7 @@ def get_cached_var(build_dir, var, default=None):
     return res.get(var, default)
 
 
-def cmake(source_dir, build_dir, cmake_args, env=None,
+def cmake(source_dir, build_dir, cmake_args, env=None,  # pylint: disable=too-many-branches,too-many-locals
           clean_first=True, profiling=False, debug_trycompile=False,
           trace_cmake=False, summarize_options=False):
     """Call cmake with from a build dir for a source dir.
@@ -233,7 +233,7 @@ def get_cmake_qibuild_dir():
 
 def find_installed_cmake_qibuild_dir(python_dir):
     ui.debug("looking for cmake code from", python_dir)
-    for candidate in [
+    candidates = [
         # python in qibuild/python, cmake in qibuild/cmake
         ("..", "..", "cmake"),
         # python in lib/python-2.7/{dist,site}-packages,
@@ -254,7 +254,8 @@ def find_installed_cmake_qibuild_dir(python_dir):
         ("..", "share", "cmake"),
         # pip on mac
         (sys.prefix, "share", "cmake")
-    ]:
+    ]
+    for candidate in candidates:
 
         rel_path = os.path.join(*candidate)
         res = os.path.join(python_dir, rel_path)
@@ -333,8 +334,7 @@ cmake_minimum_required(VERSION 2.8)
 project({project_name})
 find_package(qibuild)
 
-""".format(
-            project_name=suggested_project_name)
+""".format(project_name=suggested_project_name)
 
     if find_qibuild_line_number is not None and \
             project_line_number is not None and \
@@ -348,6 +348,7 @@ find_package(qibuild)
 
 class IncorrectCMakeLists(Exception):
     def __init__(self, cmake_list_file, message):
+        super(IncorrectCMakeLists, self).__init__()
         self.cmake_list_file = cmake_list_file
         self.message = message
 

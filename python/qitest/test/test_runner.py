@@ -1,14 +1,14 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+import pytest
+
 import qitest.project
 import qitest.runner
 
-import pytest
-
 
 class DummyTestRunner(qitest.runner.TestSuiteRunner):
-    def launcher(self, *args):
+    def launcher(self):
         pass
 
 

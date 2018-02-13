@@ -15,8 +15,6 @@ from xml.etree import ElementTree as etree
 from qisys import ui
 import qisys.parsers
 
-import qibuild
-
 
 def guess_project_name(source_dir):
     """ Try to guess the project name
@@ -91,7 +89,7 @@ def name_from_cmakelists(cmakelists):
     return res
 
 
-def fix_root_cmake(cmakelists, project_name, dry_run=True):
+def fix_root_cmake(cmakelists, project_name, dry_run=True):  # pylint: disable=too-many-branches
     """ Fix the root CMakeLists.txt file
 
     If not found, create a new one
@@ -127,17 +125,17 @@ find_package(qibuild)
     # Replace old include() by new find_package
     seen_find_package_qibuild = False
     for line in old_lines:
-        match = re.match("\s*find_package\s*\(\s*qibuild\s*\)", line)
+        match = re.match(r"\s*find_package\s*\(\s*qibuild\s*\)", line)
         if match:
             seen_find_package_qibuild = True
-        match = re.match("\s*include\s*\(.*/?bootstrap.cmake.*", line)
+        match = re.match(r"\s*include\s*\(.*/?bootstrap.cmake.*", line)
         if match:
             if not seen_find_package_qibuild:
                 new_lines.append('find_package(qibuild)\n')
                 new_lines.append('include(qibuild/compat/compat)\n')
             seen_find_package_qibuild = True
         else:
-            match = re.match("\s*include\s*\(.*/?qibuild.cmake.*", line)
+            match = re.match(r"\s*include\s*\(.*/?qibuild.cmake.*", line)
             if match:
                 if not seen_find_package_qibuild:
                     new_lines.append('find_package(qibuild)\n')

@@ -5,12 +5,7 @@
 
 """
 import sys
-import os
 
-from qisys import ui
-import qisys.sh
-import qisys.command
-import qisys.parsers
 import qibuild.parsers
 import qipy.parsers
 import qipy.worktree

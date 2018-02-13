@@ -1,10 +1,9 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+import os
 
 import mock
-import pytest
-import os
 
 import qisys.archive
 import qitoolchain.database
@@ -12,8 +11,9 @@ import qitoolchain.qipackage
 import qitoolchain.svn_package
 import qitoolchain.feed
 
-from qisrc.test.conftest import svn_server
-from qisrc.test.conftest import git_server
+from qisrc.test.conftest import git_server, svn_server  # pylint: disable=unused-import
+
+# pylint: disable=redefined-outer-name
 
 
 def test_persistent(toolchain_db):
@@ -114,7 +114,7 @@ def test_solve_deps(toolchain_db, tmpdir):
     assert res == [foo_package, bar_package]
 
 
-def test_git_feed(toolchain_db, feed, git_server):
+def test_git_feed(toolchain_db, feed, git_server):  # pylint: disable=unused-argument
     boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.44")
     feed.add_package(boost_package)
     git_server.create_repo("toolchains.git")
@@ -135,7 +135,7 @@ def test_git_feed(toolchain_db, feed, git_server):
     assert boost.version == "1.55"
 
 
-def test_svn_package_conflict(toolchain_db, feed, svn_server):
+def test_svn_package_conflict(toolchain_db, feed, svn_server):  # pylint: disable=unused-argument
     boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.44")
     feed.add_package(boost_package)
 

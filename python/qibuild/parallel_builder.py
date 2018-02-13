@@ -7,7 +7,6 @@ import threading
 import sys
 import StringIO
 import traceback
-import time
 
 import qibuild.project
 
@@ -32,12 +31,12 @@ class BuildJob(object):
     def add_dependency(self, job):
         with self.lock:
             self.deps.append(job)
-            job._add_back_dependency(self)
+            job.add_back_dependency(self)
 
-    def _add_back_dependency(self, job):
+    def add_back_dependency(self, job):
         self.back_deps.append(job)
 
-    def execute(self, *args, **kwargs):
+    def execute(self, *args, **kwargs):  # pylint: disable=unused-argument
         ui.info_count(self.index, self.num_projects,
                       ui.green, "Building",
                       ui.blue, self.project.name,
@@ -59,7 +58,6 @@ class BuildJob(object):
                 self.deps.remove(job)
             except ValueError:
                 ui.debug(ui.red, "Job not in the deps list!", self.deps, job)
-                pass
 
 
 class ParallelBuilder(object):
@@ -144,7 +142,7 @@ class ParallelBuilder(object):
 
     def _find_job_by_name(self, name):
         for job in self.all_jobs:
-            if (job.project.name == name):
+            if job.project.name == name:
                 return job
 
         return None
@@ -190,7 +188,8 @@ class BuildWorker(threading.Thread):
                     self.result.failed_project = job.project
                     ui.error(*self.message_for_exception(e))
 
-    def message_for_exception(self, exception):
+    @staticmethod
+    def message_for_exception(exception):
         tb = sys.exc_info()[2]
         io = StringIO.StringIO()
         traceback.print_tb(tb, file=io)

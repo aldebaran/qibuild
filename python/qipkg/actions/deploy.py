@@ -5,9 +5,6 @@
 """ Deploy a complete package on the robot. This uses rsync to be fast
 """
 
-import os
-
-from qisys import ui
 import qisys.sh
 import qisys.parsers
 import qipkg.parsers

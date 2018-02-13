@@ -1,11 +1,9 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-
-import sys
 import os
+
 import qisys.remote
-import subprocess
 
 from qisys import ui
 from qisys.abstractbuilder import AbstractBuilder
@@ -21,6 +19,7 @@ class PythonBuilder(AbstractBuilder):
     """
 
     def __init__(self, python_worktree, build_worktree=None):
+        super(PythonBuilder, self).__init__(self.__class__.__name__)
         self.python_worktree = python_worktree
         self.build_worktree = build_worktree
         self.projects = list()

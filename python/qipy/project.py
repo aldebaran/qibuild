@@ -6,7 +6,7 @@ import os
 import qisys.sh
 
 
-class PythonProject(object):
+class PythonProject(object):  # pylint: disable=too-many-instance-attributes
     """ Collections of scripts, modules and packages """
 
     def __init__(self, worktree, src, name):
@@ -31,7 +31,7 @@ class PythonProject(object):
                 res.append(to_add)
         return res
 
-    def install(self, dest):
+    def install(self, dest):  # pylint: disable=too-many-locals
         """ Install scripts, modules and packages to the given destination """
         empty = (not self.setup_with_distutils) and \
             (not self.scripts) and \
@@ -82,7 +82,7 @@ in the qiproject.xml file
         """ Returns all the .py files in the given package"""
         res = list()
         full_package_path = os.path.join(self.path, package.src, package.name)
-        for root, directories, filenames in os.walk(full_package_path):
+        for root, __directories, filenames in os.walk(full_package_path):  # pylint: disable=unused-variable
             init_py = os.path.join(root, "__init__.py")
             if not os.path.exists(init_py):
                 continue
@@ -103,20 +103,20 @@ in the qiproject.xml file
         return "<%s in %s>" % (self.name, self.src)
 
 
-class Module():
+class Module(object):
     def __init__(self, name, src):
         self.name = name
         self.src = src
         self.qimodule = False
 
 
-class Package():
+class Package(object):
     def __init__(self, name, src):
         self.name = name
         self.src = src
         self.qimodule = False
 
 
-class Script():
+class Script(object):
     def __init__(self, src):
         self.src = src

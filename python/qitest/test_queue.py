@@ -3,7 +3,6 @@
 # found in the COPYING file.
 
 import os
-import contextlib
 import collections
 import datetime
 import json
@@ -20,7 +19,7 @@ import qisys.command
 import qitest.result
 
 
-class TestQueue(object):
+class TestQueue(object):  # pylint: disable=too-many-instance-attributes
     """ A class able to run tests in parallel """
 
     __test__ = False  # Tell PyTest to ignore this Test* named class: This is as test to collect
@@ -125,7 +124,7 @@ class TestQueue(object):
                                   ui.reset, *failure.message)
         self.write_failures(failures)
 
-    def sigint_handler(self, *args):
+    def sigint_handler(self, *args):  # pylint: disable=unused-argument
         """ Called when user press ctr+c during the test suite
 
         * Tell qisys.command to kill every process still running
@@ -134,7 +133,7 @@ class TestQueue(object):
         * Setup a second sigint for when killing process failed
 
         """
-        def double_sigint(signum, frame):
+        def double_sigint(signum, frame):  # pylint: disable=unused-argument
             sys.exit("Exiting main program \n",
                      "This may leave orphan processes")
         qisys.command.SIGINT_EVENT.set()
@@ -194,7 +193,8 @@ class TestWorker(threading.Thread):
             self.results[test["name"]] = result
             self.queue.task_done()
 
-    def message_for_exception(self, exception):
+    @staticmethod
+    def message_for_exception(exception):
         tb = sys.exc_info()[2]
         io = StringIO.StringIO()
         traceback.print_tb(tb, file=io)

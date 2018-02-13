@@ -4,6 +4,9 @@
 
 """ Extract a binary toolchain package """
 
+# FIXME: deal with the cyclic-import in a dedicated issue
+# pylint: disable=cyclic-import
+
 import os
 
 from qisys import ui

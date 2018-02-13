@@ -4,12 +4,11 @@
 """ Remove a group from the current worktree
 
 """
+import copy
+import sys
 
 from qisys import ui
 import qisrc.parsers
-
-import sys
-import copy
 
 
 def configure_parser(parser):

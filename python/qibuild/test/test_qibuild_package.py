@@ -3,15 +3,17 @@
 # found in the COPYING file.
 import os
 
+import pytest
+
 import qisys.archive
 import qisrc.license
 import qibuild.config
-import qitoolchain.qipackage
-
 from qibuild.test.conftest import QiBuildAction
+
+import qitoolchain.qipackage
 from qitoolchain.test.conftest import QiToolchainAction
 
-import pytest
+# pylint: disable=unused-variable
 
 
 def test_simple(qibuild_action):
@@ -27,7 +29,7 @@ def test_building_in_release(qibuild_action):
     qibuild_action("package", "world", "--release")
 
 
-def test_using_toolchain(cd_to_tmpdir):
+def test_using_toolchain(cd_to_tmpdir):  # pylint: disable=unused-argument
     qibuild_action = QiBuildAction()
     qitoolchain_action = QiToolchainAction()
     build_worktree = qibuild_action.build_worktree
@@ -52,8 +54,8 @@ def test_preserve_license(qibuild_action, qitoolchain_action):
     world_package = qibuild_action("package", "world")
     extracted = qitoolchain_action("extract-package", world_package)
     package_xml = os.path.join(extracted, "package.xml")
-    license = qisrc.license.read_license(package_xml)
-    assert license == "BSD"
+    license_name = qisrc.license.read_license(package_xml)
+    assert license_name == "BSD"
 
 
 def test_standalone(qibuild_action, tmpdir):
@@ -72,7 +74,7 @@ def test_standalone(qibuild_action, tmpdir):
 # pylint: disable-msg=E1101
 @pytest.mark.skipif(not qisys.command.find_program("dump_syms"),
                     reason="dump_syms not found")
-def test_standalone_breakpad(qibuild_action, tmpdir):
+def test_standalone_breakpad(qibuild_action, tmpdir):  # pylint: disable=unused-argument
     world_proj = qibuild_action.add_test_project("world")
     hello_proj = qibuild_action.add_test_project("hello")
     hello_archive, hello_symbols = qibuild_action("package", "hello", "--standalone",

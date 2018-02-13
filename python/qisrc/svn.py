@@ -33,14 +33,14 @@ class Svn(object):
             # Don't want useless blank lines
             out = out.rstrip("\n")
             ui.debug("out:", out)
-            return (process.returncode, out)
+            return process.returncode, out
         else:
             if "raises" in kwargs:
                 del kwargs["raises"]
             qisys.command.call(cmd, **kwargs)
 
     def commit_all(self, message):
-        rc, out = self.call("status", raises=False)
+        __rc, out = self.call("status", raises=False)  # pylint: disable=unused-variable
         for line in out.splitlines():
             line = line.strip()
             filename = line[8:]

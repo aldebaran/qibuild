@@ -8,8 +8,6 @@ import subprocess
 import qisys.command
 import qibuild.gdb
 
-import pytest
-
 
 def check_gdb():
     gdb = qisys.command.find_program("gdb", raises=False)

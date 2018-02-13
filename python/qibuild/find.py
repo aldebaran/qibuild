@@ -41,13 +41,13 @@ def find_lib(paths, name, debug=None, expect_one=True, shared=None):
     else:
         shared_cases = [shared]
 
-    for debug in debug_cases:
-        for shared in shared_cases:
-            lib_name = library_name(name, shared=shared, debug=debug)
+    for debug_case in debug_cases:
+        for shared_case in shared_cases:
+            lib_name = library_name(name, shared=shared_case, debug=debug_case)
             for path in paths:
                 lib_path = os.path.join(path, "lib", lib_name)
                 candidates.add(lib_path)
-                if os.name == 'nt' and shared:
+                if os.name == 'nt' and shared_case:
                     # dlls can be in bin/ on windows:
                     lib_path = os.path.join(path, "bin", lib_name)
                     candidates.add(lib_path)
@@ -79,8 +79,8 @@ def find_bin(paths, name, debug=None, expect_one=True):
     else:
         debug_cases = [debug]
 
-    for debug in debug_cases:
-        bin_name = binary_name(name, debug=debug)
+    for debug_case in debug_cases:
+        bin_name = binary_name(name, debug=debug_case)
         for path in paths:
             bin_path = os.path.join(path, "bin", bin_name)
             candidates.add(bin_path)
@@ -119,8 +119,8 @@ def _library_prefix(os_name=None):
         os_name = platform.system()
     if os_name == "Windows":
         return ""
-    else:
-        return "lib"
+
+    return "lib"
 
 
 def _library_suffix(shared=True, debug=True, os_name=None):
@@ -180,6 +180,7 @@ def _filter_candidates(name, candidates, expect_one=True):
 
 class NotFound(Exception):
     def __init__(self, name):
+        super(NotFound, self).__init__()
         self.name = name
 
     def __str__(self):
@@ -188,6 +189,7 @@ class NotFound(Exception):
 
 class MulipleFound(Exception):
     def __init__(self, name, res):
+        super(MulipleFound, self).__init__()
         self.name = name
         self.res = res
 

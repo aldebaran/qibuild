@@ -83,7 +83,7 @@ def get_forked_projects(git_projects, upstream_projects, branch):
             continue
         if not git_project.default_branch:
             continue
-        local_branch = git_project.default_branch.name
+        # local_branch = git_project.default_branch.name
         remote_branch = git_project.default_branch.remote_branch
         remote_name = git_project.default_remote.name
         remote_ref = "%s/%s" % (remote_name, remote_branch)
@@ -99,10 +99,11 @@ def get_forked_projects(git_projects, upstream_projects, branch):
     return res
 
 
-def rebase_project(git_project, upstream_project):
+def rebase_project(git_project, upstream_project):  # pylint: disable=too-many-return-statements
     ok = check_local_branch(git_project)
     if not ok:
         return False
+
     git = qisrc.git.Git(git_project.path)
     local_branch = git_project.default_branch.name
     upstream_branch = upstream_project.default_branch.name
@@ -122,16 +123,17 @@ def rebase_project(git_project, upstream_project):
             return False
         ui.info(ui.green, "[OK]", ui.reset, "fast-forwarded")
         return True
+
     git.call("tag", "-f", "before-rebase", raises=False)  # suppress output
     rc, out = git.call("rebase", upstream_ref, raises=False)
     if rc == 0:
         ui.info(ui.green, "[OK]", ui.reset, "rebased")
         return True
-    else:
-        ui.info(ui.red, "[FAILED]", ui.reset, "there was some conflicts")
-        git.call("rebase", "--abort", raises=False)
-        git.call("tag", "-d", "before-rebase", raises=False)  # suppress output
-        return False
+
+    ui.info(ui.red, "[FAILED]", ui.reset, "there was some conflicts")
+    git.call("rebase", "--abort", raises=False)
+    git.call("tag", "-d", "before-rebase", raises=False)  # suppress output
+    return False
 
 
 def check_local_branch(git_project):
@@ -164,11 +166,11 @@ def check_local_branch(git_project):
 
 
 def display_changes(git, remote_ref, branch_name):
-    rc, out = git.call("log", "--color", "--graph", "--abbrev-commit",
-                       "--pretty=format:%Cred%h%Creset " +
-                       "-%C(yellow)%d%Creset " +
-                       "%s %Cgreen(%cr) %C(bold blue) " +
-                       "<%an>%Creset",
-                       remote_ref, branch_name,
-                       raises=False)
+    __rc, out = git.call("log", "--color", "--graph", "--abbrev-commit",  # pylint: disable=unused-variable
+                         "--pretty=format:%Cred%h%Creset " +
+                         "-%C(yellow)%d%Creset " +
+                         "%s %Cgreen(%cr) %C(bold blue) " +
+                         "<%an>%Creset",
+                         remote_ref, branch_name,
+                         raises=False)
     ui.info(out)

@@ -9,6 +9,10 @@ import qisrc.git
 from qisrc.test.conftest import TestGitWorkTree
 import qisys.sh
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+# pylint: disable=unused-variable
+
 
 def test_stores_url_and_groups(git_worktree, git_server):
     git_server.create_group("mygroup", ["foo", "bar"])

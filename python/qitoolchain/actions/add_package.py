@@ -5,17 +5,17 @@
 """Add a new package to a toolchain
 
 """
+import os
 
 import argparse
-import os
+import urlparse
 import zipfile
 
 from qisys import ui
 import qisys.archive
+import qisys.remote
 import qisys.worktree
 import qitoolchain.parsers
-import qisys.remote
-import urlparse
 
 
 def configure_parser(parser):
@@ -36,7 +36,7 @@ def do(args):
 
     """
     toolchain = qitoolchain.parsers.get_toolchain(args)
-    name = args.name
+    # name = args.name
     package_path = args.package_path
     legacy = False
     try:
@@ -51,7 +51,7 @@ def do(args):
     if args.name and not legacy:
         ui.warning("--name ignored when using modern format")
 
-    package = None
+    package = None  # pylint: disable=unused-variable
     if legacy:
         package = qitoolchain.qipackage.QiPackage(args.name)
     else:

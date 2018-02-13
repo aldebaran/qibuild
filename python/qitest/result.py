@@ -3,7 +3,7 @@
 # found in the COPYING file.
 
 
-class TestResult:
+class TestResult(object):
     """ Just a small class to store the results for a test
 
     """

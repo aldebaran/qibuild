@@ -19,8 +19,8 @@ import qisys
 import qisys.sh
 import qisys.ui
 from qisys.qixml import etree
-from qitoolchain.binary_package.core import BinaryPackage
-from qitoolchain.binary_package.core import BinaryPackageException
+from qitoolchain.binary_package.core import BinaryPackage  # pylint: disable=ungrouped-imports
+from qitoolchain.binary_package.core import BinaryPackageException  # pylint: disable=ungrouped-imports
 
 WITH_PORTAGE = True
 try:
@@ -104,7 +104,7 @@ def _fix_package_tree(root_dir):
     qisys.sh.rm(usr_dir)
 
 
-def convert_to_qibuild(package, package_metadata=None,
+def convert_to_qibuild(package, package_metadata=None,  # pylint: disable=too-many-locals
                        output_dir=None, output_name=None):
     """ Convert a binary package into a qiBuild package.
 
@@ -143,7 +143,7 @@ def convert_to_qibuild(package, package_metadata=None,
         _fix_package_tree(root_dir)
         package_xml_path = os.path.join(root_dir, "package.xml")
         package_xml_root = etree.Element("package")
-        package_xml_tree = etree.ElementTree(package_xml_root)
+        # package_xml_tree = etree.ElementTree(package_xml_root)
         package_xml_root.set("name", package_name)
         version = metadata.get("version")
         if version:

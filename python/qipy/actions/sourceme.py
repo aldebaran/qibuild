@@ -8,8 +8,6 @@ Mostly useful in scripts:
     source $(qibuild sourceme)
 """
 
-from qisys import ui
-
 import qisys.parsers
 import qipy.parsers
 import qibuild.parsers

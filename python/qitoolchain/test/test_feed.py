@@ -1,12 +1,14 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-
-from qitoolchain.feed import *
-
-from qisrc.test.conftest import git_server
-
 import pytest
+
+from qitoolchain.feed import is_url, tree_from_feed, ToolchainFeedParser
+
+from qisrc.test.conftest import git_server  # pylint: disable=unused-import
+
+# pylint: disable=redefined-outer-name
+
 
 #
 # Commons variables

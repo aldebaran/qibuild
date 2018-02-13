@@ -1,10 +1,13 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-import os
 import qisrc.git
 
 from qibuild.test.conftest import TestBuildWorkTree
+
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+# pylint: disable=unused-variable
 
 
 def test_git_server_creates_valid_urls(tmpdir, git_server):
@@ -47,7 +50,7 @@ def test_create_several_commits(git_server):
     git_server.push_file("foo.git", "foo.txt", "change 2")
 
 
-def test_no_review_by_default(tmpdir, git_server):
+def test_no_review_by_default(tmpdir, git_server):  # pylint: disable=unused-argument
     foo_repo = git_server.create_repo("foo.git")
     assert foo_repo.review is False
     origin = git_server.manifest.get_remote("origin")
@@ -102,7 +105,7 @@ def test_change_branch(git_server):
     assert foo_repo.default_branch == "devel"
 
 
-def test_fixed_ref(git_server, tmpdir):
+def test_fixed_ref(git_server):
     git_server.create_repo("foo.git")
     git_server.set_fixed_ref("foo.git", "v0.1")
     foo_repo = git_server.get_repo("foo.git")

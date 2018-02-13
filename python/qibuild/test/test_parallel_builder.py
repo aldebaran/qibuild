@@ -12,7 +12,7 @@ class FakeProject(object):
         else:
             self.build_depends = set()
 
-    def build(self, *args, **kwargs):
+    def build(self, *args, **kwargs):  # pylint: disable=unused-argument
         self.build_log.append(self.name)
 
 

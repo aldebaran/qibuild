@@ -3,7 +3,6 @@
 # found in the COPYING file.
 import zipfile
 
-import qisys.qixml
 from qisys.qixml import etree
 
 

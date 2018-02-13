@@ -19,7 +19,7 @@ class SetHome(argparse.Action):
     def __init__(self, *args, **kwargs):
         super(SetHome, self).__init__(*args, **kwargs)
 
-    def __call__(self, parser, namespace, values, option_string):
+    def __call__(self, parser, namespace, values, option_string=None):
         qisys.sh.set_home(values)
 
 
@@ -28,6 +28,7 @@ def cpu_count():
         default = multiprocessing.cpu_count()
     except NotImplementedError:
         default = 1
+    return default
 
 
 def parallel_parser(parser, default=cpu_count()):
@@ -136,8 +137,8 @@ def get_worktree(args=None, raises=True):
         wt_root = qisys.worktree.guess_worktree(raises=raises)
     if wt_root:
         return qisys.worktree.WorkTree(wt_root)
-    else:
-        return None
+
+    return None
 
 
 def get_projects(worktree, args):
@@ -199,8 +200,8 @@ class AbstractProjectParser(object):
         if not args.projects:
             if default_all and not args.single:
                 return self.all_projects(args)
-            else:
-                return self.parse_no_project(args)
+
+            return self.parse_no_project(args)
         res = list()
         for project_arg in project_args:
             # parsing one arg can result in several projets
@@ -213,6 +214,7 @@ class WorkTreeProjectParser(AbstractProjectParser):
     """ Implements AbstractProjectParser for a basic WorkTree """
 
     def __init__(self, worktree):
+        super(WorkTreeProjectParser, self).__init__()
         self.worktree = worktree
 
     def all_projects(self, args):

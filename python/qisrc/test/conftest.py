@@ -1,12 +1,15 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-from qisys.test.conftest import *
+from qisys.test.conftest import *  # pylint: disable=wildcard-import,unused-wildcard-import
+import qisys.script
 
 import qisrc.git
 import qisrc.worktree
 import qisrc.manifest
-import qisys.script
+
+# pylint: disable=redefined-outer-name
+# pylint: disable=unused-variable
 
 
 class TestGitWorkTree(qisrc.worktree.GitWorkTree):
@@ -38,7 +41,7 @@ class TestGitWorkTree(qisrc.worktree.GitWorkTree):
         return new_project
 
 
-class TestGitServer(object):
+class TestGitServer(object):  # pylint: disable=too-many-instance-attributes
     """ Represent a set of git urls
 
     everything is done relative to the <root> parameter
@@ -315,7 +318,7 @@ class TestGit(qisrc.git.Git):
 
     def initialize(self, branch="master"):
         """ Make sure there is at least one commit and one branch """
-        rc, out = self.call("show", raises=False)
+        rc, __out = self.call("show", raises=False)  # pylint: disable=unused-variable
         if rc == 0:
             return
         self.init()
@@ -419,7 +422,7 @@ class FakeGit(qisrc.git.Git):
         (retcode, out) = self.get_result(args[0])
         raises = kwargs.get("raises")
         if raises is False:
-            return (retcode, out)
+            return retcode, out
         else:
             if retcode != 0:
                 raise Exception("%s failed" % " ".join(args))
@@ -427,14 +430,14 @@ class FakeGit(qisrc.git.Git):
 
 # pylint: disable-msg=E1101
 @pytest.fixture
-def git_worktree(cd_to_tmpdir):
+def git_worktree(cd_to_tmpdir):  # pylint: disable=unused-argument
     return TestGitWorkTree()
 
 # pylint: disable-msg=E1101
 
 
 @pytest.fixture
-def test_git(request):
+def test_git(request):  # pylint: disable=unused-argument
     return TestGit
 
 # pylint: disable-msg=E1101
@@ -450,14 +453,14 @@ def git_server(tmpdir):
 
 
 @pytest.fixture
-def mock_git(request):
+def mock_git(request):  # pylint: disable=unused-argument
     return FakeGit("repo")
 
 # pylint: disable-msg=E1101
 
 
 @pytest.fixture
-def qisrc_action(cd_to_tmpdir):
+def qisrc_action(cd_to_tmpdir):  # pylint: disable=unused-argument
     return QiSrcAction()
 
 

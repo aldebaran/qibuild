@@ -13,7 +13,6 @@ from qisys import ui
 import qisys.qixml
 import qisrc.git
 import qisrc.manifest
-import qibuild.profile
 
 
 class WorkTreeSyncer(object):
@@ -277,7 +276,8 @@ Please run `qisrc init MANIFEST_URL`
             raise Exception(mess.format(root=self.git_worktree.root))
         self._sync_git(self.manifest_repo, self.manifest.url, self.manifest.branch, self.manifest.ref)
 
-    def _sync_git(self, repo, url, branch, ref):
+    @staticmethod
+    def _sync_git(repo, url, branch, ref):
         git = qisrc.git.Git(repo)
         git.set_remote("origin", url)
         if git.get_current_branch() != branch:
@@ -292,7 +292,7 @@ Please run `qisrc init MANIFEST_URL`
         if not transaction.ok:
             raise Exception("Update failed\n" + transaction.output)
 
-    def _sync_repos(self, old_repos, new_repos, force=False):
+    def _sync_repos(self, old_repos, new_repos, force=False):  # pylint: disable=too-many-branches
         """ Sync the remote repo configurations with the git worktree """
         res = True
         ##
@@ -419,7 +419,7 @@ class LocalManifest(object):
 # Compute updates
 
 
-def compute_repo_diff(old_repos, new_repos):
+def compute_repo_diff(old_repos, new_repos):  # pylint: disable=too-many-branches
     """ Compute the work that needs to be done
 
     :returns: a tuple (to_add, to_move, to_rm, to_update)
@@ -434,10 +434,9 @@ def compute_repo_diff(old_repos, new_repos):
         for old_repo in old_repos:
             common_url = find_common_url(old_repo, new_repo)
             if common_url:
-                if new_repo.src == old_repo.src:
-                    pass  # nothing to do
-                else:
+                if new_repo.src != old_repo.src:
                     to_move.append((old_repo, new_repo.src))
+                # else: nothing to do
                 break
         else:
             # actually we are adding repos that
@@ -447,16 +446,15 @@ def compute_repo_diff(old_repos, new_repos):
 
     for old_repo in old_repos:
         for new_repo in new_repos:
-            if old_repo.src == new_repo.src:
-                if new_repo.remotes == old_repo.remotes:
-                    if new_repo.default_branch == old_repo.default_branch:
-                        if new_repo.fixed_ref != old_repo.fixed_ref:
-                            to_update.append((old_repo, new_repo))
-                    else:
-                        to_update.append((old_repo, new_repo))
-                else:
-                    to_update.append((old_repo, new_repo))
-                break
+            if old_repo.src != new_repo.src:
+                continue
+
+            if new_repo.remotes != old_repo.remotes\
+                    or new_repo.default_branch != old_repo.default_branch\
+                    or new_repo.fixed_ref != old_repo.fixed_ref:
+                to_update.append((old_repo, new_repo))
+
+            break
         else:
             if old_repo not in [x[0] for x in to_move]:
                 to_rm.append(old_repo)
@@ -473,7 +471,7 @@ def compute_repo_diff(old_repos, new_repos):
     for repo_list in [to_move, to_update]:
         repo_list.sort(key=lambda x: x[0].src)
 
-    return (to_add, to_move, to_rm, to_update)
+    return to_add, to_move, to_rm, to_update
 
 
 def find_common_url(repo_a, repo_b):

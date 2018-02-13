@@ -57,18 +57,18 @@ def handle_src_attribute(project, root_elem, doc_elem):
     root_elem.remove(doc_elem)
 
 
-def convert_template_project(project):
+def convert_template_project(project):  # pylint: disable=unused-argument
     pass
 
 
-def create_sub_project(worktree, root_elem, project, src):
+def create_sub_project(worktree, root_elem, project, src):  # pylint: disable=unused-argument
     project_elem = qisys.qixml.etree.Element("project")
     project_elem.set("src", src)
     root_elem.append(project_elem)
     return os.path.join(project.path, src)
 
 
-def create_doc_project(worktree, project_path, doc_elem):
+def create_doc_project(worktree, project_path, doc_elem):  # pylint: disable=unused-argument
     doc_type = None
     if doc_elem.tag == "doxydoc":
         doc_type = "doxygen"

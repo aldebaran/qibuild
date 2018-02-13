@@ -14,6 +14,8 @@ import qisys.command
 import qitest.conf
 import qitest.runner
 
+# pylint: disable=unused-variable
+
 
 class ProjectTestRunner(qitest.runner.TestSuiteRunner):
     """ Implements :py:class:`.TestSuiteRunner` for a qibuild/cmake project """
@@ -100,6 +102,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
     """
 
     def __init__(self, project_runner):
+        super(ProcessTestLauncher, self).__init__()
         self.suite_runner = project_runner
         self.project = self.suite_runner.project
         self.verbose = self.suite_runner.verbose
@@ -251,7 +254,8 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         test["cmd"] = ["valgrind", "--track-fds=yes",
                        "--log-file=%s" % valgrind_log] + test["cmd"]
 
-    def _nightmare_mode(self, test):
+    @staticmethod
+    def _nightmare_mode(test):
         if not test.get("gtest"):
             return
         cmd = test["cmd"]
@@ -284,14 +288,15 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         if process_crashed or not os.path.exists(test_out):
             self._write_xml(res, test, test_out)
 
-    def _write_xml(self, res, test, out_xml):
+    @staticmethod
+    def _write_xml(res, test, out_xml):
         """ Make sure a Junit XML compatible file is written """
         # Arbitrary limit output (~700 lines) to prevent from crashing on read
         res.out = res.out[-16384:]
         res.out = re.sub('\x1b[^m]*m', "", res.out)
 
         message_as_string = " ".join(str(x) for x in res.message
-                                     if not isinstance(x, ui._Color))
+                                     if not isinstance(x, ui._Color))  # pylint: disable=protected-access
         # Windows output is most likely code page 850
         if sys.platform.startswith("win"):
             encoding = "ascii"
@@ -335,7 +340,8 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
 
         qisys.qixml.write(root, out_xml, encoding=encoding)
 
-    def get_message(self, process, timeout=None):
+    @staticmethod
+    def get_message(process, timeout=None):  # pylint: disable=too-many-return-statements
         """ Human readable string describing the state of the process """
         if process.return_type == qisys.command.Process.OK:
             return "[OK]"
@@ -354,8 +360,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             retcode = process.returncode
             if retcode > 0:
                 return "[FAIL] Return code: %i" % retcode
-            else:
-                return qisys.command.str_from_signal(-retcode)
+            return qisys.command.str_from_signal(-retcode)
 
 
 def get_cpu_list(total_cpus, num_cpus_per_test, worker_index):
@@ -369,8 +374,8 @@ def get_cpu_list(total_cpus, num_cpus_per_test, worker_index):
 def parse_valgrind(valgrind_log, res):
     """ Parse valgrind logs and extract interesting errors. """
     message = ""
-    leak_fd_regex = re.compile("==\d+== FILE DESCRIPTORS: (\d+)")
-    invalid_read_regex = re.compile("==\d+== Invalid read of size (\d+)")
+    leak_fd_regex = re.compile(r"==\d+== FILE DESCRIPTORS: (\d+)")
+    invalid_read_regex = re.compile(r"==\d+== Invalid read of size (\d+)")
     with open(valgrind_log, "r") as f:
         lines = f.readlines()
 

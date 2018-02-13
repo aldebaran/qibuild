@@ -5,6 +5,8 @@
 import sys
 import qibuild.dylibs
 
+# pylint: disable=unused-variable
+
 
 def test_create_symlinks_to_deps(tmpdir):
     if sys.platform != 'darwin':

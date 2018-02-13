@@ -10,7 +10,6 @@ import stat
 from qisys import ui
 import qisys.archive
 import qisys.sh
-import qibuild.cmake
 
 
 def is_elf(filename):
@@ -55,7 +54,7 @@ def can_be_dumped(filename):
         return is_exe(filename)
 
 
-def dump_symbols_from_binary(binary, pool_dir):
+def dump_symbols_from_binary(binary, pool_dir):  # pylint: disable=too-many-locals
     """ Dump sympobls from the binary.
     Results can be found in
     <pool_dir>/<binary name>/<id>/<binary name>.sym
@@ -137,7 +136,7 @@ def dump_symbols_from_directory(root_dir, pool_dir, strip=True,
     in $PATH)
 
     """
-    for (root, directories, filenames) in os.walk(root_dir):
+    for (root, __directories, filenames) in os.walk(root_dir):  # pylint: disable=unused-variable
         for filename in filenames:
             full_path = os.path.join(root_dir, root, filename)
             if os.path.islink(full_path):

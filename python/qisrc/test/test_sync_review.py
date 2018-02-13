@@ -1,12 +1,13 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+import mock
 
 import qisrc.sync
 from qisrc.test.conftest import TestGitWorkTree
 
-import mock
-import pytest
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
 
 
 def test_call_setup_review(git_worktree, git_server):

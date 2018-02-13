@@ -14,8 +14,8 @@ def get_linguist_worktree(args):
     worktree = qisys.parsers.get_worktree(args, raises=False)
     if worktree:
         return LinguistWorkTree(worktree)
-    else:
-        return None
+
+    return None
 
 
 def get_linguist_projects(args, default_all=False):
@@ -56,7 +56,7 @@ def get_pml_projects(pml_paths):
 
 
 def get_linguist_builder(args, with_projects=True):
-    worktree = get_linguist_worktree(args)
+    __worktree = get_linguist_worktree(args)  # pylint: disable=unused-variable
     builder = qilinguist.builder.QiLinguistBuilder()
     if with_projects:
         projects = get_linguist_projects(args)
@@ -71,6 +71,7 @@ class LinguistProjectParser(qisys.parsers.AbstractProjectParser):
     """ Implements AbstractProjectParser for a LinguistWorkTree """
 
     def __init__(self, linguist_worktree):
+        super(LinguistProjectParser, self).__init__()
         self.linguist_worktree = linguist_worktree
         self.linguist_projects = linguist_worktree.linguist_projects
 

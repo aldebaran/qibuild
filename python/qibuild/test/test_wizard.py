@@ -13,12 +13,12 @@ import tempfile
 import unittest
 import mock
 
-import qisys
 import qibuild.wizard
+import qisys
 from qisys.test.fake_interact import FakeInteract
 
 
-class ConfigWizardTestCase(unittest.TestCase):
+class ConfigWizardTestCase(unittest.TestCase):  # pylint: disable=too-many-instance-attributes
 
     def setUp(self):
         self.orig_platform = sys.platform
@@ -38,7 +38,8 @@ class ConfigWizardTestCase(unittest.TestCase):
         worktree = qisys.worktree.WorkTree(self.tmp, sanity_check=False)
         self.build_worktree = qibuild.worktree.BuildWorkTree(worktree)
 
-    def setup_platform(self, platform):
+    @staticmethod
+    def setup_platform(platform):
         """ Setup sys.platform
 
         """
@@ -66,7 +67,7 @@ class ConfigWizardTestCase(unittest.TestCase):
         for this test
 
         """
-        def fake_find(name, raises=True, env=None):
+        def fake_find(name, raises=True, env=None):  # pylint: disable=unused-argument
             return programs.get(name)
         self.find_program.side_effect = fake_find
 
@@ -87,7 +88,8 @@ class ConfigWizardTestCase(unittest.TestCase):
         """
         self.get_generators.return_value = generators
 
-    def run_wizard(self, build_worktree=None):
+    @staticmethod
+    def run_wizard(build_worktree=None):
         """ Run the wizard, return the QiBuildConfig object
 
         """
@@ -138,7 +140,7 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.assertEqual(qtcreator.name, 'QtCreator')
         self.assertEqual(qtcreator.path, '/home/john/QtSDK/bin/qtcreator')
         defaults_env_path = qibuild_cfg.defaults.env.path
-        self.assertEqual(defaults_env_path,  "/home/john/.local/cmake/bin")
+        self.assertEqual(defaults_env_path, "/home/john/.local/cmake/bin")
 
     def test_qtcreator_in_conf(self):
         if sys.platform == "darwin":

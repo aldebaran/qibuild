@@ -1,13 +1,14 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+import pytest
 
 import qisrc.manifest
 import qisrc.review
 
-import pytest
-
-import mock
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+# pylint: disable=unused-variable
 
 
 def test_simple_read(tmpdir):
@@ -395,7 +396,7 @@ def test_all_repos(tmpdir):
 </manifest>
 """)
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
-    git_projects = manifest.get_repos(all=True)
+    git_projects = manifest.get_repos(get_all=True)
     assert len(git_projects) == 3
 
 

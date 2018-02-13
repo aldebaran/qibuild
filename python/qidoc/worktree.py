@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
 import os
-import difflib
 
 from qisys import ui
 import qisys.worktree
@@ -90,8 +89,8 @@ def new_doc_project(doc_worktree, project):
     root = tree.getroot()
     if root.get("version") == "3":
         return _new_doc_project_3(doc_worktree, project)
-    else:
-        return _new_doc_project_2(doc_worktree, project)
+
+    return _new_doc_project_2(doc_worktree, project)
 
 
 def _new_doc_project_3(doc_worktree, project):
@@ -144,6 +143,7 @@ def _new_doc_project_2(doc_worktree, project):
 
 
 def _new_doc_project(doc_worktree, project, xml_elem, doc_type):
+    # pylint: disable=too-many-branches,too-many-locals
     qiproject_xml = project.qiproject_xml
     if doc_type == "template":
         return TemplateProject(doc_worktree, project)

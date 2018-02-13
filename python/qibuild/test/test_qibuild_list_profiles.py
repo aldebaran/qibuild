@@ -5,7 +5,9 @@
 import qibuild.profile
 
 from qibuild.test.conftest import TestBuildWorkTree
-from qisrc.test.conftest import qisrc_action, git_server
+from qisrc.test.conftest import qisrc_action, git_server  # pylint: disable=unused-import
+
+# pylint: disable=redefined-outer-name
 
 
 def test_list_profiles(qibuild_action, qisrc_action, git_server, record_messages):
@@ -16,5 +18,5 @@ def test_list_profiles(qibuild_action, qisrc_action, git_server, record_messages
     qibuild.profile.configure_build_profile(qibuild_xml, "bar", [("WITH_BAR", "ON")])
     record_messages.reset()
     qibuild_action("list-profiles")
-    assert record_messages.find("\*\s+foo")
-    assert record_messages.find("\*\s+bar")
+    assert record_messages.find(r"\*\s+foo")
+    assert record_messages.find(r"\*\s+bar")

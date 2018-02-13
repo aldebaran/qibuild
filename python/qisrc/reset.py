@@ -8,7 +8,7 @@ from qisys import ui
 import qisrc.git
 
 
-def clever_reset_ref(git_project, ref, raises=True):
+def clever_reset_ref(git_project, ref, raises=True):  # pylint: disable=too-many-return-statements,too-many-branches
     """ Resets only if needed, fetches only if needed """
     try:
         remote_name = git_project.default_remote.name
@@ -40,8 +40,8 @@ def clever_reset_ref(git_project, ref, raises=True):
     if actual_sha1 == ref_sha1:  # Nothing to do
         if raises:
             return
-        else:
-            return True, ""
+
+        return True, ""
     ret, _ = git.call("show", "--oneline", ref, raises=False)
     if ret == 0:  # SHA-1 exists locally
         if raises:

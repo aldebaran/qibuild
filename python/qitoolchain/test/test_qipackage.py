@@ -1,12 +1,17 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-import pytest
 import os
 
+import pytest
+
 import qisys.archive
-import qitoolchain.qipackage
 from qisys.test.conftest import skip_on_win
+import qitoolchain.qipackage
+
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+# pylint: disable=unused-variable
 
 
 def test_equality():
@@ -49,8 +54,7 @@ def test_reads_runtime_manifest(tmpdir):
     boost_path.ensure("include", "boost.h", file=True)
     boost_path.ensure("lib", "libboost.so", file=True)
     runtime_manifest = boost_path.ensure("install_manifest_runtime.txt", file=True)
-    runtime_manifest.write("""\
-lib/libboost.so
+    runtime_manifest.write(r"""lib/libboost.so
 """)
     package = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
     dest = tmpdir.join("dest")
@@ -84,7 +88,7 @@ def test_reads_release_mask(tmpdir):
     qt_path.ensure("bin", "QtCore4.dll", file=True)
     qt_path.ensure("bin", "QtCored4.dll", file=True)
     runtime_mask = qt_path.ensure("runtime.mask", file=True)
-    runtime_mask.write("""\
+    runtime_mask.write(r"""
 # headers
 exclude include/.*
 
@@ -92,7 +96,7 @@ exclude include/.*
 exclude lib/.*\.lib
 """)
     release_mask = qt_path.ensure("release.mask", file=True)
-    release_mask.write("""\
+    release_mask.write(r"""
 exclude bin/QtCored4.dll
 """)
     package = qitoolchain.qipackage.QiPackage("qt", path=qt_path.strpath)
@@ -109,7 +113,7 @@ def test_include_in_mask(tmpdir):
     qt_path.ensure("bin", "lrelease.exe")
     qt_path.ensure("bin", "lupdate.exe")
     runtime_mask = qt_path.ensure("runtime.mask", file=True)
-    runtime_mask.write("""\
+    runtime_mask.write(r"""
 exclude bin/.*\.exe
 include bin/lrelease.exe
 include bin/lupdate.exe
@@ -123,7 +127,7 @@ include bin/lupdate.exe
 
 def test_load_deps(tmpdir):
     libqi_path = tmpdir.mkdir("libqi")
-    libqi_path.ensure("package.xml").write("""\
+    libqi_path.ensure("package.xml").write(r"""
 <package name="libqi">
   <depends testtime="true" names="gtest" />
   <depends runtime="true" names="boost python" />
@@ -204,7 +208,7 @@ def test_post_add_noop(tmpdir):
 
 def test_post_add_does_not_exist(tmpdir):
     boost_path = tmpdir.mkdir("boost")
-    boost_path.join("package.xml").write("""
+    boost_path.join("package.xml").write(r"""
 <package name="boost" version="1.58" post-add="asdf" />
 """)
 
@@ -219,10 +223,9 @@ def test_post_add_does_not_exist(tmpdir):
 @skip_on_win
 def test_post_add(tmpdir):
     boost_path = tmpdir.mkdir("boost")
-    boost_path.join("package.xml").write(
-        '<package name="boost" version="1.58" '
-        'post-add="post-add.sh hello world" />'
-    )
+    boost_path.join("package.xml").write(r"""
+<package name="boost" version="1.58" post-add="post-add.sh hello world" />
+""")
 
     script = boost_path.join("post-add.sh")
     script.write(

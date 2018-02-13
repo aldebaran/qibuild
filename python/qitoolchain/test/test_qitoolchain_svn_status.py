@@ -7,7 +7,9 @@ import os
 import qitoolchain.svn_package
 import qitoolchain.toolchain
 
-from qisrc.test.conftest import svn_server
+from qisrc.test.conftest import svn_server  # pylint: disable=unused-import
+
+# pylint: disable=redefined-outer-name
 
 
 def test_simple(qitoolchain_action, svn_server, feed, record_messages):

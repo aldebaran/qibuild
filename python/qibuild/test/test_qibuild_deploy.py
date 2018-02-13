@@ -6,7 +6,7 @@ import os
 import qisys.command
 import qibuild.find
 
-import mock
+# pylint: disable=unused-variable
 
 
 def check_ssh_connection():

@@ -1,13 +1,13 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+import pytest
 
 import qibuild.cmake_builder
 import qibuild.config
 import qibuild.parsers
 
-import mock
-import pytest
+# pylint: disable=unused-variable
 
 
 def test_check_configure_has_been_called_before_building(build_worktree):
@@ -67,7 +67,7 @@ def test_add_package_paths_from_toolchain(build_worktree, toolchains, monkeypatc
     assert sdk_dirs == [boost_package.path, qi_package.path]
 
 
-def test_host_tools_happy_path(build_worktree, fake_ctc):
+def test_host_tools_happy_path(build_worktree, fake_ctc):  # pylint: disable=unused-argument
     footool = build_worktree.add_test_project("footool")
     footool.configure()
     host_sdk_dir = footool.sdk_directory
@@ -78,7 +78,7 @@ def test_host_tools_happy_path(build_worktree, fake_ctc):
     assert host_dirs == [host_sdk_dir]
 
 
-def test_host_tools_no_host_config(build_worktree, fake_ctc):
+def test_host_tools_no_host_config(build_worktree, fake_ctc):  # pylint: disable=unused-argument
     footool = build_worktree.add_test_project("footool")
     usefootool_proj = build_worktree.add_test_project("usefootool")
     build_worktree.set_active_config("fake-ctc")
@@ -89,7 +89,7 @@ def test_host_tools_no_host_config(build_worktree, fake_ctc):
     assert "`qibuild set-host-config`" in e.value.message
 
 
-def test_host_tools_host_tools_not_built(build_worktree, fake_ctc):
+def test_host_tools_host_tools_not_built(build_worktree, fake_ctc):  # pylint: disable=unused-argument
     qibuild.config.add_build_config("foo", host=True)
     footool = build_worktree.add_test_project("footool")
     usefootool_proj = build_worktree.add_test_project("usefootool")

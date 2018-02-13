@@ -1,17 +1,18 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-import sys
 import os
 
 import qisys.command
+from qisys.test.conftest import skip_on_win
 import qitest.project
 import qibuild.config
 import qibuild.find
 
-from qisys.test.conftest import skip_on_win
 from qibuild.test.conftest import QiBuildAction
 from qitoolchain.test.conftest import QiToolchainAction
+
+# pylint: disable=unused-variable
 
 
 def create_foo_toolchain_with_world_package(qibuild_action, qitoolchain_action):
@@ -116,7 +117,7 @@ def test_qi_install_cmake(qibuild_action, tmpdir):
     assert tmpdir.join("share", "recurse", "a_dir/b_dir/c_dir/d_file").check(file=True)
 
 
-def test_fails_early(qibuild_action, tmpdir):
+def test_fails_early(qibuild_action, tmpdir):  # pylint: disable=unused-argument
     qibuild_action.add_test_project("installme")
     qibuild_action("configure", "installme", "-DFAIL_EMPTY_GLOB=TRUE", raises=True)
     qibuild_action("configure", "installme", "-DFAIL_NON_EXISTING=TRUE", raises=True)
@@ -138,7 +139,7 @@ def install_cross(qibuild_action, tmpdir, cmake_generator="Unix Makefiles"):
                    "-G", cmake_generator,
                    "-DCMAKE_TOOLCHAIN_FILE=%s" % toolchain_file)
     qibuild_action("make", "cross",)
-    qibuild_action("install", "cross",  tmpdir.strpath)
+    qibuild_action("install", "cross", tmpdir.strpath)
 
 
 def test_running_tests_after_install(qibuild_action, tmpdir):

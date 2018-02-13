@@ -7,6 +7,9 @@ import os
 import qisys.qixml
 import qitoolchain.qipackage
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_create_extract(qitoolchain_action, tmpdir):
     foo = tmpdir.join("foo")

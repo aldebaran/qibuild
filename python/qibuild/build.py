@@ -54,6 +54,7 @@ def msbuild(sln_file, build_type="Debug", target=None, num_jobs=None):
 
 class BuildFailed(Exception):
     def __init__(self, project):
+        super(BuildFailed, self).__init__()
         self.project = project
 
     def __str__(self):
@@ -62,12 +63,13 @@ class BuildFailed(Exception):
 
 class ConfigureFailed(Exception):
     def __init__(self, project, exception=None):
+        super(ConfigureFailed, self).__init__()
         self.project = project
         self.exception = exception
 
     def __str__(self):
         mess = "Error occurred when configuring project %s" % self.project.name
         returncode = self.exception.returncode
-        if (returncode < 0):
+        if returncode < 0:
             mess += " (%s)" % qisys.command.str_from_signal(-returncode)
         return mess

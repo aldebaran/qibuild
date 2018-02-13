@@ -1,14 +1,14 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-from qibuild.test.conftest import *
-from qisys.test.conftest import TestAction
 
+from qibuild.test.conftest import *  # pylint: disable=wildcard-import,unused-wildcard-import
 import qibuild.find
 
-import pytest
+from qisys.test.conftest import TestAction
 
 # pylint: disable-msg=E1103
+# pylint: disable=redefined-outer-name
 
 
 @pytest.fixture
@@ -33,7 +33,7 @@ def compiled_tests(build_worktree):
 
 
 @pytest.fixture
-def qitest_action(cd_to_tmpdir):
+def qitest_action(cd_to_tmpdir):  # pylint: disable=unused-argument
     res = QiTestAction()
     return res
 

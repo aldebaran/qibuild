@@ -5,6 +5,8 @@ import qisrc.manifest
 import qisrc.git_config
 import qisrc.sync
 
+# pylint: disable=unused-variable
+
 
 def make_repos(*args):
     res = list()

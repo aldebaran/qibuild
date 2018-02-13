@@ -23,7 +23,7 @@ def test_non_cloned_groups(qisrc_action, git_server, record_messages):
     qisrc_action("init", git_server.manifest_url, "--group", "foo")
     record_messages.reset()
     qisrc_action("foreach", "--group", "bar", "ls")
-    warning = record_messages.find("\[WARN \]")
+    warning = record_messages.find(r"\[WARN \]")
     assert warning
     assert "Group bar is not currently in use" in warning
 
@@ -34,5 +34,5 @@ def test_do_not_warn_on_subgroups(qisrc_action, git_server, record_messages):
     qisrc_action("init", git_server.manifest_url, "--group", "big")
     record_messages.reset()
     qisrc_action("foreach", "--group", "small", "ls")
-    assert not record_messages.find("\[WARN \]")
-    assert record_messages.find("\* \(1/1\) b")
+    assert not record_messages.find(r"\[WARN \]")
+    assert record_messages.find(r"\* \(1/1\) b")

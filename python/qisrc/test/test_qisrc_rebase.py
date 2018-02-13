@@ -6,6 +6,8 @@ import pytest
 from qisrc.test.conftest import TestGitWorkTree
 from qisrc.test.conftest import TestGit
 
+# pylint: disable=unused-variable
+
 
 def test_happy_rebase(git_server, qisrc_action):
     git_server.create_repo("foo")
@@ -59,7 +61,7 @@ def test_raises_when_not_on_correct_branch(git_server, qisrc_action, record_mess
     assert record_messages.find("skipped")
 
 
-def test_when_moved(git_server, qisrc_action, record_messages):
+def test_when_moved(git_server, qisrc_action, record_messages):  # pylint: disable=unused-argument
     git_server.create_repo("foo")
     git_server.switch_manifest_branch("devel")
     git_server.change_branch("foo", "devel")
@@ -99,7 +101,7 @@ def test_when_ahead(git_server, qisrc_action):
     qisrc_action("rebase", "--all")
 
 
-def test_push_after_rebase(git_server, git_worktree, qisrc_action, interact):
+def test_push_after_rebase(git_server, git_worktree, qisrc_action, interact):  # pylint: disable=unused-argument
     git_server.create_repo("foo")
     git_server.switch_manifest_branch("devel")
     git_server.change_branch("foo", "devel")
@@ -120,6 +122,7 @@ def test_push_after_rebase(git_server, git_worktree, qisrc_action, interact):
 
 
 def test_only_rebase_forked_projects(git_server, git_worktree, qisrc_action, record_messages):
+    # pylint: disable=unused-argument
     git_server.create_repo("foo")
     git_server.create_repo("bar")
     git_server.switch_manifest_branch("devel")

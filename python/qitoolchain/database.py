@@ -29,7 +29,7 @@ class DataBase(object):
             to_add = qitoolchain.qipackage.from_xml(element)
             self.packages[to_add.name] = to_add
         for svn_elem in tree.findall("svn_package"):
-            to_add = qitoolchain.qipackage.from_xml(element)
+            to_add = qitoolchain.qipackage.from_xml(svn_elem)
             self.packages[to_add.name] = to_add
 
     def save(self):
@@ -96,7 +96,7 @@ class DataBase(object):
                 res.append(self.packages[name])
         return res
 
-    def update(self, feed, branch=None, name=None):
+    def update(self, feed, branch=None, name=None):  # pylint: disable=too-many-branches,too-many-locals
         """ Update a toolchain given a feed
 
         ``feed`` can be:
@@ -188,7 +188,8 @@ class DataBase(object):
         else:
             svn_package.checkout()
 
-    def handle_local_package(self, package, feed):
+    @staticmethod
+    def handle_local_package(package, feed):
         directory = package.directory
         feed_root = os.path.dirname(feed)
         package_path = os.path.join(feed_root, directory)

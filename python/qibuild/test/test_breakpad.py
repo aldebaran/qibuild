@@ -34,7 +34,7 @@ def test_generate_symbols(build_worktree, tmpdir):
 
 
 def test_is_macho(qibuild_action):
-    if not sys.platform == "darwin":
+    if sys.platform != "darwin":
         return
     world_project = qibuild_action.add_test_project("world")
     qibuild_action("configure", "world")

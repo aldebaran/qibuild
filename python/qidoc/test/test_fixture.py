@@ -4,7 +4,7 @@
 from qidoc.test.conftest import TestDocWorkTree
 
 
-def test_create_projects(cd_to_tmpdir):
+def test_create_projects(cd_to_tmpdir):  # pylint: disable=unused-argument
     doc_worktree = TestDocWorkTree()
     doc_worktree.add_templates()
     doc_worktree.create_doxygen_project("foo")

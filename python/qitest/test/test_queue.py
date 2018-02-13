@@ -1,8 +1,9 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-from qisys import ui
 import time
+
+from qisys import ui
 import qitest.test_queue
 import qitest.runner
 import qitest.result
@@ -15,6 +16,7 @@ class DummyProject(object):
 
 class DummyLauncher(qitest.runner.TestLauncher):
     def __init__(self, tmpdir):
+        super(DummyLauncher, self).__init__()
         self.results = dict()
         self.project = DummyProject(tmpdir)
 
@@ -98,6 +100,7 @@ def test_no_tests(tmpdir):
 
 class SporadicallyFailingLauncher(qitest.runner.TestLauncher):
     def __init__(self, tmpdir):
+        super(SporadicallyFailingLauncher, self).__init__()
         self.num_runs = 0
         self.project = DummyProject(tmpdir)
 

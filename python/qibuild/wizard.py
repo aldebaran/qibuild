@@ -12,7 +12,6 @@ import sys
 from qisys import ui
 import qisys
 import qibuild
-import qitoolchain
 
 
 def guess_cmake(qibuild_cfg):
@@ -58,9 +57,8 @@ def ask_ide():
         ides.append("Visual Studio")
     if sys.platform == "darwin":
         ides.append("Xcode")
-    ide = qisys.interact.ask_choice(ides,
-                                    "Please choose an IDE")
-    if ide is "None":
+    ide = qisys.interact.ask_choice(ides, "Please choose an IDE")
+    if ide == "None":
         return None
     return ide
 
@@ -82,7 +80,7 @@ def _configure_qtcreator(qibuild_cfg):
     build_env = qibuild.config.get_build_env()
     qtcreator_path = qisys.command.find_program("qtcreator", env=build_env)
     if qtcreator_path:
-        ui.info(ui.green, "::", ui.reset,  "Found QtCreator:", qtcreator_path)
+        ui.info(ui.green, "::", ui.reset, "Found QtCreator:", qtcreator_path)
         mess = "Do you want to use qtcreator from %s?\n" % qtcreator_path
         mess += "Answer 'no' if you installed qtcreator from Nokia's installer"
         answer = qisys.interact.ask_yes_no(mess, default=True)
@@ -136,7 +134,7 @@ def configure_local_settings(build_worktree):
     """
     print
     worktree_root = build_worktree.root
-    ui.info(ui.green, "::", ui.reset,  "Found a worktree in", worktree_root)
+    ui.info(ui.green, "::", ui.reset, "Found a worktree in", worktree_root)
     qibuild_cfg = build_worktree.qibuild_cfg
     answer = qisys.interact.ask_yes_no(
         "Do you want to configure settings for this worktree?",

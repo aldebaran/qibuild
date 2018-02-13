@@ -10,7 +10,7 @@ from qisys import ui
 import qitest.test_queue
 
 
-class TestSuiteRunner(object):
+class TestSuiteRunner(object):  # pylint: disable=too-many-instance-attributes
     """ Interface for a class able to run a test suite """
     __metaclass__ = abc.ABCMeta
 
@@ -58,7 +58,8 @@ class TestSuiteRunner(object):
     @patterns.setter
     def patterns(self, value):
         if value:
-            [re.compile(x) for x in value]  # just checking regexps are valid
+            # just checking regexps are valid
+            [re.compile(x) for x in value]  # pylint: disable=expression-not-assigned
         self._patterns = value
 
     @property
@@ -68,7 +69,8 @@ class TestSuiteRunner(object):
     @excludes.setter
     def excludes(self, value):
         if value:
-            [re.compile(x) for x in value]  # just checking regexps are valid
+            # just checking regexps are valid
+            [re.compile(x) for x in value]  # pylint: disable=expression-not-assigned
         self._excludes = value
 
     @property

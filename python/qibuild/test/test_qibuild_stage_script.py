@@ -3,11 +3,10 @@
 # found in the COPYING file.
 import os
 import sys
-import subprocess
-import qisys.command
-import qibuild.find
 
 import pytest
+
+import qisys.command
 
 
 def run_python_script(name):

@@ -4,6 +4,9 @@
 
 from qisys.test.conftest import TestWorkTree
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_get_set_license(worktree):
     foo = worktree.create_project("foo")

@@ -12,7 +12,6 @@ import os
 import ntpath
 import posixpath
 import operator
-import difflib
 
 import qisys.project
 import qisys.command
@@ -217,7 +216,7 @@ This path does not exist
         src = self.normalize_path(path)
         new_src = self.normalize_path(new_path)
 
-        project = self.get_project(src, raises=True)
+        __project = self.get_project(src, raises=True)  # pylint: disable=unused-variable
 
         if self.has_project(new_src):
             mess = "Could not move project\n"
@@ -346,6 +345,7 @@ class NotInWorkTree(Exception):
 
 class NoSuchProject(Exception):
     def __init__(self, name, message):
+        super(NoSuchProject, self).__init__()
         self.name = name
         self.message = message
 

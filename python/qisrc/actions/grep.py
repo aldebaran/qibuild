@@ -29,7 +29,7 @@ def configure_parser(parser):
                         help="git grep options preceded with -- to escape the leading '-'")
 
 
-def do(args):
+def do(args):  # pylint: disable=too-many-locals
     """Main entry point."""
     git_worktree = qisrc.parsers.get_git_worktree(args)
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args, default_all=True,

@@ -50,7 +50,7 @@ def _get_pkg_arch(metadata_dir):
         variant = _parse_march(os.path.join(metadata_dir, flag_file))
         if variant is not None:
             break
-    return (arch, variant)
+    return arch, variant
 
 
 class GentooPackage(GentooNoPortagePackage):
@@ -61,7 +61,7 @@ class GentooPackage(GentooNoPortagePackage):
     def __init__(self, package_path):
         GentooNoPortagePackage.__init__(self, package_path)
 
-    def _load(self):
+    def _load(self):  # pylint: disable=too-many-locals
         """ Read the metadata from the binary package and store them in the
         instance.
 
@@ -84,7 +84,7 @@ class GentooPackage(GentooNoPortagePackage):
                 with open(dep_path, 'r') as fdep:
                     dependency[dep] = fdep.read().strip().split()
         dependency['all'] = list()
-        for dep_list in _DEPENDENCY.keys():
+        for dep_list in _DEPENDENCY:
             dependency['all'].extend(dependency[dep_list])
         for dep, dep_list in dependency.iteritems():
             dependency[dep] = list(set(dep_list))

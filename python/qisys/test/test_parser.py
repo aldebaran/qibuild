@@ -1,10 +1,14 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+import pytest
+
 import qisys.parsers
 import qisys.worktree
 
-import pytest
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+# pylint: disable=unused-variable
 
 
 def test_guess_woktree(worktree, args):

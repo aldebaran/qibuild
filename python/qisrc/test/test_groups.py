@@ -3,13 +3,13 @@
 # found in the COPYING file.
 import xml.etree.ElementTree as etree
 
-import qisrc.groups
-
 import pytest
+
+import qisrc.groups
 
 
 def test_parser_read():
-    file = """
+    default_file = """
 <groups>
   <group name="a">
     <project name="b" />
@@ -23,14 +23,14 @@ def test_parser_read():
 </groups>
 """
 
-    root = etree.fromstring(file)
+    root = etree.fromstring(default_file)
 
     groups = qisrc.groups.Groups()
     parser = qisrc.groups.GroupsParser(groups)
     parser.parse(root)
 
-    assert set(groups.projects('d')) - set(['bar', 'foo']) == set()
-    assert set(groups.projects('a')) - set(['bar', 'foo', 'b', 'c', 'd']) == set()
+    assert set(groups.projects('d')) - {'bar', 'foo'} == set()
+    assert set(groups.projects('a')) - {'bar', 'foo', 'b', 'c', 'd'} == set()
 
     # pylint: disable-msg=E1101
     with pytest.raises(qisrc.groups.GroupError):

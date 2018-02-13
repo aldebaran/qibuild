@@ -1,17 +1,17 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-
 import os
+
+import mock
 
 import qibuild.find
 
-from qibuild.test.conftest import QiBuildAction
-from qitoolchain.test.conftest import QiToolchainAction
-from qibuild.actions import run
+from qibuild.test.conftest import QiBuildAction  # pylint: disable=unused-import
+from qibuild.actions import run  # pylint: disable=unused-import
+from qitoolchain.test.conftest import QiToolchainAction  # pylint: disable=unused-import
 
-import pytest
-import mock
+# pylint: disable=unused-variable
 
 
 def test_run_target(qibuild_action):

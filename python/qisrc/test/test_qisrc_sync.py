@@ -14,6 +14,9 @@ from qibuild.test.conftest import TestBuildWorkTree
 import qibuild.config
 import qibuild.profile
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_sync_clones_new_repos(qisrc_action, git_server):
     git_server.create_repo("foo.git")
@@ -441,7 +444,7 @@ def test_fixed_ref_no_such_ref(qisrc_action, git_server, record_messages):
     assert record_messages.find("Could not parse v0.1 as a valid ref")
 
 
-def test_switching_to_new_fixed_ref(qisrc_action, git_server, record_messages):
+def test_switching_to_new_fixed_ref(qisrc_action, git_server):
     git_server.create_repo("foo.git")
     git_server.push_file("foo.git", "a.txt", "a")
     git_server.push_tag("foo.git", "v0.1")
@@ -494,7 +497,7 @@ def test_switching_to_new_fixed_ref_local_changes(qisrc_action, git_server, reco
     assert sha1 == expected
 
 
-def test_switching_from_fixed_ref_to_branch(qisrc_action, git_server, record_messages):
+def test_switching_from_fixed_ref_to_branch(qisrc_action, git_server):
     git_server.create_repo("foo.git")
     git_server.push_file("foo.git", "a.txt", "a")
     git_server.push_tag("foo.git", "v0.1")

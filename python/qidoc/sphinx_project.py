@@ -8,7 +8,6 @@ from qisys import ui
 import qisys.archive
 import qisys.sh
 import qidoc.project
-import pprint
 
 
 class SphinxProject(qidoc.project.DocProject):
@@ -56,7 +55,7 @@ class SphinxProject(qidoc.project.DocProject):
         try:
             # quick hack if conf.in.py used __file__
             from_conf["__file__"] = in_conf_py
-            exec(conf, from_conf)
+            exec(conf, from_conf)  # pylint: disable=exec-used
             conf = conf.replace("__file__", 'r"%s"' % in_conf_py)
         except Exception, e:
             ui.error("Could not read", in_conf_py, "\n", e)
@@ -94,7 +93,7 @@ class SphinxProject(qidoc.project.DocProject):
         self.append_doxy_xml_path(path_list)
         return (
             "\nqiapidoc_srcs=[" +
-            ','.join(map(lambda x: "r'" + x + "'", path_list)) +
+            ','.join(["r'" + x + "'" for x in path_list]) +
             "]\n")
 
     def append_doxylink_settings(self, conf, rel_paths=False):
@@ -138,16 +137,17 @@ class SphinxProject(qidoc.project.DocProject):
         res += "\nintersphinx_mapping= " + str(intersphinx_mapping)
         return res
 
-    def append_extension(self, conf, extension_name):
+    @staticmethod
+    def append_extension(conf, extension_name):
         from_conf = dict()
-        exec(conf, from_conf)
+        exec(conf, from_conf)  # pylint: disable=exec-used
         res = ""
         if "extensions" not in from_conf:
             res += "extensions = list()\n"
         res += '\nextensions.append("%s")' % extension_name
         return res
 
-    def build(self, build_type=None, language=None,
+    def build(self, build_type=None, language=None,  # pylint: disable=arguments-differ,too-many-branches
               spellcheck=False, werror=False, pdb=False):
         """ Run sphinx.main() with the correct arguments """
         try:
@@ -287,6 +287,7 @@ class SphinxBuildError(Exception):
 
 class UnknownLingua(Exception):
     def __init__(self, project, language):
+        super(UnknownLingua, self).__init__()
         self.language = language
         self.project = project
 

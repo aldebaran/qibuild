@@ -21,7 +21,7 @@ class GentooPackage(BinaryPackage):
 
     """
     # regex copied from portage.versions source
-    _PN = r'(?P<pn>[\w+][\w+-]*?(?P<pn_inval>-(cvs\.)?(\d+)((\.\d+)*)([a-z]?)((_(pre|p|beta|alpha|rc)\d*)*)(-r(\d+))?)?)'  # noqa
+    _PN = r'(?P<pn>[\w+][\w+-]*?(?P<pn_inval>-(cvs\.)?(\d+)((\.\d+)*)([a-z]?)((_(pre|p|beta|alpha|rc)\d*)*)(-r(\d+))?)?)'  # noqa # pylint: disable=line-too-long
     _PV = r'(?P<ver>(cvs\.)?(\d+)((\.\d+)*)([a-z]?)((_(pre|p|beta|alpha|rc)\d*)*))'
     _PR = r'(-r(?P<rev>\d+))?'
     _PF = r'^' + _PN + '-' + _PV + _PR + '$'
@@ -59,7 +59,7 @@ class GentooPackage(BinaryPackage):
             mess = 'No such file or directory: %s' % dest_dir
             raise Exception(mess)
         discard_pattern = "trailing garbage after EOF ignored"
-        root_dir = qisys.archive._extract_tar(self.path, dest_dir, algo="bzip2",
+        root_dir = qisys.archive._extract_tar(self.path, dest_dir, algo="bzip2",  # pylint: disable=protected-access
                                               quiet=True, verbose=False,
                                               output_filter=discard_pattern)
         return root_dir

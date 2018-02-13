@@ -7,11 +7,9 @@
 import os
 import sys
 
-from qisys.qixml import etree
 from qisys import ui
 import qisys.archive
 import qisys.sh
-import qisys.archive
 import qibuild.parsers
 
 
@@ -28,7 +26,7 @@ def configure_parser(parser):
                             "(Force CMAKE_BUILD_TYPE=RelWithDebInfo)")
 
 
-def do(args):
+def do(args):  # pylint: disable=too-many-locals
     """Main entry point"""
     standalone = args.standalone
     breakpad = args.breakpad
@@ -88,8 +86,8 @@ def do(args):
         ui.info(ui.green, "Symbols package generated in", ui.reset, ui.bold,
                 symbols_archive)
         return archive, symbols_archive
-    else:
-        return archive
+
+    return archive
 
 
 def _do_package(cmake_builder, destdir, build_type="Release", standalone=False):

@@ -103,7 +103,7 @@ hard to test:
             if self.config.foo_bar:
                 do_foo_bar()
 
-    class MyClass():
+    class MyClass:
         def __init__(self):
             self.foo = Foo()
 
@@ -121,7 +121,7 @@ you
 
 .. code-block:: python
 
-    class MyClass():
+    class MyClass:
         def __init__(self, foo=None)
             if foo is None:
               self.foo = Foo()

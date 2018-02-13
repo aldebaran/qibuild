@@ -4,13 +4,11 @@
 """ Add a group to the current worktree
 
 """
-
 import copy
+import sys
 
 from qisys import ui
 import qisrc.parsers
-
-import sys
 
 
 def configure_parser(parser):

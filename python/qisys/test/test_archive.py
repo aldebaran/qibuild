@@ -7,20 +7,19 @@
 """
 
 import os
-import stat
 import zipfile
 
 import pytest
 
 import qisys
 
-from qisys.archive import compress
-from qisys.archive import extract
-from qisys.archive import guess_algo
+from qisys.archive import extract, guess_algo  # pylint: disable=unused-import
 
 # We don't use the stdlib for tar: it does not have
 # all the features `tar` has and is slower, so all tar tests
 # are disabled on Windows
+
+# pylint: disable=unused-variable
 
 
 def test_create_extract_zip_simple(tmpdir):

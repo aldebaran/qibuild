@@ -3,12 +3,12 @@
 # found in the COPYING file.
 
 """ Get the list of all licenses used by the given projects """
+import collections
 import json
 
 from qisys import ui
 import qisys.parsers
 import qibuild.parsers
-import collections
 
 
 def configure_parser(parser):
@@ -40,18 +40,18 @@ def do(args):
 
     res = collections.OrderedDict()
     for package in packages:
-        license_ = package.license
-        if should_add_license(license_):
+        license_name = package.license
+        if should_add_license(license_name):
             res[package.name] = package.license
     for project in projects:
-        license_ = project.license
-        if should_add_license(license_):
+        license_name = project.license
+        if should_add_license(license_name):
             res[project.name] = project.license
 
     if args.json:
         print json.dumps(res, indent=2)
     else:
-        for name, license in res.iteritems():
-            ui.info(name, license)
+        for name, license_ in res.iteritems():
+            ui.info(name, license_)
 
     return res

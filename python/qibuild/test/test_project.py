@@ -1,14 +1,15 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-
 import os
+
+import pytest
 
 import qisys.qixml
 import qisrc.git
 import qibuild.config
 
-import pytest
+# pylint: disable=unused-variable
 
 
 def test_dependencies_cmake(build_worktree):
@@ -34,11 +35,11 @@ def test_parse_num_jobs_unsupported_generator(build_worktree):
     hello = build_worktree.create_project("hello")
     # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
-        hello.parse_num_jobs(3, cmake_generator="NMake Makefiles") == list()
+        assert hello.parse_num_jobs(3, cmake_generator="NMake Makefiles") == list()
     assert "-j is not supported for NMake Makefiles" in str(e.value)
 
 
-def test_parse_num_jobs_no_dash_j(build_worktree, record_messages):
+def test_parse_num_jobs_no_dash_j(build_worktree, record_messages):  # pylint: disable=unused-argument
     hello = build_worktree.create_project("hello")
     assert hello.parse_num_jobs(3, cmake_generator="Visual Studio 10") == ["/maxcpucount:3"]
 
@@ -80,7 +81,7 @@ def test_validates_name(build_worktree):
         build_worktree.create_project("foo/bar")
 
 
-def test_get_host_sdk_dir_no_system(build_worktree, toolchains, fake_ctc):
+def test_get_host_sdk_dir_no_system(build_worktree, toolchains, fake_ctc):  # pylint: disable=unused-argument
     toolchains.create("foo")
     qibuild.config.add_build_config("foo", toolchain="foo")
     qibuild_cfg = qibuild.config.QiBuildConfig()
@@ -95,7 +96,7 @@ def test_get_host_sdk_dir_no_system(build_worktree, toolchains, fake_ctc):
     assert bar_proj.get_host_sdk_dir() == host_sdk_dir
 
 
-def test_get_host_sdk_dir_system(build_worktree, toolchains, fake_ctc):
+def test_get_host_sdk_dir_system(build_worktree, toolchains, fake_ctc):  # pylint: disable=unused-argument
     bar_proj = build_worktree.create_project("bar")
     system_sdk_dir = bar_proj.sdk_directory
     build_worktree.set_active_config("fake-ctc")

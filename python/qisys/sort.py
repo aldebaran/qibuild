@@ -116,9 +116,9 @@ def topological_sort(data, heads):
         head = 'internalfakehead'
         result = _topological_sort(data, head, head)
         return [x for x in result if x != 'internalfakehead']
-    else:
-        head = heads
-        return _topological_sort(data, head, head)
+
+    head = heads
+    return _topological_sort(data, head, head)
 
 
 def _topological_sort(data, head, top_node, raise_exception=False, result=None, visited=None):

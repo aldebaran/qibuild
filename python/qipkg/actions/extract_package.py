@@ -25,8 +25,6 @@ def do(args):
     # Extract the manifest to a tempfile to
     # parse it
     archive = zipfile.ZipFile(pkg_path)
-    name = None
-    version = None
     pkg_name = None
     with qisys.sh.TempDir() as tmp:
         for name in archive.namelist():

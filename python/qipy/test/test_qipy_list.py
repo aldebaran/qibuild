@@ -8,5 +8,5 @@ def test_simple(qipy_action, record_messages):
     qipy_action.add_test_project("big_project")
     qipy_action.add_test_project("foomodules")
     qipy_action("list")
-    assert record_messages.find("\*\s+a")
-    assert record_messages.find("\*\s+big_project")
+    assert record_messages.find(r"\*\s+a")
+    assert record_messages.find(r"\*\s+big_project")

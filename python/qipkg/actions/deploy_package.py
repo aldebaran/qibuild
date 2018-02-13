@@ -7,7 +7,6 @@
 
 import os
 import sys
-import zipfile
 
 from qisys import ui
 import qisys.command
@@ -64,8 +63,8 @@ def deploy(pkg_path, url):
 
 
 def _install_package(url, pkg_name, pkg_path):
-    import qi
-    app = qi.Application()
+    import qi  # pylint: disable=import-error
+    # app = qi.Application()
     session = qi.Session()
     session.connect("tcp://%s:9559" % (url.host))
     package_manager = session.service("PackageManager")

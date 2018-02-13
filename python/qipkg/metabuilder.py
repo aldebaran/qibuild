@@ -1,9 +1,6 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-import copy
-import os
-import zipfile
 
 from qisys import ui
 import qipkg.metapackage
@@ -57,14 +54,14 @@ class MetaPMLBuilder(object):
                     "Deploying", pml_builder.pml_path)
             pml_builder.deploy(url)
 
-    def package(self, *args, **kwargs):
+    def package(self, *args, **kwargs):  # pylint: disable=unused-argument
         """ Generate a package containing every package.
 
         :param: with_breakpad generate debug symbols for usage
                                with breakpad
 
         """
-        output = kwargs.get('output', None)
+        # output = kwargs.get('output', None)
         force = kwargs.get('force', False)
         with_breakpad = kwargs.get('with_breakpad', False)
         all_packages = list()

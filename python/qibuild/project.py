@@ -6,7 +6,6 @@ import argparse
 import json
 import os
 import platform
-import re
 import sys
 from xml.etree import ElementTree as etree
 
@@ -14,6 +13,7 @@ from qisys import ui
 import qisys.command
 import qisys.parsers
 import qisys.sh
+import qibuild
 import qibuild.cmake
 import qibuild.build
 import qibuild.breakpad
@@ -24,7 +24,6 @@ import qibuild.dlls
 import qibuild.test_runner
 import qisrc.worktree
 import qisrc.git
-import qitoolchain.toolchain
 import qitest.conf
 import qitest.project
 
@@ -58,6 +57,8 @@ def write_qi_path_conf(directory, sdk_dirs, sdk_layout=True):
         fp.write(to_write)
 
 
+# pylint: disable=too-many-public-methods
+# pylint: disable=too-many-instance-attributes
 class BuildProject(object):
     def __init__(self, build_worktree, worktree_project):
         self.build_worktree = build_worktree
@@ -119,8 +120,8 @@ class BuildProject(object):
                                 build_prefix,
                                 build_directory_name,
                                 self.name)
-        else:
-            return os.path.join(self.path, build_directory_name)
+
+        return os.path.join(self.path, build_directory_name)
 
     @property
     def cmake_cache(self):
@@ -250,7 +251,6 @@ endif()
             custom_cmake_code=custom_cmake_code
         )
 
-        import qibuild
         qibuild_python = os.path.join(qibuild.__file__, "..", "..")
         qibuild_python = os.path.abspath(qibuild_python)
         qibuild_python = qisys.sh.to_posix_path(qibuild_python)
@@ -307,7 +307,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             mess += "Error was: %s" % message
             ui.error(mess)
         for line in lines:
-            parser.error = lambda message: log_error(message, line)
+            parser.error = lambda message, current_line_in_loop=line: log_error(message, current_line_in_loop)
             line = line.strip()
             try:
                 args = parser.parse_args(args=line.split(";"))
@@ -335,8 +335,9 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             qisys.sh.mkdir(cov_dir)
             cmd += ["cov-build", "--dir", cov_dir]
 
-        cmd += ["cmake", "--build", self.build_directory,
-                         "--config", self.build_type]
+        cmd += ["cmake",
+                "--build", self.build_directory,
+                "--config", self.build_type]
 
         if target:
             cmd += ["--target", target]
@@ -592,7 +593,7 @@ The following tools were not found: {missing}\
                 ret['known_configs'].append(bdir)
             elif bdir.startswith("build-"):
                 ret['unknown_configs'].append(bdir)
-        for k in ret.keys():
+        for k in ret:
             if build_prefix:
                 ret[k] = [os.path.join(build_prefix, x, self.name) for x in ret[k]]
             else:
@@ -644,7 +645,7 @@ The following tools were not found: {missing}\
         return self.name == other.name and self.src == other.src
 
     def __ne__(self, other):
-        return not (self == other)
+        return not self == other
 
 
 class BadProjectConfig(Exception):

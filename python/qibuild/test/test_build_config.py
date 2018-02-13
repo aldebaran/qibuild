@@ -5,12 +5,11 @@
 import os
 
 import qisys.sh
-from qisys.qixml import etree
 import qibuild.build_config
 import qibuild.config
-import qitoolchain.toolchain
-
 from qibuild.test.conftest import TestBuildWorkTree
+
+import qitoolchain.toolchain
 
 
 def test_read_profiles(build_worktree):
@@ -182,10 +181,10 @@ def test_local_and_remote_profiles(build_worktree):
     qibuild.config.add_build_config("foo", profiles=["foo"])
 
     build_config.set_active_config("bar")
-    assert build_config._profile_flags == [("WITH_BAR", "ON")]
+    assert build_config._profile_flags == [("WITH_BAR", "ON")]  # pylint: disable=protected-access
 
     build_config.set_active_config("foo")
-    assert build_config._profile_flags == [("WITH_FOO", "ON")]
+    assert build_config._profile_flags == [("WITH_FOO", "ON")]  # pylint: disable=protected-access
 
 
 def test_overwriting_remote_profiles(build_worktree):
@@ -201,10 +200,10 @@ def test_overwriting_remote_profiles(build_worktree):
 
     qibuild.config.add_build_config("bar", profiles=["bar"])
     build_config.set_active_config("bar")
-    assert build_config._profile_flags == [("WITH_BAR", "OFF")]
+    assert build_config._profile_flags == [("WITH_BAR", "OFF")]  # pylint: disable=protected-access
 
 
-def test_profiles_from_config(cd_to_tmpdir):
+def test_profiles_from_config(cd_to_tmpdir):  # pylint: disable=unused-argument
     qibuild.config.add_build_config("foo", profiles=["bar"])
     build_worktree = TestBuildWorkTree()
     local_xml = build_worktree.qibuild_xml

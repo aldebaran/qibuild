@@ -96,7 +96,7 @@ def parse_fun_block(txt):
 
     params = parse_params(param_txt)
     example = parse_example(txt)
-    return (desc, params, example)
+    return desc, params, example
 
 
 def parse_params(txt):

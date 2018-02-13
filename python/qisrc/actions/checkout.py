@@ -7,11 +7,9 @@ Also, checkout the correct branch for every git project
 in the worktree
 
 """
-
-from qisys import ui
-import qisrc.parsers
-
 import sys
+
+import qisrc.parsers
 
 
 def configure_parser(parser):

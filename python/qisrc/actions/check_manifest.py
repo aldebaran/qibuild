@@ -6,11 +6,9 @@
 Useful to check everything is ok before pushing the manifest
 
 """
-
-from qisys import ui
-import qisrc.parsers
-
 import sys
+
+import qisrc.parsers
 
 
 def configure_parser(parser):

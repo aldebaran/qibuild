@@ -6,15 +6,13 @@
 
 """
 import os
-import sys
-import subprocess
 
 from qisys import ui
+import qisys.command
 import qisys.interact
+import qisys.parsers
 import qibuild.find
 import qibuild.parsers
-import qisys.parsers
-import qisys.command
 
 
 def run(projects, binary, bin_args, env=None, exec_=True):
@@ -42,6 +40,6 @@ def run(projects, binary, bin_args, env=None, exec_=True):
     cmd = [bin_path] + bin_args
     if exec_:
         ui.debug("exec", cmd)
-        os.execve(bin_path,  cmd, env)
+        os.execve(bin_path, cmd, env)
     else:
         qisys.command.call(cmd, env=env)

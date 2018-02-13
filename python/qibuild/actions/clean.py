@@ -33,21 +33,27 @@ def configure_parser(parser):
     parser.add_argument("--force", "-f", dest="force", action="store_true", help="force the clean")
 
 
+def _get_clean_selection(remove_known_configs, remove_unknown_configs):
+    clean_selection = "given_config"
+
+    if remove_known_configs and remove_unknown_configs:
+        clean_selection = "all_configs"
+    elif remove_known_configs and not remove_unknown_configs:
+        clean_selection = "known_configs"
+    elif not remove_known_configs and remove_unknown_configs:
+        clean_selection = "unknown_configs"
+
+    return clean_selection
+
+
 @ui.timer("qibuild clean")
-def do(args):
+def do(args):  # pylint: disable=too-many-branches,too-many-locals
     """Main entry point."""
     build_worktree = qibuild.parsers.get_build_worktree(args)
     projects = qibuild.parsers.get_build_projects(build_worktree, args,
                                                   solve_deps=True)
 
-    if args.remove_known_configs and args.remove_unknown_configs:
-        clean_selection = "all_configs"
-    elif args.remove_known_configs and not args.remove_unknown_configs:
-        clean_selection = "known_configs"
-    elif not args.remove_known_configs and args.remove_unknown_configs:
-        clean_selection = "unknown_configs"
-    else:
-        clean_selection = "given_config"
+    clean_selection = _get_clean_selection(args.remove_known_configs, args.remove_unknown_configs)
 
     bdirs = {'known_configs': list(), 'unknown_configs': list()}
     all_configs = clean_selection != "given_config"

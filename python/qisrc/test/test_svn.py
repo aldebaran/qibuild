@@ -1,5 +1,8 @@
 import qisrc.svn
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_commit_all_adds_new_subfolders(svn_server, tmpdir):
     foo_url = svn_server.create_repo("foo")

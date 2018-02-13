@@ -15,13 +15,11 @@ import operator
 from qisys import ui
 
 
-import qisys.command
-
-
 class InvalidAction(Exception):
     """Just a custom exception """
 
     def __init__(self, name, message):
+        super(InvalidAction, self).__init__()
         self.name = name
         self._message = message
 
@@ -31,7 +29,7 @@ class InvalidAction(Exception):
         return message
 
 
-def parse_args_for_help(args):
+def parse_args_for_help(args):  # pylint: disable=too-many-return-statements
     """Parse a command line for help usage.
 
     Returns a tuple:
@@ -58,22 +56,25 @@ def parse_args_for_help(args):
         return arg in ("-h", "--help", "help")
 
     if not args:
-        return (True, None)
+        return True, None
+
     if len(args) > 2:
-        return (False, None)
+        return False, None
 
     if len(args) == 1:
         if is_help(args[0]):
-            return (True, None)
-        else:
-            return(False, None)
+            return True, None
+
+        return False, None
 
     if len(args) == 2:
         if is_help(args[0]):
-            return (True, args[1])
+            return True, args[1]
+
         if is_help(args[1]):
-            return (True, args[0])
-        return(False, None)
+            return True, args[0]
+
+        return False, None
 
 
 def run_action(module_name, args=None, forward_args=None):
@@ -174,7 +175,7 @@ def _dump_arguments(name, args):
     ui.debug("[%s] arguments:\n%s" % (name, output))
 
 
-def root_command_main(name, parser, modules, args=None):
+def root_command_main(name, parser, modules, args=None):  # pylint: disable=too-many-locals
     """name : name of the main program
        parser : an instance of ArgumentParser class
        modules : list of Python modules

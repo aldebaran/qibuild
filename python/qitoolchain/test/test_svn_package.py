@@ -6,10 +6,12 @@ import os
 import qitoolchain.toolchain
 import qitoolchain.svn_package
 
-from qisrc.test.conftest import svn_server
+from qisrc.test.conftest import svn_server  # pylint: disable=unused-import
+
+# pylint: disable=redefined-outer-name
 
 
-def test_svn_update(svn_server, feed, toolchains):
+def test_svn_update(svn_server, feed, toolchains):  # pylint: disable=unused-argument
     boost_url = svn_server.create_repo("boost")
     svn_server.commit_file("boost", "version.hpp", '#define BOOST_VERSION "1_55"\n')
     boost_package = qitoolchain.svn_package.SvnPackage("boost")

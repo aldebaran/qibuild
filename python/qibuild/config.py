@@ -419,7 +419,7 @@ class BuildConfig(object):
         return res
 
 
-class QiBuildConfig(object):
+class QiBuildConfig(object):  # pylint: disable=too-many-instance-attributes
     """ A class to represent both local and global
     qibuild.xml configuration files
 
@@ -453,7 +453,7 @@ class QiBuildConfig(object):
         # A dict of worktree, key being the path
         self.worktrees = dict()
 
-    def read(self, cfg_path=None, create_if_missing=False):
+    def read(self, cfg_path=None, create_if_missing=False):  # pylint: disable=too-many-locals
         """ Read from a config location
 
         """
@@ -673,10 +673,7 @@ class QiBuildConfig(object):
         # Make sure that we unset the previous 'host' config when
         # called twice with different config names
         for name, config in self.configs.iteritems():
-            if name == config_name:
-                config.host = True
-            else:
-                config.host = False
+            config.host = name == config_name
 
     def get_host_config(self):
         """ Get the config to use when looking for host tools """
@@ -684,7 +681,7 @@ class QiBuildConfig(object):
             if config.host:
                 return name
 
-    def write(self, xml_path=None):
+    def write(self, xml_path=None):  # pylint: disable=too-many-locals
         """ Write back the new config
 
         """

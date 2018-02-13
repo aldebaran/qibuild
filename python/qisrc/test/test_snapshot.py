@@ -1,11 +1,10 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-import qisys.sh
 import qisrc.snapshot
-from qisrc.test.conftest import TestGitWorkTree
+from qisrc.test.conftest import TestGitWorkTree  # pylint: disable=unused-import
 
-import pytest
+# pylint: disable=unused-variable
 
 
 def test_dump_load(tmpdir):
@@ -89,7 +88,7 @@ def test_stores_manifest_in_snapshot(git_server, git_worktree):
     assert manifest.url == manifest_url
 
 
-def test_generate_load_json(tmpdir, git_server, git_worktree):
+def test_generate_load_json(tmpdir, git_server, git_worktree):  # pylint: disable=unused-argument
     snapshot1 = qisrc.snapshot.Snapshot()
     snapshot1.manifest = qisrc.sync.LocalManifest()
     snapshot1.manifest.ref = "refs/heads/master"

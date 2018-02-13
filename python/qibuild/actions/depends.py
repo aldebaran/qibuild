@@ -123,7 +123,7 @@ def separate_into_groups(dependency_relationships):
     projects_bad = sorted(set(projects_bad))
     packages = sorted(set(packages))
     packages_bad = sorted(set(packages_bad))
-    return (projects, projects_bad, packages, packages_bad)
+    return projects, projects_bad, packages, packages_bad
 
 
 def print_deps_compressed(dependency_relationships):
@@ -135,13 +135,13 @@ def print_deps_compressed(dependency_relationships):
     (projects, projects_bad, packages, packages_bad) = separate_into_groups(
         dependency_relationships)
 
-    if (len(projects) + len(projects_bad) > 0):
+    if len(projects) + len(projects_bad) > 0:
         qisys.ui.info(qisys.ui.reset, "  Projects")
         for project in projects:
             qisys.ui.info(qisys.ui.white, "    " + project)
         for project in projects_bad:
             qisys.ui.info(qisys.ui.red, "    " + project)
-    if (len(packages) + len(packages_bad) > 0):
+    if len(packages) + len(packages_bad) > 0:
         qisys.ui.info(qisys.ui.reset, "  Packages")
         for package in packages:
             qisys.ui.info(qisys.ui.white, "    " + package)

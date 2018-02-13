@@ -52,7 +52,7 @@ class FakeInteract(object):
         mess += "Known keys are: %s" % ", ".join(keys)
         raise Exception(mess)
 
-    def ask_choice(self, choices, message, **unused):
+    def ask_choice(self, choices, message, **unused):  # pylint: disable=unused-argument
         print "::", message
         for choice in choices:
             print "* ", choice
@@ -99,6 +99,6 @@ class FakeInteract(object):
         self.questions.append(question)
         if self.answers_type == "dict":
             return self.find_answer(message, choices=choices, default=default)
-        else:
-            self.answer_index += 1
-            return self.answers[self.answer_index]
+
+        self.answer_index += 1
+        return self.answers[self.answer_index]

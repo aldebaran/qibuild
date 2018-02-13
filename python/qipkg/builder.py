@@ -18,7 +18,7 @@ import qilinguist.pml_translator
 import qipkg.manifest
 
 
-class PMLBuilder(object):
+class PMLBuilder(object):  # pylint: disable=too-many-instance-attributes
     """ Build a package from a pml file """
 
     def __init__(self, pml_path, worktree=None):
@@ -91,7 +91,7 @@ Error when parsing {pml_path}
 """
             raise Exception(mess.format(pml_path=pml_path, mess=str(e)))
 
-    def _load_pml(self, pml_path):
+    def _load_pml(self, pml_path):  # pylint: disable=too-many-branches,too-many-locals
         for builder in self.builders:
             builder.projects = list()
         tree = qisys.qixml.read(pml_path)
@@ -152,10 +152,10 @@ Error when parsing {pml_path}
                 self.pml_extra_files.append(src)
 
         errors = list()
-        for file in self.pml_extra_files:
-            full_path = os.path.join(self.base_dir, file)
+        for extra_file in self.pml_extra_files:
+            full_path = os.path.join(self.base_dir, extra_file)
             if not os.path.exists(full_path):
-                errors.append(file)
+                errors.append(extra_file)
         if errors:
             mess = "Some files do not exist\n"
             for error in errors:
@@ -211,7 +211,7 @@ Error when parsing {pml_path}
         """ Deploy every project to the given url """
         qisys.remote.deploy(self.stage_path, url)
 
-    def package(self, *args, **kwargs):
+    def package(self, *args, **kwargs):  # pylint: disable=unused-argument
         """ Generate a package containing every project.
 
         :param: with_breakpad generate debug symbols for usage
@@ -239,7 +239,7 @@ Error when parsing {pml_path}
         # Make sure self.stage_path exists and is empty
         qisys.sh.rm(self.stage_path)
         qisys.sh.mkdir(self.stage_path, recursive=True)
-        res = list()
+
         if not output:
             output = os.path.join(os.getcwd(), self.pkg_name + ".pkg")
 
@@ -265,8 +265,8 @@ Error when parsing {pml_path}
         qisys.sh.rm(self.stage_path)
         if symbols_archive:
             return [output, symbols_archive]
-        else:
-            return output
+
+        return output
 
     def __repr__(self):
         return "<PMLBuilder for %s>" % self.pml_path

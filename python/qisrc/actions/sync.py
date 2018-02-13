@@ -8,16 +8,15 @@
  * Configure projects for code review
 
 """
-
+import threading
 import sys
 
 from qisys import ui
 import qisys.parsers
+import qisys.parallel
 import qisrc.git
 import qisrc.sync
 import qisrc.parsers
-import qisys.parallel
-import threading
 
 
 def configure_parser(parser):

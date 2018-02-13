@@ -6,7 +6,7 @@ import qitoolchain.qipackage
 import qisrc.svn
 
 
-class SvnPackage(qitoolchain.qipackage.QiPackage):
+class SvnPackage(qitoolchain.qipackage.QiPackage):  # pylint: disable=too-many-instance-attributes
     """ A ``QiPackage`` managed by subversion """
 
     def __init__(self, name):

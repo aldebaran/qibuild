@@ -41,7 +41,7 @@ def stat_ahead_behind(git, local_ref, remote_ref):
     return ahead, behind
 
 
-class ProjectState:
+class ProjectState(object):  # pylint: disable=too-many-instance-attributes
     """A class which represent a project and is cleanlyness."""
 
     def __init__(self, project):
@@ -122,8 +122,7 @@ def _set_status(git, state_project, untracked=False):
     if not state_project.sync_and_clean:
         out = git.get_status(untracked)
         if out is not None:
-            state_project.status = [x for x in out.splitlines() if
-                                    len(x.strip()) > 0]
+            state_project.status = [x for x in out.splitlines() if x.strip()]
 
 
 def _print_behind_ahead(behind, ahead):
@@ -192,7 +191,7 @@ def print_incorrect_projs(projects, max_len):
                 "Manifest")
         for project in incorrect_projs:
             ui.info(ui.green, " *", ui.reset,
-                    ui.blue,  project.project.src.ljust(max_len + 3),
+                    ui.blue, project.project.src.ljust(max_len + 3),
                     ui.green, project.current_branch.ljust(max_branch_len + 3),
                     ui.green, project.project.default_branch.name)
 

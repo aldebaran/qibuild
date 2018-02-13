@@ -35,7 +35,7 @@ def configure_parser(parser):
     parser.set_defaults(ignore_groups=False)
 
 
-def do(args):
+def do(args):  # pylint: disable=too-many-branches
     """Main entry points."""
 
     git_worktree = qisrc.parsers.get_git_worktree(args)

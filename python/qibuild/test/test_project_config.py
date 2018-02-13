@@ -5,14 +5,14 @@
 """ Automatic testing for qibuild.project.ProjectConfig
 
 """
+from StringIO import StringIO
+import unittest
 
 from qibuild.config import ProjectConfig
-import unittest
-from StringIO import StringIO
 
 
-def cfg_from_string(str):
-    cfg_loc = StringIO(str)
+def cfg_from_string(input_str):
+    cfg_loc = StringIO(input_str)
     project_cfg = ProjectConfig()
     project_cfg.read(cfg_loc)
     return project_cfg
@@ -45,7 +45,7 @@ class ProjectConfigTestClass(unittest.TestCase):
 </project>
 """
         project_cfg = cfg_from_string(xml)
-        self.assertEqual(project_cfg.build_depends,  set(["bar", "baz", "eggs"]))
+        self.assertEqual(project_cfg.build_depends, set(["bar", "baz", "eggs"]))
         self.assertEqual(project_cfg.run_depends, set(["bar", "baz", "spam"]))
         self.assertEqual(project_cfg.test_depends, set(["gtest"]))
 

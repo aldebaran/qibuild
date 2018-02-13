@@ -18,7 +18,7 @@ def test_find_target_in_project_cmake(qibuild_action, record_messages):
     assert record_messages.find("WORLD_LIBRARIES")
 
 
-def test_find_target_in_toolchain_package_cmake(cd_to_tmpdir, record_messages):
+def test_find_target_in_toolchain_package_cmake(cd_to_tmpdir, record_messages):  # pylint: disable=unused-argument
     qibuild_action = QiBuildAction()
     qitoolchain_action = QiToolchainAction()
     build_worktree = qibuild_action.build_worktree
@@ -52,7 +52,7 @@ def test_find_target_in_build_dir(qibuild_action, record_messages):
     assert rc == 1
 
 
-def test_find_target_in_toolchain_package(cd_to_tmpdir, record_messages):
+def test_find_target_in_toolchain_package(cd_to_tmpdir, record_messages):  # pylint: disable=unused-argument
     qibuild_action = QiBuildAction()
     qitoolchain_action = QiToolchainAction()
     qibuild_action.add_test_project("world")

@@ -9,14 +9,10 @@ import locale
 from xml.etree import ElementTree as etree
 
 from qisys import ui
-import qisrc.git
 import qisys.qixml
 
 
 class ProjectXML(qisys.qixml.XMLParser):
-    def __init__(self, target):
-        super(ProjectXML, self).__init__(target)
-
     def _parse_maintainer(self, element):
         maintainer = {'email': element.get('email'), 'name': element.text}
         self.target.append(maintainer)

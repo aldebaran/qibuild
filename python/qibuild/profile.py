@@ -11,7 +11,7 @@ import os
 import qisys.qixml
 
 
-class Profile:
+class Profile(object):
     """ A profile is just a set of CMake flags for now.
     If has a name you can specify when building using
     ``qibuild configure --profile <name>``
@@ -24,7 +24,7 @@ class Profile:
 
     def elem(self):
         elem = qisys.qixml.etree.Element("profile")
-        elem.set("name",  self.name)
+        elem.set("name", self.name)
         if self.cmake_flags:
             cmake_elem = qisys.qixml.etree.Element("cmake")
             flags_elem = qisys.qixml.etree.Element("flags")
@@ -44,7 +44,7 @@ class Profile:
         return not self.__eq__(other)
 
 
-def parse_profiles(xml_path):
+def parse_profiles(xml_path):  # pylint: disable=too-many-locals
     """ Parse .qi/qibuild.xml. Return a dict
     name -> Profile
     """

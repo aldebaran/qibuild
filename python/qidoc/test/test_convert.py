@@ -7,7 +7,8 @@ import qisys.sh
 
 import qidoc.convert
 from qidoc.test.conftest import TestDocWorkTree
-from qibuild.test.conftest import TestBuildWorkTree
+
+# pylint: disable=unused-variable
 
 
 def test_convert_handle_src(worktree):

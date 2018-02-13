@@ -4,10 +4,12 @@
 
 import bs4
 
-from qisys.test.conftest import *
+from qisys.test.conftest import *  # pylint: disable=wildcard-import,unused-wildcard-import
 import qisys.qixml
 
 import qidoc.worktree
+
+# pylint: disable=redefined-outer-name
 
 
 class TestDocWorkTree(qidoc.worktree.DocWorkTree):
@@ -104,13 +106,13 @@ def find_link(html_path, text):
 
 # pylint: disable-msg=E1101
 @pytest.fixture
-def doc_worktree(cd_to_tmpdir):
+def doc_worktree(cd_to_tmpdir):  # pylint: disable=unused-argument
     return TestDocWorkTree()
 
 # pylint: disable-msg=E1103
 
 
 @pytest.fixture
-def qidoc_action(cd_to_tmpdir):
+def qidoc_action(cd_to_tmpdir):  # pylint: disable=unused-argument
     res = QiDocAction()
     return res

@@ -11,6 +11,7 @@ class QiLinguistBuilder(AbstractBuilder):
     """
 
     def __init__(self):
+        super(QiLinguistBuilder, self).__init__(self.__class__.__name__)
         self.projects = list()
 
     def configure(self, *args, **kwargs):
@@ -23,7 +24,7 @@ class QiLinguistBuilder(AbstractBuilder):
             ui.info_count(i, len(self.projects), "Releasing", project.name)
             project.release(raises=kwargs.get("raises"))
 
-    def install(self, dest):
+    def install(self, dest, *args, **kwargs):
         for i, project in enumerate(self.projects):
             ui.info_count(i, len(self.projects), "Installing", project.name)
             project.install(dest)

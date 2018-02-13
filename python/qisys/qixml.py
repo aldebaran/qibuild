@@ -7,11 +7,10 @@
 `The ElemtTree XML API <http://docs.python.org/library/xml.etree.elementtree.html>`_
 
 """
-
 import re
-from qisys import ui
-
 from xml.etree import ElementTree as etree
+
+from qisys import ui
 
 
 def indent(elem, level=0):
@@ -20,15 +19,17 @@ def indent(elem, level=0):
     """
     # Taken from http://infix.se/2007/02/06/gentlemen-indent-your-xml
     i = "\n" + level*"  "
-    if len(elem):  # Can't use "if elem": etree advises against it for future compat
+
+    # Can't use "if elem": etree advises against it for future compat
+    if len(elem):  # pylint: disable=len-as-condition
         if not elem.text or not elem.text.strip():
             elem.text = i + "  "
         for e in elem:
             indent(e, level+1)
             if not e.tail or not e.tail.strip():
                 e.tail = i + "  "
-        if not e.tail or not e.tail.strip():
-            e.tail = i
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
     else:
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
@@ -246,7 +247,7 @@ class XMLParser(object):
                                                              attribute_name)
             raise Exception(mess)
 
-    def xml_elem(self, node_name=None):
+    def xml_elem(self, node_name=None):  # pylint: disable=too-many-branches
         """ Get the xml representation of the target
 
         Will set attributes of the node using attributes of the target,
@@ -262,7 +263,7 @@ class XMLParser(object):
 
         def is_serializable(value):
             # no way to guess that from etree api:
-            return type(value) in (list, bool, str, unicode, int)
+            return isinstance(value, (list, bool, str, unicode, int))
 
         target_dir = dir(self.target)
         for member in target_dir:
@@ -286,12 +287,12 @@ class XMLParser(object):
                 continue
             member_value = getattr(self.target, member)
             if is_serializable(member_value):
-                if type(member_value) == bool:
+                if isinstance(member_value, bool):
                     if member_value:
                         res.set(member, "true")
                     else:
                         res.set(member, "false")
-                elif type(member_value) == list:
+                elif isinstance(member_value, list):
                     if member_value:
                         res.set(member, " ".join(member_value))
                 else:

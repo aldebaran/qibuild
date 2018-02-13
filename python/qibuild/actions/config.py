@@ -6,9 +6,9 @@
 import subprocess
 
 import qisys.parsers
+from qisys import ui
 import qibuild.parsers
 import qibuild.wizard
-from qisys import ui
 
 
 def configure_parser(parser):

@@ -14,7 +14,7 @@ def test_simple(qitoolchain_action):
     qitoolchain_action("create", "foo")
     qibuild.config.add_build_config("foo", toolchain="foo")
     word_package = qitoolchain_action.get_test_package("world")
-    qitoolchain_action("add-package", "-c", "foo",  word_package)
+    qitoolchain_action("add-package", "-c", "foo", word_package)
     tc = qitoolchain.get_toolchain("foo")
     world_package = tc.packages[0]
     assert world_package.name == "world"
@@ -64,7 +64,7 @@ set(CMAKE_CXX_FLAGS "-std=gnu++11")
         contents = fp.read()
     included_file = None
     for line in contents.splitlines():
-        match = re.match('include\("(.*)"\)', line)
+        match = re.match(r'include\("(.*)"\)', line)
         if match:
             included_file = match.groups()[0]
     assert os.path.exists(included_file)

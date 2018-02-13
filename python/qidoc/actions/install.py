@@ -9,9 +9,6 @@ attribute in the qiproject.xml
 
 """
 
-import operator
-
-from qisys import ui
 import qisys.parsers
 import qidoc.parsers
 import qidoc.builder

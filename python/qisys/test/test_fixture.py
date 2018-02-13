@@ -9,7 +9,7 @@ from qisys.test.conftest import skip_on_win
 
 
 def test_worktree(worktree):
-    assert len(worktree.projects) == 0
+    assert not worktree.projects
     assert os.path.exists(worktree.worktree_xml)
 
 
@@ -27,7 +27,7 @@ def test_record(record_messages):
     assert not record_messages.find("foo")
 
 
-def test_cd_to_tmp(cd_to_tmpdir):
+def test_cd_to_tmp(cd_to_tmpdir):  # pylint: disable=unused-argument
     assert os.listdir(os.getcwd()) == list()
 
 

@@ -3,7 +3,6 @@
 # found in the COPYING file.
 import os
 import sys
-import difflib
 
 from qisys import ui
 import qisys.command
@@ -152,7 +151,7 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
             res = qibuild.profile.parse_profiles(remote_xml)
         local_xml = self.qibuild_xml
         local_profiles = qibuild.profile.parse_profiles(local_xml)
-        for name in local_profiles.keys():
+        for name in local_profiles:
             if name in res:
                 remote_profile = res[name]
                 local_profile = local_profiles[name]

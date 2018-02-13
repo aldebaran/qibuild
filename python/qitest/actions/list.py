@@ -3,9 +3,7 @@
 # found in the COPYING file.
 """ List the tests"""
 
-import os
 import re
-import sys
 from qisys import ui
 
 import qisys.parsers
@@ -46,9 +44,9 @@ def do(args):
                     message += "(no type)"
                 ui.info_count(i, n, name, ui.brown, message)
 
-    if warn_name_count:
-        msg = "%i on %i tests do not respect naming convention" % (warn_name_count, len(test_runner.tests))
-        ui.warning(msg)
-    if warn_type_count:
-        msg = "%i on %i tests do not have any type" % (warn_type_count, len(test_runner.tests))
-        ui.warning(msg)
+        if warn_name_count:
+            msg = "%i on %i tests do not respect naming convention" % (warn_name_count, len(test_runner.tests))
+            ui.warning(msg)
+        if warn_type_count:
+            msg = "%i on %i tests do not have any type" % (warn_type_count, len(test_runner.tests))
+            ui.warning(msg)

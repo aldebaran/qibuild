@@ -6,6 +6,8 @@ import qisys.sh
 import qisrc.git
 from qisrc.test.conftest import TestGit
 
+# pylint: disable=unused-variable
+
 
 def test_name_from_url_common():
     examples = [
@@ -63,7 +65,7 @@ def test_set_tracking_branch_existing_branch_tracking_other(tmpdir):
     assert ret is True
 
 
-def test_changelog(cd_to_tmpdir):
+def test_changelog(cd_to_tmpdir):  # pylint: disable=unused-argument
     git = TestGit()
     git.initialize()
     message_1 = "mess1"
@@ -86,7 +88,7 @@ def test_get_repo_root(tmpdir):
     assert actual == expected
 
 
-def test_safe_checkout(cd_to_tmpdir, git_server):
+def test_safe_checkout(cd_to_tmpdir, git_server):  # pylint: disable=unused-argument
     git_server.create_repo("foo.git")
     git = TestGit()
     git.clone(git_server.srv.join("foo.git").strpath)

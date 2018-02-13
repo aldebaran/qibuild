@@ -34,7 +34,7 @@ if os.name == 'nt':
 #  qisys.ui.msg(qisys.ui.bold, "This is bold", qisys.ui.reset)
 
 
-class _Color:
+class _Color(object):
     def __init__(self, code, modifier=None):
         self.code = '\033[%d' % code
         if modifier is not None:
@@ -107,35 +107,36 @@ def configure_logging(args):
 
 
 def config_title(fp):
-    config_title = CONFIG["title"]
-    if config_title.lower() == "never":
+    _config_title = CONFIG["title"]
+    if _config_title.lower() == "never":
         return False
-    if config_title.lower() == "always":
+    if _config_title.lower() == "always":
         return True
     if os.name == 'nt':
         return fp.isatty() and _console is not None
-    else:
-        # else: auto
-        legal_terms = ["xterm", "xterm-256color", "xterm-color",
-                       "Eterm", "aterm", "rxvt", "screen", "kterm",
-                       "rxvt-unicode", "gnome", "interix", "cygwin",
-                       "rxvt-unicode-256color"]
-        return fp.isatty() and \
-            'TERM' in os.environ and \
-            os.environ['TERM'] in legal_terms
+
+    # else: auto
+    legal_terms = ["xterm", "xterm-256color", "xterm-color",
+                   "Eterm", "aterm", "rxvt", "screen", "kterm",
+                   "rxvt-unicode", "gnome", "interix", "cygwin",
+                   "rxvt-unicode-256color"]
+    return fp.isatty() and \
+        'TERM' in os.environ and \
+        os.environ['TERM'] in legal_terms
 
 
 def config_color(fp):
-    config_color = CONFIG["color"]
-    if config_color.lower() == "never":
+    _config_color = CONFIG["color"]
+    if _config_color.lower() == "never":
         return False
-    if config_color.lower() == "always":
+    if _config_color.lower() == "always":
         return True
+
     # else: auto
     if os.name == 'nt' and not HAS_PYREADLINE or not fp.isatty():
         return False
-    else:
-        return True
+
+    return True
 
 
 _enable_xterm_title = None
@@ -149,7 +150,8 @@ def update_title(mystr, fp):
 
 
 def _update_title_unix(mystr, fp):
-    global _enable_xterm_title
+    # This module should be refactored into object to avoid the anti-pattern global statement
+    global _enable_xterm_title  # pylint: disable=global-statement
     if _enable_xterm_title is None:
         _enable_xterm_title = config_title(fp)
 
@@ -164,7 +166,7 @@ def _update_title_windows(mystr):
         _console.title(txt=mystr)
 
 
-def _msg(*tokens, **kwargs):
+def _msg(*tokens, **kwargs):  # pylint: disable=too-many-branches
     """ Helper method for error, warning, info, debug
 
     """
@@ -179,8 +181,8 @@ def _msg(*tokens, **kwargs):
     if CONFIG["timestamp"]:
         now = datetime.datetime.now()
         res.append(now.strftime("[%Y-%m-%d %H:%M:%S] "))
+    should_add_sep = True
     for i, token in enumerate(tokens):
-        should_add_sep = True
         if isinstance(token, _Color):
             if with_color:
                 res.append(token.code)
@@ -292,7 +294,7 @@ def tabs(num):
     return "  " * num
 
 
-class timer:
+class timer(object):
     """ To be used as a decorator,
     or as a with statement:
 
@@ -351,11 +353,11 @@ class timer:
 def did_you_mean(message, user_input, choices):
     if not choices:
         return message
-    else:
-        result = {difflib.SequenceMatcher(a=user_input, b=choice).ratio(): choice
-                  for choice in choices}
-        message += "\nDid you mean: %s?" % result[max(result)]
-        return message
+
+    result = {difflib.SequenceMatcher(a=user_input, b=choice).ratio(): choice
+              for choice in choices}
+    message += "\nDid you mean: %s?" % result[max(result)]
+    return message
 
 
 # Console size code inspired by: http://pastebin.com/rJqMVnZJ
@@ -376,8 +378,7 @@ def get_console_size():
     return tuple_xy
 
 
-def _get_console_size_windows():
-    res = None
+def _get_console_size_windows():  # pylint: disable=too-many-locals
     try:
         from ctypes import windll, create_string_buffer
 
@@ -390,15 +391,17 @@ def _get_console_size_windows():
         res = windll.kernel32.GetConsoleScreenBufferInfo(h, csbi)
     except Exception:
         return None
+
     if res:
         import struct
-        (bufx, bufy, curx, cury, wattr,
-            left, top, right, bottom, maxx, maxy) = struct.unpack("hhhhHhhhhhh", csbi.raw)
+        # pylint: disable=unused-variable
+        (__bufx, __bufy, __curx, __cury, __wattr,
+         left, top, right, bottom, __maxx, __maxy) = struct.unpack("hhhhHhhhhhh", csbi.raw)
         sizex = right - left + 1
         sizey = bottom - top + 1
         return sizex, sizey
-    else:
-        return None
+
+    return None
 
 
 def _get_console_size_tput():
@@ -412,7 +415,7 @@ def _get_console_size_tput():
         proc = subprocess.Popen(["tput", "lines"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         output = proc.communicate(input=None)
         rows = int(output[0])
-        return (cols, rows)
+        return cols, rows
     except Exception:
         return None
 
@@ -423,7 +426,6 @@ def _get_console_size_linux():
             import fcntl
             import termios
             import struct
-            import os
             cr = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
         except Exception:
             return None

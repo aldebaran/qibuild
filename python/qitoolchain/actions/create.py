@@ -13,7 +13,6 @@ import sys
 
 from qisys import ui
 import qisys.parsers
-import qibuild.parsers
 import qitoolchain
 
 
@@ -57,10 +56,8 @@ def do(args):
             mess += " ".join(bad_chars)
             raise Exception(mess)
 
-    build_worktree = None
-
     if tc_name in qitoolchain.get_tc_names():
-        toolchain = qitoolchain.Toolchain(tc_name)
+        toolchain = qitoolchain.Toolchain(tc_name)  # pylint: disable=unused-variable
         ui.info(tc_name, "already exists,",
                 "updating without removing")
 

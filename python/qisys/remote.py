@@ -9,7 +9,6 @@ downloading package or reading configs from URLs
 
 import os
 import re
-import sys
 import ftplib
 import urlparse
 import urllib2
@@ -20,6 +19,8 @@ import qisys.command
 import qisys.sh
 
 import qibuild.config
+
+# pylint: disable=redefined-outer-name
 
 
 def callback(total, done):
@@ -53,9 +54,9 @@ def get_ftp_access(server_name):
     """
     access = get_server_access(server_name)
     if not access:
-        return ("anonymous", "anonymous", "/")
-    else:
-        return (access.username, access.password, access.root)
+        return "anonymous", "anonymous", "/"
+
+    return access.username, access.password, access.root
 
 
 def authenticated_urlopen(location):
@@ -94,7 +95,7 @@ def open_remote_location(location, timeout=10):
         if root:
             ftp.cwd(root)
 
-        class Transfer:
+        class Transfer(object):
             pass
         Transfer.data = ""
         # url_split.path has a trailing "/":
@@ -130,6 +131,7 @@ def download(url, output_dir, output_name=None,
     :return: the path to the downloaded file
 
     """
+    # pylint: disable=redefined-outer-name,too-many-branches,too-many-locals
     qisys.sh.mkdir(output_dir, recursive=True)
     if output_name:
         dest_name = os.path.join(output_dir, output_name)
@@ -168,7 +170,7 @@ def download(url, output_dir, output_name=None,
             if root:
                 ftp.cwd(root)
 
-            class Tranfert:
+            class Tranfert(object):
                 pass
             # Set binary mode
             ftp.voidcmd("TYPE I")
@@ -251,8 +253,7 @@ def deploy(local_directory, remote_url, filelist=None):
 
 
 class URLParseError(Exception):
-    def __int__(self, message):
-        super(URLParseError).__int__(message)
+    pass
 
 
 class URL(object):
@@ -266,7 +267,7 @@ class URL(object):
 
     def _parse(self, string):
 
-        modern_scheme = """
+        modern_scheme = r"""
 ssh://
 (?:
     (?P<user>[^@]+)
@@ -301,10 +302,10 @@ Supported schemes are
 """ % self.as_string)
 
     def _handle_match(self, match):
-        dict = match.groupdict()
-        self.user = dict.get("user")
-        self.host = dict["host"]
+        match_dict = match.groupdict()
+        self.user = match_dict.get("user")
+        self.host = match_dict["host"]
         self.port = 22
-        if "port" in dict and dict["port"]:
-            self.port = int(dict["port"])
-        self.remote_directory = dict["remote_dir"] or None
+        if "port" in match_dict and match_dict["port"]:
+            self.port = int(match_dict["port"])
+        self.remote_directory = match_dict["remote_dir"] or None

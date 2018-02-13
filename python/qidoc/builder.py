@@ -7,7 +7,7 @@ from qisys import ui
 import qisys.sort
 
 
-class DocBuilder(object):
+class DocBuilder(object):  # pylint: disable=too-many-instance-attributes
     """ Build and install doc projects.
 
     Initialize with a `base_project`, which will

@@ -6,6 +6,9 @@ import qisrc.git
 
 from qisrc.test.conftest import TestGitWorkTree
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_calls_git_log(git_server, qisrc_action, record_messages):
     git_server.create_repo("foo.git")

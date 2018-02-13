@@ -72,7 +72,7 @@ def _check_algo(algo):
 # http://www.mail-archive.com/python-list@python.org/msg34223.html
 
 
-def _compress_zip(directory, quiet=True, verbose=False, display_progress=False,
+def _compress_zip(directory, quiet=True, verbose=False, display_progress=False,  # pylint: disable=too-many-locals
                   flat=False, output=None):
     """Compress directory in a .zip file
 
@@ -136,6 +136,8 @@ Please set only one of these two options to 'True'
 
 
 # pylint: disable-msg=R0914
+# pylint: disable=too-many-statements
+# pylint: disable=too-many-branches
 def _extract_zip(archive, directory, quiet, verbose, strict_mode=True):
     """Extract a zip archive into directory
 
@@ -295,9 +297,9 @@ Please set only one of these two options to 'True'
     cmd = _get_tar_command("compress", algo, output, directory, quiet, flat=flat)
     try:
         if verbose:
-            printed = qisys.command.check_output(cmd, stderr=subprocess.STDOUT)
+            __printed = qisys.command.check_output(cmd, stderr=subprocess.STDOUT)  # pylint: disable=unused-variable
         else:
-            unused_output, printed = qisys.command.check_output_error(cmd)
+            __unused_output, __printed = qisys.command.check_output_error(cmd)  # pylint: disable=unused-variable
     except qisys.command.CommandFailedException as err:
         mess = "Could not compress directory %s\n" % directory
         mess += "(algo: %s)\n" % algo
@@ -307,7 +309,7 @@ Please set only one of these two options to 'True'
     return output
 
 
-def _extract_tar(archive, directory, algo, quiet, verbose, output_filter=None):
+def _extract_tar(archive, directory, algo, quiet, verbose, output_filter=None):  # pylint: disable=too-many-branches
     """Extract a .tar.* archive into directory
 
     :param archive:   path of the archive

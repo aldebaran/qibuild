@@ -12,5 +12,5 @@ def test_simple(qitest_action, tmpdir, record_messages):
     qitest_json = tmpdir.join("qitest.json")
     qitest_json.write(json.dumps(tests))
     qitest_action("list", cwd=tmpdir.strpath)
-    assert record_messages.find("foo.*\(invalid name\)")
-    assert record_messages.find("test_bar.*\(no type\)")
+    assert record_messages.find(r"foo.*\(invalid name\)")
+    assert record_messages.find(r"test_bar.*\(no type\)")

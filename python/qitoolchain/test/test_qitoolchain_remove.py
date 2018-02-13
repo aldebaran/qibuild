@@ -1,12 +1,12 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-import qibuild.config
-import qitoolchain.toolchain
+import pytest
 
+import qibuild.config
 from qibuild.test.conftest import TestBuildWorkTree
 
-import pytest
+import qitoolchain.toolchain
 
 
 def test_simple(qitoolchain_action):
@@ -33,5 +33,5 @@ def test_when_is_default(qitoolchain_action):
     test_build_worktre2 = TestBuildWorkTree()
     # pylint:disable-msg=E1101
     with pytest.raises(Exception) as e:
-        test_build_worktre2.toolchain
+        test_build_worktre2.toolchain  # pylint: disable=pointless-statement
     assert "No such toolchain" in e.value.message

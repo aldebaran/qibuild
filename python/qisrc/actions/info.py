@@ -8,8 +8,6 @@
 from qisys import ui
 import qisrc.parsers
 
-import sys
-
 
 def configure_parser(parser):
     qisrc.parsers.worktree_parser(parser)

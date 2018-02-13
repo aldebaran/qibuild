@@ -110,7 +110,7 @@ def generate_snapshot(git_worktree, output_path, deprecated_format=True):
 def load_snapshot(git_worktree, input_path):
     """Load a snapshot file and reset projects."""
     snapshot = Snapshot()
-    ui.info(ui.green, "Loading snapshot from", ui.white,  input_path)
+    ui.info(ui.green, "Loading snapshot from", ui.white, input_path)
     snapshot.load(input_path)
     for (src, ref) in snapshot.refs.iteritems():
         ui.info("Loading", src)

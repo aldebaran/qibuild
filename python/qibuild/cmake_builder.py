@@ -7,12 +7,12 @@ import functools
 import operator
 
 from qisys import ui
+from qisys.abstractbuilder import AbstractBuilder
 import qisys.sh
 import qisys.remote
 import qibuild.deploy
 import qibuild.deps
 from qibuild.parallel_builder import ParallelBuilder
-from qisys.abstractbuilder import AbstractBuilder
 from qibuild.project import write_qi_path_conf
 
 
@@ -23,6 +23,7 @@ class CMakeBuilder(AbstractBuilder):
     """
 
     def __init__(self, build_worktree, projects=None):
+        super(CMakeBuilder, self).__init__(self.__class__.__name__)
         self.build_worktree = build_worktree
         if not projects:
             self.projects = list()
@@ -201,7 +202,7 @@ Or configure the project with no config
         """ Build the projects (in parallel) in the correct order """
         projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
         # do the prebuild step here (it is fast enough)
-        for i, project in enumerate(projects):
+        for project in projects:
             self.pre_build(project)
 
         parallel_builder = ParallelBuilder()
@@ -209,8 +210,8 @@ Or configure the project with no config
         parallel_builder.build(*args, **kwargs)
 
     @need_configure
-    def install(self, dest_dir, *args, **kwargs):
-        """ Install the projects and the packages to the dest_dir """
+    def install(self, dest, *args, **kwargs):  # pylint: disable=too-many-locals
+        """ Install the projects and the packages to the dest dir """
         installed = list()
         projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
         packages = self.deps_solver.get_dep_packages(self.projects, self.dep_types)
@@ -223,7 +224,7 @@ Or configure the project with no config
         # Compute the real path where to install the packages:
         prefix = kwargs.get("prefix", "/")
         prefix = prefix[1:]
-        real_dest = os.path.join(dest_dir, prefix)
+        real_dest = os.path.join(dest, prefix)
         components = kwargs.get("components")
 
         build_type = "Release"
@@ -248,7 +249,7 @@ Or configure the project with no config
         for i, package in enumerate(packages):
             ui.info_count(i, len(packages),
                           ui.green, "Installing", ui.blue, package.name,
-                          ui.green, "to", ui.blue, dest_dir,
+                          ui.green, "to", ui.blue, dest,
                           update_title=True)
             files = package.install(real_dest, components=components,
                                     release=release)
@@ -256,7 +257,7 @@ Or configure the project with no config
 
         # Remove qitest.json so that we don't append tests twice
         # when running qibuild install --with-tests twice
-        qitest_json = os.path.join(dest_dir, "qitest.json")
+        qitest_json = os.path.join(dest, "qitest.json")
         qisys.sh.rm(qitest_json)
 
         if projects:
@@ -264,14 +265,15 @@ Or configure the project with no config
             for i, project in enumerate(projects):
                 ui.info_count(i, len(projects),
                               ui.green, "Installing", ui.blue, project.name,
-                              ui.green, "to", ui.blue, dest_dir,
+                              ui.green, "to", ui.blue, dest,
                               update_title=True)
-                files = project.install(dest_dir, **kwargs)
+                files = project.install(dest, **kwargs)
                 installed.extend(files)
         return installed
 
     @need_configure
     def deploy(self, url, split_debug=False, with_tests=False, install_tc_packages=True):
+        # pylint: disable=too-many-branches,too-many-locals
         """ Deploy the project and the packages it depends to a remote url """
         to_deploy = list()
         dep_projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
@@ -355,6 +357,7 @@ Or configure the project with no config
 
 class NotConfigured(Exception):
     def __init__(self, project):
+        super(NotConfigured, self).__init__()
         self.project = project
 
     def __str__(self):

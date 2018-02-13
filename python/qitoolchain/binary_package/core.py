@@ -22,6 +22,7 @@ class BinaryPackageException(Exception):
     """
 
     def __init__(self, message):
+        super(BinaryPackageException, self).__init__()
         self._message = message
 
     def __str__(self):
@@ -30,7 +31,7 @@ class BinaryPackageException(Exception):
         return message
 
 
-class BinaryPackage:
+class BinaryPackage(object):
     """ A binary package is the endpoint of a binary package file provided by
     most of the Linux distribution.
 

@@ -11,6 +11,8 @@ import qisys.sh
 from qidoc.test.conftest import find_link
 import qidoc.builder
 
+# pylint: disable=unused-variable
+
 
 def test_no_templates(doc_worktree):
     foo_sphinx = doc_worktree.create_sphinx_project("foo")
@@ -59,7 +61,7 @@ def test_handles_dunder_file(doc_worktree):
     foo_sphinx.configure(version="1.2.3")
     conf_py = foo_path.join("build-doc", "conf.py").read()
     new_conf = dict()
-    exec(conf_py, new_conf)
+    exec(conf_py, new_conf)  # pylint: disable=exec-used
     assert new_conf["this_file"] == conf_py_path.strpath
 
 
@@ -79,7 +81,7 @@ project = "foo"
     conf_py = foo_path.join("build-doc", "conf.py").read()
     conf_dict = dict()
     assert "# My custom settings" in conf_py
-    exec(conf_py, conf_dict)
+    exec(conf_py, conf_dict)  # pylint: disable=exec-used
     assert conf_dict["version"] == "1.2.3"
     expected = doc_worktree.template_project.themes_path
     assert conf_dict["html_theme_path"] == [expected]
@@ -164,7 +166,7 @@ def test_spellcheck(doc_worktree, record_messages):
     doc_builder.configure()
     with pytest.raises(qidoc.sphinx_project.SphinxBuildError):
         doc_builder.build()
-    assert record_messages.find("Found 1 spelling error\(s\)")
+    assert record_messages.find(r"Found 1 spelling error\(s\)")
 
     index_rst = os.path.join(spell_proj.path, "source", "index.rst")
     with open(index_rst, "r") as fp:

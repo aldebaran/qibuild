@@ -4,7 +4,6 @@
 
 import pytest
 
-import qisrc.git
 from qisrc.test.conftest import FakeGit
 
 

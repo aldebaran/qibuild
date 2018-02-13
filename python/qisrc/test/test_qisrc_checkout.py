@@ -121,7 +121,7 @@ def test_qisrc_checkout_when_no_group(qisrc_action, git_server):
     qisrc_action("checkout", "devel")
 
     git_worktree = TestGitWorkTree()
-    assert len(git_worktree.git_projects) == 0
+    assert not git_worktree.git_projects
 
 
 def test_qisrc_checkout_with_ref_to_branch(qisrc_action, git_server):

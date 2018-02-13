@@ -22,7 +22,7 @@ def contains_debug_info(filename, objdump=None):
         objdump = "objdump"
     retcode = subprocess.call([objdump, "-j", ".debug_info", "-h", filename],
                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    return (retcode == 0)
+    return retcode == 0
 
 
 def split_debug(src, objcopy=None, objdump=None):
@@ -51,8 +51,11 @@ def split_debug(src, objcopy=None, objdump=None):
     dest = os.path.join(src, debug_dir, basename)
     to_run = list()
     to_run.append([objcopy, "--only-keep-debug", src, dest])
-    to_run.append([objcopy, "--strip-debug", "--strip-unneeded",
-                            "--add-gnu-debuglink=%s" % dest, src])
+    to_run.append([objcopy,
+                   "--strip-debug",
+                   "--strip-unneeded",
+                   "--add-gnu-debuglink=%s" % dest,
+                   src])
     try:
         for cmd in to_run:
             qisys.command.check_output(cmd, stderr=subprocess.STDOUT)

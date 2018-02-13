@@ -10,14 +10,12 @@ import os
 import unittest
 from StringIO import StringIO
 
-import qisys
-import qisys.sh
 import qibuild
 import qibuild.config
 
 
-def cfg_from_string(str, user_config=None):
-    cfg_loc = StringIO(str)
+def cfg_from_string(input_str, user_config=None):
+    cfg_loc = StringIO(input_str)
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read(cfg_loc)
     if user_config:
@@ -37,6 +35,7 @@ def local_cfg_to_string(cfg):
     return cfg_loc.getvalue()
 
 
+# pylint: disable=too-many-public-methods
 class QiBuildConfig(unittest.TestCase):
 
     def test_simple(self):
@@ -424,7 +423,7 @@ class QiBuildConfig(unittest.TestCase):
   </config>
 </qibuild>
 """  # noqa
-        qibuild_cfg = cfg_from_string(xml,  user_config='win32-vs2010')
+        qibuild_cfg = cfg_from_string(xml, user_config='win32-vs2010')
         self.assertEquals(qibuild_cfg.cmake.generator, "NMake Makefiles")
 
 

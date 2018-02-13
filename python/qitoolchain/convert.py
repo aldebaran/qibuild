@@ -3,7 +3,6 @@
 # found in the COPYING file.
 import os
 
-from qisys import ui
 import qisys.sh
 
 from qitoolchain.binary_package import convert_to_qibuild, open_package

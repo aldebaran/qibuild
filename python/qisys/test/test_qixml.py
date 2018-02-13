@@ -1,10 +1,14 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+from xml.etree import ElementTree as etree
+
 import pytest
 
 import qisys.qixml
-from xml.etree import ElementTree as etree
+
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
 
 
 def test_qixml_parse_bool_attr():
@@ -89,15 +93,14 @@ def test_simple_xml_parser():
 />
 """)
 
-    class Foo:
+    class Foo(object):
         def __init__(self):
             self.bar = None
             self.spam = None
             self.quzz = 42
 
     class FooParser(qisys.qixml.XMLParser):
-        def __init__(self, target):
-            super(FooParser, self).__init__(target)
+        pass
 
     foo = Foo()
     foo_parser = FooParser(foo)
@@ -111,7 +114,7 @@ def test_simple_xml_parser():
 def test_required_attr():
     tree = etree.fromstring("<foo />")
 
-    class Foo:
+    class Foo(object):
         pass
 
     class FooParser(qisys.qixml.XMLParser):
@@ -130,13 +133,9 @@ def test_required_attr():
 def test_complex_xml_parser():
 
     class BarParser(qisys.qixml.XMLParser):
-        def __init__(self, target):
-            super(BarParser, self).__init__(target)
+        pass
 
     class FooParser(qisys.qixml.XMLParser):
-        def __init__(self, target):
-            super(FooParser, self).__init__(target)
-
         def _write_bar(self, elem):
             parser = BarParser(self.target.bar)
             bar_elem = parser.xml_elem()
@@ -146,11 +145,11 @@ def test_complex_xml_parser():
             parser = BarParser(self.target.bar)
             parser.parse(elem)
 
-    class Bar:
+    class Bar(object):
         def __init__(self):
             self.baz = None
 
-    class Foo:
+    class Foo(object):
         def __init__(self):
             self.bar = Bar()
             self.spam = None
@@ -172,13 +171,12 @@ def test_complex_xml_parser():
 
 
 def test_list_attr():
-    class Foo:
+    class Foo(object):
         def __init__(self):
             self.names = list()
 
     class FooParser(qisys.qixml.XMLParser):
-        def __init__(self, target):
-            super(FooParser, self).__init__(target)
+        pass
 
     foo = Foo()
     foo.names = ["a", "b"]
@@ -197,13 +195,12 @@ def test_list_attr():
 
 
 def test_write_bool_attr():
-    class Foo:
+    class Foo(object):
         def __init__(self):
             self.bar = False
 
     class FooParser(qisys.qixml.XMLParser):
-        def __init__(self, target):
-            super(FooParser, self).__init__(target)
+        pass
 
     foo = Foo()
     foo.bar = True
@@ -221,7 +218,7 @@ def test_sanitize_xml():
 
 
 def test_ignore_attributes():
-    class Foo:
+    class Foo(object):
         def __init__(self):
             self.bar = "bar"
             self.baz = "baz"

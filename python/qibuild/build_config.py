@@ -12,7 +12,7 @@ import qibuild.profile
 import qitoolchain
 
 
-class CMakeBuildConfig(object):
+class CMakeBuildConfig(object):  # pylint: disable=too-many-instance-attributes
     """ Compute a list of CMake flags from all the settings
     that can affect the build  (the toolchain name, the build
     profiles, etc ...)
@@ -49,12 +49,13 @@ class CMakeBuildConfig(object):
         """
         if not self.active_build_config:
             return None
+
         custom_cmake = os.path.join(self.build_worktree.root, ".qi",
                                     self.active_build_config.name + ".cmake")
         if os.path.exists(custom_cmake):
             return custom_cmake
-        else:
-            return None
+
+        return None
 
     @property
     def toolchain(self):
@@ -234,6 +235,7 @@ class NoSuchProfile(Exception):
     """ The profile specified by the user cannot be found """
 
     def __init__(self, name, known_profiles):
+        super(NoSuchProfile, self).__init__()
         self.name = name
         self.known_profiles = known_profiles
 

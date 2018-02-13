@@ -1,17 +1,22 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+import os
+
+import pytest
+
 import qisys.script
 import qisrc.git
 
 from qisrc.test.conftest import TestGit
 from qisrc.test.conftest import TestGitWorkTree
 
-import os
-import pytest
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+# pylint: disable=unused-variable
 
 
-def test_in_new_directory(cd_to_tmpdir, git_server):
+def test_in_new_directory(cd_to_tmpdir, git_server):  # pylint: disable=unused-argument
     git_server.create_repo("foo.git")
     git_server.create_repo("bar.git")
     qisys.script.run_action("qisrc.actions.init", [git_server.manifest_url])
@@ -19,7 +24,7 @@ def test_in_new_directory(cd_to_tmpdir, git_server):
     assert len(git_worktree.git_projects) == 2
 
 
-def test_use_branch(cd_to_tmpdir, git_server):
+def test_use_branch(cd_to_tmpdir, git_server):  # pylint: disable=unused-argument
     git_server.create_repo("foo.git")
     git_server.switch_manifest_branch("devel")
     git_server.create_repo("onlyindevel.git")
@@ -86,7 +91,7 @@ def test_reconfigure(qisrc_action, git_server):
     manifest_url = git_server.manifest_url
     git_server.create_group("mygroup", ["a", "b"])
     git_server.create_repo("c")
-    qisrc_action("init",  manifest_url)
+    qisrc_action("init", manifest_url)
     git_worktree = TestGitWorkTree()
     assert len(git_worktree.git_projects) == 3
     qisrc_action("init", manifest_url, "-g", "mygroup")

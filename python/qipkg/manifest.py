@@ -55,7 +55,6 @@ class Validator(object):
         ui.info(ui.yellow, "\nPackage warnings:")
         for warning in self.warnings:
             ui.info(ui.bold, "\t%s" % warning)
-        pass
 
     def _load_manifest(self, manifest_path):
         tree = qisys.qixml.read(manifest_path)
@@ -87,7 +86,7 @@ class Validator(object):
             return
 
         for requirement in robot_requirements:
-            if requirement.get('model', '') is '':
+            if requirement.get('model', '') == '':
                 self._add_error("A robot requirement has no model defined.")
 
     def _validate_naoqi_requirements(self):
@@ -98,7 +97,7 @@ class Validator(object):
             return
 
         for requirement in naoqi_requirements:
-            if requirement.get('minVersion', '') is '':
+            if requirement.get('minVersion', '') == '':
                 self._add_error("A NAOqi requirement has no "
                                 "minimum version defined.")
 
@@ -113,7 +112,7 @@ class Validator(object):
                 "contents/behaviorContent"):
             for supported_language in supported_languages:
                 if behavior_content.find(
-                    ".//triggerSentences/sentence[@lang=\'%s\']"
+                        ".//triggerSentences/sentence[@lang=\'%s\']"
                         % supported_language.text) is None:
                     self._add_error("Behavior \'%s\' has no trigger "
                                     "sentence defined for \'%s\'."

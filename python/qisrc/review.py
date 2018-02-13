@@ -10,11 +10,11 @@ import os
 import sys
 import subprocess
 
-from qisys import ui
 import qisrc.git
+from qisys import ui
 import qisys.interact
-import qibuild.config
 import qisys.command
+import qibuild.config
 
 
 def fetch_gerrit_hook_ssh(path, username, server, port=None):
@@ -40,8 +40,8 @@ def fetch_gerrit_hook_ssh(path, username, server, port=None):
     (out, _) = process.communicate()
     if process.returncode == 0:
         return True, ""
-    else:
-        return False, out
+
+    return False, out
 
 
 def check_gerrit_connection(username, server, ssh_port=29418):
@@ -138,8 +138,8 @@ def setup_project(project):
     return True
 
 
-def push(project,  branch, bypass_review=False, dry_run=False,
-         reviewers=None, topic=None):
+def push(project, branch, bypass_review=False, dry_run=False, reviewers=None, topic=None):
+    # pylint: disable=too-many-locals
     """ Push the changes for review.
 
     Unless review is False, in this case, simply update

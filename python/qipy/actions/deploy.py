@@ -4,10 +4,6 @@
 """ Deploy python projects to a remote location
 
 """
-import sys
-import os
-
-from qisys import ui
 import qisys.sh
 import qisys.command
 import qisys.parsers

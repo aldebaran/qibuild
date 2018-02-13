@@ -18,6 +18,7 @@ import tempfile
 import subprocess
 import ntpath
 import posixpath
+import warnings
 
 from qisys import ui
 
@@ -34,7 +35,8 @@ SHARE_PATH = xdg_data_home
 
 
 def set_home(home):
-    global CONFIG_PATH, CACHE_PATH, SHARE_PATH
+    # This module should be refactored into object to avoid the anti-pattern global statement
+    global CONFIG_PATH, CACHE_PATH, SHARE_PATH  # pylint: disable=global-statement
 
     CONFIG_PATH = os.path.join(home, "config")
     CACHE_PATH = os.path.join(home, "cache")
@@ -88,9 +90,9 @@ def username():
         pw_info = pwd.getpwuid(uid)
         if pw_info:
             return pw_info.pw_name
-    username = os.environ.get("USERNAME")
-    if username:
-        return username
+    _username = os.environ.get("USERNAME")
+    if _username:
+        return _username
 
 
 def mkdir(dest_dir, recursive=False):
@@ -100,7 +102,7 @@ def mkdir(dest_dir, recursive=False):
             os.makedirs(dest_dir)
         else:
             os.mkdir(dest_dir)
-    except OSError, e:
+    except OSError, e:  # pylint: disable=invalid-name
         if e.errno == 17:
             # Directory already exists -> we don't care
             pass
@@ -138,7 +140,8 @@ def write_file_if_different(data, out_path, mode="w"):
         out_file.write(data)
 
 
-def configure_file(in_path, out_path, copy_only=False, *args, **kwargs):
+# pylint: disable=keyword-arg-before-vararg
+def configure_file__legacy(in_path, out_path, copy_only=False, *args, **kwargs):
     """Configure a file.
     :param in_path: input file
     :param out_path: output file
@@ -153,6 +156,14 @@ def configure_file(in_path, out_path, copy_only=False, *args, **kwargs):
         in_content.format(*args, **kwargs)
 
     """
+    # This function seems to be never called, and has been renamed with __legacy suffix (2018-02-07)
+    # If nobody complains, remove this function in the next release
+    warnings.warn(
+        "Deprecated function: "
+        "This function seems to be never called, and has been renamed with __legacy suffix (2018-02-07)\n"
+        "If nobody complains, remove this function in the next release, else, deals with its bad args/kwargs signature",
+        DeprecationWarning)
+
     mkdir(os.path.dirname(os.path.abspath(out_path)), recursive=True)
     with open(in_path, "r") as in_file:
         in_content = in_file.read()
@@ -282,7 +293,7 @@ def install(src, dest, filter_fun=None, quiet=False):
         if src == dest:
             raise Exception("source and destination are the same directory")
         for (root, dirs, files) in os.walk(src):
-            dirs = _handle_dirs(src, dest, root, dirs,  filter_fun, quiet)
+            dirs = _handle_dirs(src, dest, root, dirs, filter_fun, quiet)
             files = _handle_files(src, dest, root, files, filter_fun, quiet)
             installed.extend(files)
     else:
@@ -499,7 +510,6 @@ def which(program):
     find program in the environment PATH
     :return: path to program if found, None otherwise
     """
-    import warnings
     warnings.warn("qisys.sh.which is deprecated, "
                   "use qisys.command.find_program instead")
     from qisys.command import find_program
@@ -573,7 +583,7 @@ def is_empty(path):
     return os.listdir(path) == list()
 
 
-class TempDir:
+class TempDir(object):
     """This is a nice wrapper around tempfile module.
 
     Usage::
@@ -599,7 +609,7 @@ class TempDir:
     def __enter__(self):
         return self._temp_dir
 
-    def __exit__(self, type, value, tb):
+    def __exit__(self, _type, value, tb):
         if os.environ.get("DEBUG"):
             if tb is not None:
                 print "=="
@@ -630,39 +640,24 @@ def is_runtime(filename):
     # Maybe a user-generated MANIFEST at the root of the package path
     # would be better?
 
-    basename = os.path.basename(filename)
     basedir = filename.split(os.path.sep)[0]
-    if filename.startswith("bin"):
-        if sys.platform.startswith("win"):
-            if filename.endswith(".exe"):
-                return True
-            if filename.endswith(".dll"):
-                return True
-            else:
-                return False
-        else:
-            return True
+    if filename.startswith("bin") and sys.platform.startswith("win"):
+        return filename.endswith(".exe") or filename.endswith(".dll")
     if filename.startswith("lib"):
-        if filename.endswith((".a", ".lib", ".la", ".pc")):
-            return False
-        return True
-    if filename.startswith(os.path.join("share", "cmake")):
+        is_lib_prefixed_runtime = not filename.endswith((".a", ".lib", ".la", ".pc"))
+        return is_lib_prefixed_runtime
+    if filename.startswith(os.path.join("share", "cmake")) or \
+            filename.startswith(os.path.join("share", "man")):
         return False
-    if filename.startswith(os.path.join("share", "man")):
-        return False
-    if basedir == "share":
-        return True
     if basedir == "include":
-        # exception for python:
-        if filename.endswith("pyconfig.h"):
-            return True
-        else:
-            return False
-    if basedir.endswith(".framework"):
-        return True
+        # Usually runtime dir names aren't include, but there is an exception for python:
+        return filename.endswith("pyconfig.h")
 
-    # True by default: better have too much stuff than
-    # not enough
+    # True by default: better have too much stuff than not enough
+    # That includes these known cases:
+    # * filename.startswith("bin") but not sys.platform.startswith("win")
+    # * basedir == "share"
+    # * basedir.endswith(".framework")
     return True
 
 
@@ -717,7 +712,7 @@ class PreserveFileMetadata(object):
         self.time = (st.st_atime, st.st_mtime)
         self.mode = st.st_mode
 
-    def __exit__(self, type, value, tb):
+    def __exit__(self, _type, value, tb):
         """ Exit method restoring metadata
         """
         os.chmod(self.path, self.mode)

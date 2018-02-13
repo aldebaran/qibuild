@@ -7,8 +7,6 @@ import xml.etree.ElementTree as etree
 
 import qisys.qixml
 
-from qisys import ui
-
 
 class Groups(object):
     def __init__(self):
@@ -78,9 +76,6 @@ class Group(object):
 
 
 class GroupParser(qisys.qixml.XMLParser):
-    def __init__(self, target):
-        super(GroupParser, self).__init__(target)
-
     def _parse_project(self, element):
         self.target.projects.append(element.attrib['name'])
 
@@ -100,10 +95,10 @@ class GroupParser(qisys.qixml.XMLParser):
 
 
 def get_root(worktree):
-    file = os.path.join(worktree.root, ".qi", "manifests", "default", "manifest.xml")
-    if not os.path.exists(file):
+    manifest_file = os.path.join(worktree.root, ".qi", "manifests", "default", "manifest.xml")
+    if not os.path.exists(manifest_file):
         return None
-    tree = etree.parse(file)
+    tree = etree.parse(manifest_file)
     root = tree.getroot()
     groups_elem = root.find("groups")
     if groups_elem is None:

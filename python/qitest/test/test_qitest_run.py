@@ -6,7 +6,9 @@ import sys
 import json
 
 import qisys.command
-import qibuild.find
+
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
 
 
 def test_simple_run(tmpdir, qitest_action):
@@ -72,8 +74,8 @@ def test_run_last_failed(tmpdir, qitest_action, record_messages):
     qitest_action("run", retcode=True)
     record_messages.reset()
     qitest_action("run", "--last-failed", retcode=True)
-    assert not record_messages.find("\(2/2\) test_two")
-    assert record_messages.find("\(1/1\) test_one")
+    assert not record_messages.find(r"\(2/2\) test_two")
+    assert record_messages.find(r"\(1/1\) test_one")
     test_one.write("")
     record_messages.reset()
     qitest_action("run", "--last-failed", retcode=True)

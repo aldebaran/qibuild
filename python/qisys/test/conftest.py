@@ -4,7 +4,6 @@
 
 import os
 import re
-import tempfile
 
 import py
 import pytest
@@ -15,6 +14,8 @@ import qisys.sh
 import qisys.script
 import qisys.interact
 import qisys.worktree
+
+# pylint: disable=redefined-outer-name
 
 
 class TestNamespace(object):
@@ -72,7 +73,7 @@ skip_on_win = pytest.mark.skipif(os.name == 'nt', reason="cannot pass on windows
 
 
 @pytest.fixture
-def worktree(cd_to_tmpdir):
+def worktree(cd_to_tmpdir):  # pylint: disable=unused-argument
     """ A new worktree in a temporary dir.
     As a bonus, we also change working dir to the temporary dir.
     This object has the same methods as WorkTree, plus:
@@ -100,7 +101,7 @@ def interact(request):
 
 
 @pytest.fixture
-def args(request):
+def args(request):  # pylint: disable=unused-argument
     """ Forge argparse.Namespace objects
     All unknown attributes will be initialized to
     None
@@ -117,21 +118,24 @@ def record_messages(request):
     return recorder
 
 
-class MessageRecorder():
+class MessageRecorder(object):
     def __init__(self):
         ui.CONFIG["record"] = True
-        ui._MESSAGES = list()
+        ui._MESSAGES = list()  # pylint: disable=protected-access
 
-    def stop(self):
+    @staticmethod
+    def stop():
         ui.CONFIG["record"] = False
-        ui._MESSAGES = list()
+        ui._MESSAGES = list()  # pylint: disable=protected-access
 
-    def reset(self):
-        ui._MESSAGES = list()
+    @staticmethod
+    def reset():
+        ui._MESSAGES = list()  # pylint: disable=protected-access
 
-    def find(self, pattern):
+    @staticmethod
+    def find(pattern):
         regexp = re.compile(pattern)
-        for message in ui._MESSAGES:
+        for message in ui._MESSAGES:  # pylint: disable=protected-access
             if re.search(regexp, message):
                 return message
 
@@ -173,7 +177,8 @@ class TestAction(object):
         self.package = package
         self.worktree = TestWorkTree()
 
-    def chdir(self, directory):
+    @staticmethod
+    def chdir(directory):
         try:
             directory = directory.strpath
         except AttributeError:
@@ -196,5 +201,5 @@ class TestAction(object):
             except SystemExit as e:
                 return e.code
             return 0
-        else:
-            return qisys.script.run_action(module_name, args)
+
+        return qisys.script.run_action(module_name, args)

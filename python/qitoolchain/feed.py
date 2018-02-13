@@ -5,20 +5,16 @@
 
 """
 
-
 import os
-import sys
-import hashlib
 import urlparse
 from xml.etree import ElementTree
 
-from qisys import ui
+import qisrc.git
 import qisys
 import qisys.archive
 import qisys.remote
 import qisys.version
-import qisrc.git
-import qibuild.config
+from qisys import ui
 import qitoolchain
 
 
@@ -39,7 +35,7 @@ def raise_parse_error(package_tree, feed, message):
     raise Exception(mess)
 
 
-def tree_from_feed(feed_location, branch=None, name=None):
+def tree_from_feed(feed_location, branch=None, name=None):  # pylint: disable=unused-argument
     """ Returns an ElementTree object from an
     feed location
 
@@ -81,7 +77,7 @@ def open_git_feed(toolchain_name, feed_url, name=None, branch="master", first_pa
     return feed_path
 
 
-class ToolchainFeedParser:
+class ToolchainFeedParser(object):
     """ A class to handle feed parsing
 
     """
@@ -125,7 +121,7 @@ class ToolchainFeedParser:
                 self.packages.append(qitoolchain.qipackage.from_xml(package_tree))
                 self._versions[name] = version
 
-    def parse(self, feed, branch=None, name=None, first_pass=True):
+    def parse(self, feed, branch=None, name=None, first_pass=True):  # pylint: disable=too-many-locals
         """ Recursively parse the feed, filling the self.packages
 
         """
@@ -150,7 +146,7 @@ class ToolchainFeedParser:
 
         feeds = tree.findall("feed")
         for feed_tree in feeds:
-            feed_name = feed_tree.get("name")
+            # feed_name = feed_tree.get("name")
             feed_url = feed_tree.get("url")
             feed_path = feed_tree.get("path")
             assert feed_path or feed_url, "Either 'url' or 'path' attributes must be set in a 'feed' non-root element"

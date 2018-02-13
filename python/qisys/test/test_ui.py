@@ -3,11 +3,11 @@
 # found in the COPYING file.
 
 """ Just some tests for ui """
-
 import io
-import qisys.ui as ui
 
 import pytest
+
+import qisys.ui as ui
 
 
 def main():

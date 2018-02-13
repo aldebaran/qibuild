@@ -4,8 +4,6 @@
 """ Rebase repositories on top of an other branch of the manifest
 
 """
-
-from qisys import ui
 import qisys.parsers
 import qisrc.parsers
 import qisrc.rebase

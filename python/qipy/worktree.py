@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
 import os
-import difflib
 import virtualenv
 
 from qisys import ui
@@ -89,7 +88,7 @@ Found two projects with the same name. (%s)
         execfile(activate_this_dot_py, {"__file__": activate_this_dot_py})
 
 
-def new_python_project(worktree, project):
+def new_python_project(worktree, project):  # pylint: disable=too-many-locals
     qiproject_xml = project.qiproject_xml
     tree = qisys.qixml.read(qiproject_xml)
     qipython_elem = tree.find("qipython")

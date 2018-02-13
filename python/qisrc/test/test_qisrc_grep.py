@@ -1,9 +1,11 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+import py
+
 import qisrc.git
 
-import py
+# pylint: disable=unused-variable
 
 
 def setup_projects(qisrc_action):
@@ -51,5 +53,5 @@ def test_using_git_grep_options(qisrc_action, record_messages):
 
 def test_worktree_paths(qisrc_action, record_messages):
     setup_projects(qisrc_action)
-    rc = qisrc_action("grep", "--path", "worktree",  "--", "-i", "-l", "Spam", retcode=True)
+    rc = qisrc_action("grep", "--path", "worktree", "--", "-i", "-l", "Spam", retcode=True)
     assert record_messages.find("foo/a.txt")

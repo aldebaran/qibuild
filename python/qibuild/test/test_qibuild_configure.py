@@ -1,22 +1,27 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-
 import os
 import platform
 import subprocess
+
+import pytest
 
 import qisys.command
 import qibuild.cmake
 import qibuild.config
 import qibuild.find
+from qibuild.test.conftest import TestBuildWorkTree
 import qisrc.git
 import qitoolchain
 
-from qibuild.test.conftest import TestBuildWorkTree
-from qipy.test.conftest import qipy_action
+from qipy.test.conftest import qipy_action  # pylint: disable=unused-import
 
-import pytest
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
+# pylint: disable=redefined-outer-name
+# pylint: disable=unused-variable
 
 
 # This module also serves as a test for the
@@ -300,7 +305,7 @@ def test_using_build_prefix_from_command_line(qibuild_action, tmpdir):
     assert expected.join("CMakeCache.txt").check(file=True)
 
 
-def test_using_build_prefix_from_config(qibuild_action, tmpdir):
+def test_using_build_prefix_from_config(qibuild_action, tmpdir):  # pylint: disable=unused-argument
     build_worktree = TestBuildWorkTree()
     qibuild_action.add_test_project("world")
     qibuild_cfg = qibuild.config.QiBuildConfig()
@@ -323,7 +328,7 @@ def test_relwithdebinfo(qibuild_action):
     assert cmake_build_type == "RelWithDebInfo"
 
 
-def test_using_fake_ctc(qibuild_action, fake_ctc):
+def test_using_fake_ctc(qibuild_action, fake_ctc):  # pylint: disable=unused-argument
     qibuild_action.add_test_project("footool")
     qibuild_action("configure", "footool", "--config", "fake-ctc")
     qibuild_action("make", "footool", "--config", "fake-ctc")

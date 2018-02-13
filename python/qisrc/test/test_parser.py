@@ -1,6 +1,9 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+import mock
+import pytest
+
 import qisys.sh
 import qisys.parsers
 import qisrc.git
@@ -8,12 +11,13 @@ import qisrc.parsers
 import qisrc.worktree
 
 from qisrc.parsers import get_git_projects
-
-from qibuild.test.conftest import TestBuildWorkTree
 from qisrc.test.conftest import TestGitWorkTree
 
-import mock
-import pytest
+from qibuild.test.conftest import TestBuildWorkTree
+
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+# pylint: disable=unused-variable
 
 
 def test_guess_git_repo(tmpdir, args):
@@ -50,10 +54,10 @@ def setup_test():
     foo = git_worktree.get_git_project("foo")
     hello = git_worktree.get_git_project("hello")
     world = git_worktree.get_git_project("world")
-    return (foo, hello, world)
+    return foo, hello, world
 
 
-def test_default_all(cd_to_tmpdir, args):
+def test_default_all(cd_to_tmpdir, args):  # pylint: disable=unused-argument
     (foo, hello, world) = setup_test()
     git_worktree = TestGitWorkTree()
 
@@ -68,7 +72,7 @@ def test_default_all(cd_to_tmpdir, args):
         get_git_projects(git_worktree, args, default_all=False)
 
 
-def test_default_all_build_deps(cd_to_tmpdir, args):
+def test_default_all_build_deps(cd_to_tmpdir, args):  # pylint: disable=unused-argument
     (foo, hello, world) = setup_test()
     git_worktree = TestGitWorkTree()
 
@@ -125,7 +129,7 @@ def test_build_deps_not_top_dir(cd_to_tmpdir, args):
         assert projs == [dep_proj, top_proj]
 
 
-def test_groups(git_worktree, args):
+def test_groups(git_worktree, args):  # pylint: disable=unused-argument
     git_worktree = mock.Mock()
     args.groups = ["mygroup"]
     get_git_projects(git_worktree, args)
