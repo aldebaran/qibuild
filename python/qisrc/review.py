@@ -46,9 +46,12 @@ def fetch_gerrit_hook_ssh(path, username, server, port=None):
 
 def check_gerrit_connection(username, server, ssh_port=29418):
     """ Check that the user can connect to gerrit with ssh """
-    cmd = ["ssh", "-p", str(ssh_port),
-           "%s@%s" % (username, server),
-           "gerrit", "version"]
+    cmd = ["ssh", "-p", str(ssh_port)]
+    if os.environ.get("DISABLE_SSH_CHECKING"):
+        ui.warning("Use ssh with StrictHostKeyChecking=no")
+        cmd.extend(["-o", "StrictHostKeyChecking=no"])
+    cmd.extend(["%s@%s" % (username, server),
+                "gerrit", "version"])
     try:
         qisys.command.call(cmd, quiet=True)
     except qisys.command.CommandFailedException:
