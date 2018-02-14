@@ -50,7 +50,7 @@ def check_gerrit_connection(username, server, ssh_port=29418):
     if os.environ.get("DISABLE_SSH_CHECKING"):
         ui.warning("Use ssh with StrictHostKeyChecking=no")
         cmd.extend(["-o", "StrictHostKeyChecking=no"])
-    cmd.extend(["%s@%s" % (username, server),
+    cmd.extend(["{}@{}".format(username, server),
                 "gerrit", "version"])
     try:
         qisys.command.call(cmd, quiet=True)
