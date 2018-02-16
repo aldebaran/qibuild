@@ -97,7 +97,7 @@ class QiDocAction(TestAction):
 def find_link(html_path, text):
     with open(html_path, "r") as fp:
         data = fp.read()
-    soup = bs4.BeautifulSoup(data)
+    soup = bs4.BeautifulSoup(data, "html.parser")
     link = soup.find("a", text=text)
     target = link.attrs["href"]
     target_path = target.split("#")[0]
