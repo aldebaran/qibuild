@@ -378,13 +378,17 @@ def test_removing_group_keep_warning_user(qisrc_action, git_server,
     assert record_messages.find("Group foo not found in the manifest")
 
 
-def test_switching_to_fixed_ref_happy(qisrc_action, git_server, record_messages):
+def _test_switching_to_fixed_ref_happy(qisrc_action, git_server, record_messages, tag_ref_to_test, branch_ref_to_test):
     git_server.create_repo("foo.git")
     git_server.push_file("foo.git", "a.txt", "a")
     git_server.push_tag("foo.git", "v0.1")
     git_server.push_file("foo.git", "b.txt", "b")
+    git_server.push_branch("foo.git", "feature/b")
+    git_server.push_file("foo.git", "c.txt", "c")
     qisrc_action("init", git_server.manifest_url)
-    git_server.set_fixed_ref("foo.git", "v0.1")
+
+    # Check for fixed_ref tag
+    git_server.set_fixed_ref("foo.git", tag_ref_to_test)
     qisrc_action("sync")
     git_worktree = TestGitWorkTree()
     foo_proj = git_worktree.get_git_project("foo")
@@ -392,32 +396,62 @@ def test_switching_to_fixed_ref_happy(qisrc_action, git_server, record_messages)
     _, sha1 = git.call("rev-parse", "HEAD", raises=False)
     expected = git.get_ref_sha1("refs/tags/v0.1")
     assert sha1 == expected
-    # qisrc.reset.clever_reset_ref should do nothing, so there should be
-    # no output
+    # qisrc.reset.clever_reset_ref should tell where is the HEAD after reset
     record_messages.reset()
     qisrc_action("sync")
-    assert not record_messages.find("HEAD is now at")
+    assert record_messages.find("HEAD is now at")
+    assert record_messages.find("Add a.txt")
+    _, status_output = git.status(raises=False)
+    assert "HEAD" in status_output
+    assert "detached" in status_output
 
+    # If branch ref name is local, makesure it exists on local copy, then go back to master
+    if branch_ref_to_test == "feature/b":
+        git.checkout("feature/b", raises=False)
+        git.checkout("master", raises=False)
 
-def test_switching_to_fixed_ref_long_name_happy(qisrc_action, git_server, record_messages):
-    git_server.create_repo("foo.git")
-    git_server.push_file("foo.git", "a.txt", "a")
-    git_server.push_tag("foo.git", "v0.1")
-    git_server.push_file("foo.git", "b.txt", "b")
-    qisrc_action("init", git_server.manifest_url)
-    git_server.set_fixed_ref("foo.git", "refs/tags/v0.1")
+    # Check for fixed_ref branch
+    git_server.set_fixed_ref("foo.git", branch_ref_to_test)
     qisrc_action("sync")
     git_worktree = TestGitWorkTree()
     foo_proj = git_worktree.get_git_project("foo")
     git = qisrc.git.Git(foo_proj.path)
     _, sha1 = git.call("rev-parse", "HEAD", raises=False)
-    expected = git.get_ref_sha1("refs/tags/v0.1")
+    expected = git.get_ref_sha1("refs/remotes/origin/feature/b")
     assert sha1 == expected
-    # qisrc.reset.clever_reset_ref should do nothing, so there should be
-    # no output
+    # qisrc.reset.clever_reset_ref should tell where is the HEAD after reset
     record_messages.reset()
     qisrc_action("sync")
-    assert not record_messages.find("HEAD is now at")
+    assert record_messages.find("HEAD is now at")
+    assert record_messages.find("Add b.txt")
+    _, status_output = git.status(raises=False)
+
+    # FIXME: when using ref long name branch (refs/xxx), if we come from a tag, we stay in a detached head,
+    # and we should be in an attached head state to be consistent with the ref short name branc behaviour
+    # That's not an issue for now as users reference short name in manifest, but it will be cleaner to be consistent...
+    if not branch_ref_to_test.startswith("refs/"):
+        assert "HEAD" not in status_output
+        assert "detached" not in status_output
+    else:
+        # Remove these assert when dealing with behaviour consistency mentionned above
+        assert "HEAD" in status_output
+        assert "detached" in status_output
+
+
+def test_switching_to_fixed_ref_short_name_happy(qisrc_action, git_server, record_messages):
+    _test_switching_to_fixed_ref_happy(qisrc_action, git_server, record_messages,
+                                       "v0.1", "feature/b")
+
+
+def test_switching_to_fixed_ref_remote_long_name_happy(qisrc_action, git_server, record_messages):
+    _test_switching_to_fixed_ref_happy(qisrc_action, git_server, record_messages,
+                                       "refs/tags/v0.1", "refs/heads/feature/b")
+
+
+def test_switching_to_fixed_ref_local_long_name_happy(qisrc_action, git_server, record_messages):
+    # Need to configure a remote origin
+    _test_switching_to_fixed_ref_happy(qisrc_action, git_server, record_messages,
+                                       "refs/tags/v0.1", "refs/remotes/origin/feature/b")
 
 
 def test_fixed_ref_local_changes(qisrc_action, git_server, record_messages):
@@ -461,8 +495,6 @@ def test_switching_to_new_fixed_ref(qisrc_action, git_server):
     _, sha1 = git.call("rev-parse", "HEAD", raises=False)
     expected = git.get_ref_sha1("refs/tags/v0.2")
     assert sha1 == expected
-    _, msg = git.branch("--no-color", raises=False)
-    assert not msg.find('2') == -1
 
 
 def test_switching_to_new_fixed_ref_local_changes(qisrc_action, git_server, record_messages):
