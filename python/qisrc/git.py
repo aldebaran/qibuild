@@ -57,21 +57,34 @@ class Git(object):
 
     def _call(self, *args, **kwargs):
         """ Helper for self.call """
+        assert bool(args)
+        keep_last_newline_whitelist = (
+            "show",
+        )
         ui.debug("git", " ".join(args), "in", self.repo)
         if "cwd" not in kwargs.keys():
             kwargs["cwd"] = self.repo
         if "quiet" not in kwargs.keys():
             kwargs["quiet"] = False
+
+        # Allow caller to keep the ending new line of the git command outputs
+        keep_last_newline = kwargs.get("keep_last_newline", args[0] in keep_last_newline_whitelist)
+        if "keep_last_newline" in kwargs:
+            del kwargs["keep_last_newline"]
+
         git = qisys.command.find_program("git", raises=True)
         cmd = [git]
         cmd.extend(args)
-        raises = kwargs.get("raises")
+
+        raises = kwargs.get("raises", True)
+        if "raises" in kwargs:
+            del kwargs["raises"]
+
         env = os.environ.copy()
         for key in env.keys():
             if key.startswith("GIT_"):
                 del env[key]
-        if raises is False:
-            del kwargs["raises"]
+        if not raises:
             del kwargs["quiet"]
             process = subprocess.Popen(cmd,
                                        stdout=subprocess.PIPE,
@@ -79,13 +92,12 @@ class Git(object):
                                        env=env,
                                        **kwargs)
             out = process.communicate()[0]
-            # Don't want useless blank lines
-            out = out.rstrip("\n")
+            if not keep_last_newline:
+                # Usually, don't want useless blank lines
+                out = out.rstrip("\n")
             ui.debug("out:", out)
             return process.returncode, out
         else:
-            if "raises" in kwargs:
-                del kwargs["raises"]
             qisys.command.call(cmd, env=env, **kwargs)
 
     @contextlib.contextmanager
@@ -160,7 +172,7 @@ class Git(object):
         # Only porcelain here.
         whitelist = ("add", "branch", "checkout", "clean", "commit", "config",
                      "diff", "fetch", "init", "log", "merge", "pull", "push",
-                     "rebase", "remote", "reset", "stash",
+                     "rebase", "remote", "reset", "show", "stash",
                      "status", "submodule", "tag")
         if name in whitelist:
             return functools.partial(self.call, name)
