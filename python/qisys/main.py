@@ -13,7 +13,7 @@ import qisys.script
 
 
 def print_version(script_name):
-    sys.stdout.write("%s version 3.11.17\n" % script_name)
+    sys.stdout.write("%s version 3.11.18\n" % script_name)
     import qibuild
     qibuild_dir = os.path.dirname(qibuild.__file__)
     python_dir = os.path.dirname(qibuild_dir)

@@ -1,0 +1,29 @@
+v3.11.18
+========
+
+qibuild
+-----------
+
+* Fix pep8/pylint warnings and enforce zero warnings policy in continuous integration
+* Add ssh options for connecting to a remote host for integration test purpose
+* Add option to disable the last newline strip on the git wrapper call
+* Update copyright with mentions to 2018 and SoftBank
+* Add support for fixed refs and detached head in qisrc
+* Normalize 'src' path in worktree project manifest to be compliant with Unix and Windows usage
+* Fix qt5_3dquickextras-config.cmake filename
+* Improve qisrc sync: better outupt when a project fails
+* CMake Modules: fix raptor2 and rasqal config files
+* Fix rpath management on OSX for python sdk
+* Fix OSX rpath for targets generated in subfolders
+* change way targets are referencing their dependencies on OSX
+* Force rpath on OSX at build time
+* Fix condition in ogre-config
+* Add qt5_quicktest-config.cmake
+* ci: Watch 'master' branch instead of 'next' on Travis
+* Add GitLab Continuous integration
+* qitest: fix exception when --test-output-dir is omitted
+* qitoolchain: Fix feed test that ensure local subfeeds work
+* Uniformize install and deploy
+* Update qibuild test suite
+* when generating a junit xml, write time at testcase level too
+* fix subfeed in qitoolchain if git is used as feed source
