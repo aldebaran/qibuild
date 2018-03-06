@@ -110,3 +110,32 @@ def test_ignores_env(tmpdir, monkeypatch):
     monkeypatch.setenv("GIT_WORK_TREE", repo1.strpath)
     git2.call("clean", "--force")
     assert untracked.check(file=1)
+
+
+def test_ending_newlines(cd_to_tmpdir):  # pylint: disable=unused-argument
+    git = TestGit()
+    git.initialize()
+    message_1 = "mess1"
+    file_1 = "foo.txt"
+    content_1 = "\nfoo\nbar\n\n"
+    git.commit_file(file_1, content_1, message=message_1)
+
+    # Test git subcommand which doesn't keep the last newline by default
+    rc, out = git.status(raises=False)
+    assert rc == 0
+    assert out[-1] != "\n"
+
+    rc, out = git.status(raises=False, keep_last_newline=True)
+    assert rc == 0
+    assert out[-1] == "\n"
+
+    # Test git subcommand which KEEP the last newline by default
+    rc, out = git.show("master:foo.txt", raises=False)
+    assert rc == 0
+    assert out[-1] == "\n"
+    assert out == content_1
+
+    rc, out = git.show("master:foo.txt", raises=False, keep_last_newline=False)
+    assert rc == 0
+    assert out[-1] != "\n"
+    assert out != content_1
