@@ -117,17 +117,17 @@ function(qi_create_bin name)
       RUNTIME_OUTPUT_DIRECTORY                "${_runtime_out}"
   )
 
+  file(RELATIVE_PATH _dotdot "${_runtime_out}" "${QI_SDK_DIR}/${QI_SDK_LIB}")
   if(UNIX AND NOT APPLE)
     if(NOT ARG_NO_RPATH)
       # Use a relative rpath at installation
       set_target_properties("${name}"
         PROPERTIES
-          INSTALL_RPATH "\$ORIGIN/../lib"
+          INSTALL_RPATH "\$ORIGIN/${_dotdot}"
       )
     endif()
   endif()
   if(APPLE AND NOT ARG_NO_RPATH)
-     file(RELATIVE_PATH _dotdot "${_runtime_out}" "${QI_SDK_DIR}/${QI_SDK_LIB}")
      set_target_properties("${name}"
        PROPERTIES
          INSTALL_RPATH "@executable_path/${_dotdot};@executable_path/${_dotdot}/..")
@@ -329,18 +329,19 @@ function(qi_create_lib name)
         INSTALL_NAME_DIR ${QI_INSTALL_NAME_DIR}
     )
   endif()
+
+ file(RELATIVE_PATH _dotdot "${_lib_out}" "${QI_SDK_DIR}/${QI_SDK_LIB}")
   if(UNIX AND NOT APPLE)
     if(NOT ARG_NO_RPATH)
       # Use a relative rpath at installation
       set_target_properties("${name}"
         PROPERTIES
-          INSTALL_RPATH "\$ORIGIN/../lib"
+          INSTALL_RPATH "\$ORIGIN/${_dotdot}"
       )
     endif()
   endif()
   if(APPLE AND NOT ARG_NO_RPATH AND NOT _type STREQUAL "STATIC")
      set(_rpath "@loader_path")
-     file(RELATIVE_PATH _dotdot "${_lib_out}" "${QI_SDK_DIR}/${QI_SDK_LIB}")
      if(NOT "${_dotdot}" STREQUAL "")
          set(_rpath "${_rpath};@loader_path/${_dotdot}")
      endif()
