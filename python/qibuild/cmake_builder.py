@@ -2,9 +2,11 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
 
+import sys
 import os
 import functools
 import operator
+import hashlib
 
 from qisys import ui
 from qisys.abstractbuilder import AbstractBuilder
@@ -14,6 +16,19 @@ import qibuild.deploy
 import qibuild.deps
 from qibuild.parallel_builder import ParallelBuilder
 from qibuild.project import write_qi_path_conf
+
+
+def md5_checksum(file_path):
+    """ Compute the md5 checksum of the given file """
+    m = hashlib.md5()
+    chunksize = 1024*1024
+    with open(file_path, 'rb') as fh:
+        while True:
+            data = fh.read(chunksize)
+            if not data:
+                break
+            m.update(data)
+    return m.hexdigest()
 
 
 class CMakeBuilder(AbstractBuilder):
@@ -269,7 +284,57 @@ Or configure the project with no config
                               update_title=True)
                 files = project.install(dest, **kwargs)
                 installed.extend(files)
-        return installed
+
+        return self.post_install(dest, installed,
+                                 replace_duplicated_lib_by_symlink=not sys.platform.startswith("win") and
+                                 not os.environ.get('QIBUILD_DONT_OPTIMIZE_PKG_SIZE'),
+                                 remove_python_bytecode=not os.environ.get("QIBUILD_KEEP_PYTHON_BYTECODE"))
+
+    @staticmethod
+    def post_install(dest, installed, replace_duplicated_lib_by_symlink=False, remove_python_bytecode=False):
+        """ Run post install optimizations like:
+            - replace duplicated libs by a symlink
+            - remove python bytecode (*.pyc, *.pyo)
+
+        :param str dest: Installation directory
+        :param list installed: List on installed files (path is relative to installation directory
+        :param bool replace_duplicated_lib_by_symlink: If False, skip the symlink optimization
+        :param bool remove_python_bytecode: If False, skrip the python bytecode removal
+        """
+        ui.info("Post install step")
+        if replace_duplicated_lib_by_symlink and sys.platform.startswith("win"):
+            ui.warning("Cannot perform lib deduplication on Windows")
+            replace_duplicated_lib_by_symlink = False
+        duplicated = {}
+        clean_installed = set()
+        for fic in installed:
+            full_path = os.path.join(dest, fic)
+            if replace_duplicated_lib_by_symlink and os.path.split(fic)[0] == 'lib' and '.so' in os.path.basename(fic)\
+                    and not os.path.islink(full_path):
+                fingerprint = md5_checksum(full_path)
+                if fingerprint not in duplicated:
+                    duplicated[fingerprint] = set()
+                duplicated[fingerprint].add(fic)
+            elif os.path.splitext(fic)[1] in (".pyc", ".pyo") and remove_python_bytecode:
+                ui.info("Removing bytecode", full_path)
+                qisys.sh.rm(full_path)
+            else:
+                clean_installed.add(fic)
+        for _, files in duplicated.items():
+            clean_installed = clean_installed.union(files)
+            if len(files) > 1:
+                keep_this_one = None
+                for fic in sorted(files, reverse=True):
+                    full_path = os.path.join(dest, fic)
+                    if not keep_this_one:
+                        keep_this_one = full_path
+                        ui.info("Found duplicated lib {} ({} times)".format(fic, len(files) - 1))
+                    else:
+                        target = os.path.join('.', os.path.relpath(keep_this_one, os.path.dirname(full_path)))
+                        ui.info(" - {} -> {}".format(full_path, target))
+                        qisys.sh.rm(full_path)
+                        qisys.sh.ln(target, full_path)
+        return list(clean_installed)
 
     @need_configure
     def deploy(self, url, split_debug=False, with_tests=False, install_tc_packages=True):

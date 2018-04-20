@@ -1,7 +1,12 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+import sys
+import os
+import os.path
+from contextlib import contextmanager
 import pytest
+from mock import patch
 
 import qibuild.cmake_builder
 import qibuild.config
@@ -99,3 +104,129 @@ def test_host_tools_host_tools_not_built(build_worktree, fake_ctc):  # pylint: d
     with pytest.raises(Exception) as e:
         cmake_builder.get_host_dirs(usefootool_proj)
     assert "(Using 'foo' build config)" in e.value.message
+
+
+@patch('qibuild.cmake_builder.ui')
+@pytest.mark.skipif(sys.platform.startswith('win'), reason="Unavailable on Windows")
+def test_post_install_dup_lib(ui, tmpdir):
+
+    all_files = {"JfufezF": [{"path": os.path.join('lib', 'asomething'), "role": "to_keep"},
+                             {"path": os.path.join('lib', 'what.so.1'), "role": "symlink", "target": "./what.so.1.2.3"},
+                             {"path": os.path.join('lib', 'truc.so'), "role": "symlink", "target": "./what.so.1.2.3"},
+                             {"path": os.path.join('lib', 'what.so.1.2.3'), "role": "to_keep"},
+                             {"path": os.path.join('not_lib', 'toto.so.3'), "role": "to_keep"}],
+                 "w": [{"path": os.path.join('lib', 'nice.so'), "role": "already_symlink", "target": "./nice.so.4.3"},
+                       {"path": os.path.join('lib', 'nice.so.4'), "role": "already_symlink", "target": "./nice.so.4.3"},
+                       {"path": os.path.join('lib', 'nice.so.4.3'), "role": "to_keep"}],
+                 "pJPG8IZ": [{"path": os.path.join('not_lib', 'toto.so'), "role": "to_keep"},
+                             {"path": os.path.join('not_lib', 'toto.so.2'), "role": "to_keep"},
+                             {"path": os.path.join('lib', 'other.so.1'), "role": "symlink", "target": "./other.so.old"},
+                             {"path": os.path.join('lib', 'other.so.old'), "role": "to_keep"}],
+                 "#!/usr/bin/env python": [{"path": os.path.join('lib', 'python.py'), "role": "to_keep"},
+                                           {"path": os.path.join('lib', 'python.pyc'), "role": "to_keep"},
+                                           {"path": os.path.join('lib', 'python.pyo'), "role": "to_keep"}]}
+
+    with duplicated_lib_check(tmpdir.strpath, all_files) as input_files:
+        output_files = qibuild.cmake_builder.CMakeBuilder("").post_install(tmpdir.strpath, input_files,
+                                                                           replace_duplicated_lib_by_symlink=True,
+                                                                           remove_python_bytecode=False)
+        assert ui.warning.call_count == 0
+        assert sorted(input_files) == sorted(output_files)
+
+
+@contextmanager
+def duplicated_lib_check(directory, all_files):
+    """ Context manager to initiate directory struture and check after test """
+    input_files = []
+    for content, files in all_files.items():
+        for fic in files:
+            full_path = os.path.join(directory, fic['path'])
+            if not os.path.exists(os.path.dirname(full_path)):
+                os.makedirs(os.path.dirname(full_path))
+            input_files.append(fic['path'])
+            if fic['role'] == "already_symlink":
+                os.symlink(fic['target'], full_path)
+            else:
+                with open(full_path, 'w') as ficp:
+                    ficp.write(content)
+    yield input_files
+
+    for files in all_files.values():
+        for fic in files:
+            path = os.path.join(directory, fic['path'])
+            if fic['role'] == 'to_keep':
+                assert os.path.isfile(path)
+            elif fic['role'] in ('symlink', "already_symlink"):
+                assert os.path.islink(path)
+                assert os.readlink(path) == fic['target']
+            else:
+                assert not os.path.exists(path)
+
+
+def test_post_install_clean_python(tmpdir):
+
+    all_files = {"JCVOIUEFZace8fufezF": [{"path": os.path.join('lib', 'asomething'), "role": "to_keep"},
+                                         {"path": os.path.join('lib', 'what.so.1'), "role": "to_keep"},
+                                         {"path": os.path.join('lib', 'truc.so'), "role": "to_keep"},
+                                         {"path": os.path.join('lib', 'what.so.1.2.3'), "role": "to_keep"},
+                                         {"path": os.path.join('not_lib', 'toto.so.3'), "role": "to_keep"}],
+                 "pJPG8IZ90E8FUZEFEZF": [{"path": os.path.join('not_lib', 'toto.so'), "role": "to_keep"},
+                                         {"path": os.path.join('not_lib', 'toto.so.2'), "role": "to_keep"},
+                                         {"path": os.path.join('lib', 'other.so.1'), "role": "to_keep"},
+                                         {"path": os.path.join('lib', 'other.so.old'), "role": "to_keep"}],
+                 "#!/usr/bin/env python": [{"path": os.path.join('lib', 'python.py'), "role": "to_keep"},
+                                           {"path": os.path.join('lib', 'python.pyc'), "role": "to_delete"},
+                                           {"path": os.path.join('lib', 'python.pyo'), "role": "to_delete"}]}
+
+    with duplicated_lib_check(tmpdir.strpath, all_files) as input_files:
+        output_files = qibuild.cmake_builder.CMakeBuilder("").post_install(tmpdir.strpath, input_files,
+                                                                           replace_duplicated_lib_by_symlink=False,
+                                                                           remove_python_bytecode=True)
+        assert len(input_files) == len(output_files) + 2
+
+
+@patch('qibuild.cmake_builder.ui')
+@patch('qibuild.cmake_builder.sys')
+def test_post_install_dup_lib_windows(mocked_sys, ui, tmpdir):
+    mocked_sys.platform.return_value = 'windoze'
+
+    all_files = {"JCVOIUE": [{"path": os.path.join('lib', 'asomething'), "role": "to_keep"},
+                             {"path": os.path.join('lib', 'what.so.1'), "role": "to_keep"},
+                             {"path": os.path.join('lib', 'truc.so'), "role": "to_keep"},
+                             {"path": os.path.join('lib', 'what.so.1.2.3'), "role": "to_keep"},
+                             {"path": os.path.join('not_lib', 'toto.so.3'), "role": "to_keep"}],
+                 "pJPG8IZ": [{"path": os.path.join('not_lib', 'toto.so'), "role": "to_keep"},
+                             {"path": os.path.join('not_lib', 'toto.so.2'), "role": "to_keep"},
+                             {"path": os.path.join('lib', 'other.so.1'), "role": "to_keep"},
+                             {"path": os.path.join('lib', 'other.so.old'), "role": "to_keep"}],
+                 "#!/usr/bin/env python": [{"path": os.path.join('lib', 'python.py'), "role": "to_keep"},
+                                           {"path": os.path.join('lib', 'python.pyc'), "role": "to_keep"},
+                                           {"path": os.path.join('lib', 'python.pyo'), "role": "to_keep"}]}
+
+    with duplicated_lib_check(tmpdir.strpath, all_files) as input_files:
+        output_files = qibuild.cmake_builder.CMakeBuilder("").post_install(tmpdir.strpath, input_files + input_files,
+                                                                           replace_duplicated_lib_by_symlink=True,
+                                                                           remove_python_bytecode=False)
+        assert sorted(input_files) == sorted(output_files)
+        assert ui.warning.call_count == 1
+
+
+def test_post_install_all_with_dup(tmpdir):
+    all_files = {"JCVOIUE": [{"path": os.path.join('lib', 'asomething'), "role": "to_keep"},
+                             {"path": os.path.join('lib', 'what.so.1'), "role": "symlink", "target": "./what.so.1.2.3"},
+                             {"path": os.path.join('lib', 'truc.so'), "role": "symlink", "target": "./what.so.1.2.3"},
+                             {"path": os.path.join('lib', 'what.so.1.2.3'), "role": "to_keep"},
+                             {"path": os.path.join('not_lib', 'toto.so.3'), "role": "to_keep"}],
+                 "pJPG8IZ": [{"path": os.path.join('not_lib', 'toto.so'), "role": "to_keep"},
+                             {"path": os.path.join('not_lib', 'toto.so.2'), "role": "to_keep"},
+                             {"path": os.path.join('lib', 'other.so.1'), "role": "symlink", "target": "./other.so.old"},
+                             {"path": os.path.join('lib', 'other.so.old'), "role": "to_keep"}],
+                 "#!/usr/bin/env python": [{"path": os.path.join('lib', 'python.py'), "role": "to_keep"},
+                                           {"path": os.path.join('lib', 'python.pyc'), "role": "to_delete"},
+                                           {"path": os.path.join('lib', 'python.pyo'), "role": "to_delete"}]}
+
+    with duplicated_lib_check(tmpdir.strpath, all_files) as input_files:
+        output_files = qibuild.cmake_builder.CMakeBuilder("").post_install(tmpdir.strpath, input_files + input_files,
+                                                                           replace_duplicated_lib_by_symlink=True,
+                                                                           remove_python_bytecode=True)
+        assert len(input_files) == len(output_files) + 2
