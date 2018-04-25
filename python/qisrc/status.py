@@ -110,7 +110,7 @@ def check_state(project, untracked):
             git, state_project.current_branch, "%s/%s" % (
                 project.default_remote.name, project.default_branch.name))
 
-        _set_status(git, state_project, untracked=untracked)
+    _set_status(git, state_project, untracked=untracked)
     return state_project
 
 
