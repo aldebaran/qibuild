@@ -3,6 +3,7 @@
 # found in the COPYING file.
 
 import os
+import os.path
 import subprocess
 import sys
 import stat
@@ -60,7 +61,7 @@ def dump_symbols_from_binary(binary, pool_dir):  # pylint: disable=too-many-loca
     <pool_dir>/<binary name>/<id>/<binary name>.sym
 
     """
-    dump_syms = qisys.command.find_program("dump_syms", raises=True)
+    dump_syms = qisys.command.find_program("dump_syms", raises=True, cwd=os.path.dirname(binary))
     if sys.platform == "darwin":
         dsym = gen_dsym(binary)
         cmd = [dump_syms, dsym]
@@ -109,7 +110,7 @@ def dump_symbols_from_binary(binary, pool_dir):  # pylint: disable=too-many-loca
 
 def strip_binary(binary, strip_executable=None, strip_args=None):
     if not strip_executable:
-        strip_executable = qisys.command.find_program("strip", raises=True)
+        strip_executable = qisys.command.find_program("strip", raises=True, cwd=os.path.dirname(binary))
     cmd = [strip_executable]
     if strip_args:
         cmd.extend(strip_args)

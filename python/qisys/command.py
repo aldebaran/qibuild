@@ -239,10 +239,40 @@ class NotInPath(Exception):
         return mess
 
 
-def find_program(executable, env=None, raises=False):
+def get_toolchain_binary_paths(cwd=None):
+    """ Get the used toolchain a return the PATH of every bin packages as a string
+
+    First guess worktree with the current directory, then try with the given cwd.
+    """
+    from qibuild.worktree import BuildWorkTree
+    from qisys.worktree import WorkTree, guess_worktree, NotInWorkTree
+    bins = []
+    try:
+        try:
+            worktree = WorkTree(guess_worktree(raises=True))
+        except NotInWorkTree:
+            worktree = WorkTree(guess_worktree(cwd, raises=True))
+        build_worktree = BuildWorkTree(worktree)
+        for pkg in build_worktree.build_config.toolchain.packages:
+            bin_dir = os.path.join(pkg.path, 'bin')
+            if os.path.isdir(bin_dir):
+                bins.append(bin_dir)
+    except NotInWorkTree:
+        ui.debug("get_toolchain_binary_paths: No toolchain found as not in a worktree")
+    except AttributeError as exp:
+        # No build_config or no toolchain
+        ui.debug("No build_config or no toolchain")
+    except Exception as exp:
+        raise
+    return os.pathsep.join(bins)
+
+
+def find_program(executable, env=None, raises=False, cwd=None):
     """Get the full path of an executable by
     looking at PATH environment variable
     (and PATHEXT on windows)
+
+    Toolchain binaries are also prepend to path.
 
     :return: None if program was not found,
       the full path to executable otherwise
@@ -253,20 +283,19 @@ def find_program(executable, env=None, raises=False):
 
     res = None
     if not env:
-        env = qibuild.config.get_build_env()
+        env = dict(qibuild.config.get_build_env())
         if not env:
-            env = os.environ
-    env_path = env.get("PATH", "")
-    for path in env_path.split(os.pathsep):
+            env = dict(os.environ)
+    toolchain_paths = get_toolchain_binary_paths(cwd)
+    if toolchain_paths:
+        env["PATH"] = os.pathsep.join((toolchain_paths, env.get("PATH", "")))
+    for path in env["PATH"].split(os.pathsep):
         res = _find_program_in_path(executable, path)
         if res:
-            break
-    if res:
-        _FIND_PROGRAM_CACHE[executable] = res
-        return res
-    else:
-        if raises:
-            raise NotInPath(executable, env=env)
+            _FIND_PROGRAM_CACHE[executable] = res
+            return res
+    if raises:
+        raise NotInPath(executable, env=env)
     return None
 
 
