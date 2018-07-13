@@ -468,7 +468,10 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
 
     def _install_component(self, destdir, component):
         build_env = self.build_env.copy()
-        build_env["DESTDIR"] = destdir
+        if sys.platform.startswith("win"):
+            build_env["DESTDIR"] = destdir.encode('ascii')
+        else:
+            build_env["DESTDIR"] = destdir
 
         cmake_args = list()
         cmake_args += ["-DBUILD_TYPE=%s" % self.build_type]
