@@ -41,10 +41,6 @@ def can_be_dumped(filename):
     # File must be a regular file
     if not stat.S_ISREG(st.st_mode):
         return False
-    # File must be writable by the user
-    # or we should have enough privileges to alter its permissions:
-    if not bool(st.st_mode & stat.S_IWUSR) and not os.getuid() == 0:
-        return False
     # File must be an executable
     if sys.platform.startswith("linux"):
         return is_elf(filename)
@@ -67,11 +63,8 @@ def dump_symbols_from_binary(binary, pool_dir):  # pylint: disable=too-many-loca
     else:
         cmd = [dump_syms, binary]
     ui.debug(cmd)
-    with qisys.sh.PreserveFileMetadata(binary):
-        mode_rw = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO
-        os.chmod(binary, mode_rw)
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
 
     dump_ok = True
     (out, err) = process.communicate()
