@@ -7,6 +7,7 @@
 """
 
 import os
+import platform
 import sys
 import contextlib
 import subprocess
@@ -320,7 +321,8 @@ def _find_program_in_path(executable, path):
 
 def _check_access(executable, path):
     full_path = os.path.join(path, executable)
-    if os.path.isfile(full_path) and os.access(full_path, os.X_OK):
+    if os.path.isfile(full_path) and os.access(full_path, os.X_OK) and \
+        platform.architecture(full_path)[0] == platform.architecture(sys.executable)[0]:
         return full_path
 
 
