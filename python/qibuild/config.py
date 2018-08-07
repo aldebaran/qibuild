@@ -15,6 +15,7 @@ from qisys import ui
 
 import qisys.qixml
 import qisys.sh
+import qisys.envsetter
 from qisys.qixml import etree
 
 
