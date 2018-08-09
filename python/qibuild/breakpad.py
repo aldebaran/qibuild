@@ -51,13 +51,13 @@ def can_be_dumped(filename):
         return is_exe(filename)
 
 
-def dump_symbols_from_binary(binary, pool_dir):  # pylint: disable=too-many-locals
-    """ Dump sympobls from the binary.
+def dump_symbols_from_binary(binary, pool_dir, build_config=None):  # pylint: disable=too-many-locals
+    """ Dump symbols from the binary.
     Results can be found in
     <pool_dir>/<binary name>/<id>/<binary name>.sym
 
     """
-    dump_syms = qisys.command.find_program("dump_syms", raises=True, cwd=os.path.dirname(binary))
+    dump_syms = qisys.command.find_program("dump_syms", raises=True, build_config=build_config)
     if sys.platform == "darwin":
         dsym = gen_dsym(binary)
         cmd = [dump_syms, dsym]
@@ -123,7 +123,7 @@ def gen_dsym(binary):
 
 
 def dump_symbols_from_directory(root_dir, pool_dir, strip=True,
-                                strip_exe=None, strip_args=None):
+                                strip_exe=None, strip_args=None, build_config=None):
     """ Dump symbols for every binary in the root dir.
     Assumes that dump_syms is in $PATH.
     If strip is True, also strip the binaries. (assumes that strip is
@@ -137,7 +137,7 @@ def dump_symbols_from_directory(root_dir, pool_dir, strip=True,
                 continue
             if can_be_dumped(full_path):
                 ui.info("dumping", full_path)
-                dump_symbols_from_binary(full_path, pool_dir)
+                dump_symbols_from_binary(full_path, pool_dir, build_config=build_config)
                 if strip and os.name == "posix":
                     if sys.platform == "darwin":
                         strip_args = ["-u", "-r"]
