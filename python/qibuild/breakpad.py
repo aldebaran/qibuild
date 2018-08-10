@@ -103,7 +103,7 @@ def dump_symbols_from_binary(binary, pool_dir, build_config=None):  # pylint: di
 
 def strip_binary(binary, strip_executable=None, strip_args=None):
     if not strip_executable:
-        strip_executable = qisys.command.find_program("strip", raises=True, cwd=os.path.dirname(binary))
+        strip_executable = qisys.command.find_program("strip", raises=True)
     cmd = [strip_executable]
     if strip_args:
         cmd.extend(strip_args)
