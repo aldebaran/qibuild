@@ -101,9 +101,9 @@ def dump_symbols_from_binary(binary, pool_dir, build_config=None):  # pylint: di
         fp.write(out)
 
 
-def strip_binary(binary, strip_executable=None, strip_args=None):
+def strip_binary(binary, strip_executable=None, strip_args=None, build_config=None):
     if not strip_executable:
-        strip_executable = qisys.command.find_program("strip", raises=True)
+        strip_executable = qisys.command.find_program("strip", raises=True, build_config=build_config)
     cmd = [strip_executable]
     if strip_args:
         cmd.extend(strip_args)
@@ -145,18 +145,18 @@ def dump_symbols_from_directory(root_dir, pool_dir, strip=True,
                         strip_args = list()
                     ui.info("stripping", full_path)
                     strip_binary(full_path, strip_executable=strip_exe,
-                                 strip_args=strip_args)
+                                 strip_args=strip_args, build_config=build_config)
     return pool_dir
 
 
 def gen_symbol_archive(base_dir=None, output=None, strip=True,
-                       strip_exe=None, strip_args=None):
+                       strip_exe=None, strip_args=None, build_config=None):
     """ Generate a symbol archive from all the
     binaries in the base_dir
 
     """
     with qisys.sh.TempDir() as pool_dir:
         dump_symbols_from_directory(base_dir, pool_dir, strip=strip,
-                                    strip_exe=strip_exe, strip_args=strip_args)
+                                    strip_exe=strip_exe, strip_args=strip_args, build_config=build_config)
         qisys.archive.compress(pool_dir, output=output, flat=True)
     return output
