@@ -243,16 +243,23 @@ class NotInPath(Exception):
 def get_toolchain_binary_paths(build_config):
     """ Get the toolchain of the build_config and return the PATH of every bin packages as a string
     """
-    from qibuild.config import QiBuildConfig
-    from qitoolchain import get_toolchain
     bins = []
     if build_config:
+        toolchain = None
         try:
-            qibuild_cfg = QiBuildConfig()
-            qibuild_cfg.read()
-            qibuild_config = qibuild_cfg.configs.get(build_config)
-            if qibuild_config:
-                for pkg in get_toolchain(qibuild_config.toolchain).packages:
+            if hasattr(build_config, 'toolchain'):
+                toolchain = build_config.toolchain
+            else:
+                # When called from qibuildfarm.release.functions (ie: build_config is the build_config name as string)
+                from qibuild.config import QiBuildConfig
+                from qitoolchain import get_toolchain
+                qibuild_cfg = QiBuildConfig()
+                qibuild_cfg.read()
+                qibuild_config = qibuild_cfg.configs.get(build_config)
+                if qibuild_config:
+                    toolchain = get_toolchain(qibuild_config.toolchain)
+            if toolchain:
+                for pkg in toolchain.packages:
                     bin_dir = os.path.join(pkg.path, 'bin')
                     if os.path.isdir(bin_dir):
                         bins.append(bin_dir)

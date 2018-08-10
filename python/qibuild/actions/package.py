@@ -69,7 +69,7 @@ def do(args):  # pylint: disable=too-many-locals
         symbols_archive = os.path.join(package_dir, symbols_archive_name)
         with qisys.sh.TempDir() as tmp:
             pool_dir = os.path.join(tmp, "symbols")
-            qibuild.breakpad.dump_symbols_from_directory(destdir, pool_dir)
+            qibuild.breakpad.dump_symbols_from_directory(destdir, pool_dir, build_config=cmake_builder.build_config)
             qisys.archive.compress(pool_dir, flat=True, output=symbols_archive)
 
     ui.info(ui.blue, "::", ui.reset, ui.bold, "Compressing package ...")

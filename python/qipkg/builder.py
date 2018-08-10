@@ -255,7 +255,8 @@ Error when parsing {pml_path}
                                                 output=symbols_archive,
                                                 strip=strip,
                                                 strip_exe=strip_exe,
-                                                strip_args=strip_args)
+                                                strip_args=strip_args,
+                                                build_config=self.cmake_builder.build_config)
             ui.info(ui.bold, "-> Symbols generated in", symbols_archive)
         ui.info(ui.bold, "-> Package generated in", output, "\n")
 
