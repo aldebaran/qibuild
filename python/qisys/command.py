@@ -335,7 +335,11 @@ def _is_runnable(full_path):
     try:
         process = subprocess.Popen(['ldd', full_path], stdout=subprocess.PIPE)
         output = process.communicate()[0]
-        return process.returncode == 0 and not any([' not found ' in line for line in output.split('\n')])
+        if process.returncode == 0 and ' not found ' not in output:
+            return True
+        elif process.returncode == 1 and 'not a dynamic executable' in output:
+            return True
+        return False
     except OSError:
         # TODO: Run an equivalent test on mac and on windows
         ui.warning("ldd not available => assuming {} is runnable".format(full_path))
