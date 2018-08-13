@@ -292,7 +292,7 @@ def find_program(executable, env=None, raises=False, build_config=None):
         env["PATH"] = os.pathsep.join((toolchain_paths, env.get("PATH", "")))
     for path in env["PATH"].split(os.pathsep):
         res = _find_program_in_path(executable, path)
-        if res:
+        if res and _is_runnable(res):
             _FIND_PROGRAM_CACHE[executable] = res
             return res
     if raises:
@@ -321,9 +321,25 @@ def _find_program_in_path(executable, path):
 
 def _check_access(executable, path):
     full_path = os.path.join(path, executable)
-    if os.path.isfile(full_path) and os.access(full_path, os.X_OK) and \
-        platform.architecture(full_path)[0] == platform.architecture(sys.executable)[0]:
+    if os.path.isfile(full_path) and os.access(full_path, os.X_OK):
         return full_path
+
+
+def _is_runnable(full_path):
+    """ Return True if executable:
+    - has the same architecture (32/64 bits) than current python executable
+    - on linux, each dynamically linked libraries (found with 'ldd') have the minimum required version
+    """
+    if not platform.architecture(full_path)[0] == platform.architecture(sys.executable)[0]:
+        return False
+    try:
+        process = subprocess.Popen(['ldd', full_path], stdout=subprocess.PIPE)
+        output = process.communicate()[0]
+        return process.returncode == 0 and not any([' not found ' in line for line in output.split('\n')])
+    except OSError:
+        # TODO: Run an equivalent test on mac and on windows
+        ui.warning("ldd not available => assuming {} is runnable".format(full_path))
+        return True
 
 
 # Implementation widely inspired by the python-2.7 one.
