@@ -7,7 +7,7 @@ import mock
 
 import qibuild.find
 
-from qibuild.test.conftest import QiBuildAction  # pylint: disable=unused-import
+from qibuild.test.conftest import QiBuildAction, FakeProcess  # pylint: disable=unused-import
 from qibuild.actions import run  # pylint: disable=unused-import
 from qitoolchain.test.conftest import QiToolchainAction  # pylint: disable=unused-import
 
@@ -41,10 +41,14 @@ def test_using_no_exec(qibuild_action):
 
 
 def test_run_system(qibuild_action):
-    with mock.patch("os.execve") as execve_mock:
-        qibuild_action("run", "ls")
-    call_args_list = execve_mock.call_args_list
-    binary = call_args_list[0][0][0]
+    with mock.patch("subprocess.Popen") as popen_mock:
+        popen_mock.side_effect = [FakeProcess(0, '/bin/ls: ELF 64-bit', ''),
+                                  FakeProcess(0, '/usr/bin/python: ELF 64-bit', ''),
+                                  FakeProcess(0, '', '')]
+        with mock.patch("os.execve") as execve_mock:
+            qibuild_action("run", "ls")
+    assert popen_mock.call_args_list[-1][0][0][0] == 'ldd'
+    binary = execve_mock.call_args_list[-1][0][0]
     assert os.path.isabs(binary)
     assert os.path.basename(binary) == "ls"
 
