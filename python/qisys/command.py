@@ -263,7 +263,7 @@ def get_toolchain_binary_paths(build_config):
                     bin_dir = os.path.join(pkg.path, 'bin')
                     if os.path.isdir(bin_dir):
                         bins.append(bin_dir)
-        except Exception as exp:
+        except Exception:
             pass
     return os.pathsep.join(bins)
 
@@ -330,10 +330,10 @@ def _is_runnable(full_path):
     - has the same architecture (32/64 bits) than current python executable
     - on linux, each dynamically linked libraries (found with 'ldd') have the minimum required version
     """
-    if not platform.architecture(full_path)[0] == platform.architecture(sys.executable)[0]:
+    if platform.architecture(full_path)[0] != platform.architecture(sys.executable)[0]:
         return False
     try:
-        process = subprocess.Popen(['ldd', full_path], stdout=subprocess.PIPE)
+        process = subprocess.Popen(['ldd', full_path], stdout=subprocess.PIPE, env={"LANG": "C"})
         output = process.communicate()[0]
         if process.returncode == 0 and ' not found ' not in output:
             return True
