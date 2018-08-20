@@ -13,7 +13,6 @@ doitall:
       openssh-server
       subversion
       doxygen
-      cmake
       gdb
       ninja-build
       swig
