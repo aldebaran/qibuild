@@ -49,15 +49,15 @@ function(_qi_add_test_internal test_name target_name)
   if(_srcs)
     set(_deps ${ARG_DEPENDS})
     set(_submodules ${ARG_SUBMODULE})
-    if(ARG_GTEST_TEST)
-      list(APPEND _deps GTEST GTEST_MAIN)
-    endif()
-    if(ARG_GMOCK_TEST)
-      list(APPEND _deps GMOCK GMOCK_MAIN)
-    endif()
     # Using NO_INSTALL because we don't want to be in the 'runtime'
     # component like the other binaries
     qi_create_bin(${target_name} SRC ${_srcs} DEPENDS ${_deps} SUBMODULE ${_submodules} NO_INSTALL)
+    if(ARG_GTEST_TEST)
+      qi_use_lib(${target_name} ASSUME_SYSTEM_INCLUDE GTEST GTEST_MAIN)
+    endif()
+    if(ARG_GMOCK_TEST)
+      qi_use_lib(${target_name} ASSUME_SYSTEM_INCLUDE GMOCK GMOCK_MAIN)
+    endif()
   endif()
 
   # Validate target_name. We expect one of:
