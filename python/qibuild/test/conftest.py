@@ -135,3 +135,18 @@ class QiBuildAction(TestAction):
     @property
     def tmpdir(self):
         return self.build_worktree.tmpdir
+
+
+class FakeProcess(object):
+    """ Fake subprocess.Popen return """
+
+    def __init__(self, returncode, stdout=None, stderr=None):
+        self.returncode = int(returncode)
+        self.stdout = str(stdout) if stdout else stdout
+        self.stderr = str(stderr) if stderr else stderr
+
+    def communicate(self):
+        return self.stdout, self.stderr
+
+    def wait(self):
+        return self.returncode

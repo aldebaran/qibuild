@@ -95,7 +95,9 @@ The following generators are available on this platform:
   Sublime Text 2 - Unix Makefiles
                               = Generates Sublime Text 2 project files.
 """, "")
-        res = qibuild.cmake.get_known_cmake_generators()
+        with mock.patch("qisys.command.find_program") as mock_find_program:
+            mock_find_program.return_value = '/usr/bin/cmake'
+            res = qibuild.cmake.get_known_cmake_generators()
         call_args_list = mock_popen.call_args_list
         assert "cmake" in call_args_list[0][0][0][0]
         assert call_args_list[0][0][0][1] == "--help"
@@ -115,7 +117,9 @@ The following generators are available on this platform:
                                  Optional [arch] can be "Win64" or "ARM".
   Borland Makefiles            = Generates Borland makefiles.
 """, "")
-        res = qibuild.cmake.get_known_cmake_generators()
+        with mock.patch("qisys.command.find_program") as mock_find_program:
+            mock_find_program.return_value = 'c://cmake'
+            res = qibuild.cmake.get_known_cmake_generators()
         assert res == ["Visual Studio 14 2015",
                        "Visual Studio 14 2015 Win64",
                        "Visual Studio 14 2015 ARM",
