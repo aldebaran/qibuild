@@ -25,12 +25,11 @@ pycodestyle:
 
 pylint-full:
 	@echo ":: Running pylint: $(PYMODULES)"
-	@pylint $(PYMODULES) 2>&1 || exit 1 || exit 0
+	@pylint $(PYMODULES) 2>&1
 
 pylint-error:
 	@echo ":: Running pylint --errors-only: $(PYMODULES)"
-	@pylint --errors-only $(PYMODULES) 2>&1 || \
-		exit 1 || exit 0
+	@pylint --errors-only $(PYMODULES) 2>&1
 	@echo " => Checked only for pylint errors"
 	@echo "    Use make pylint-full for running a full pylint check"
 
