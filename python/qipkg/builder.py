@@ -26,10 +26,6 @@ class PMLBuilder(object):  # pylint: disable=too-many-instance-attributes
             raise Exception("%s does not exist" % pml_path)
         self.pml_path = pml_path
         self.base_dir = os.path.dirname(self.pml_path)
-        self.manifest_xml = os.path.join(self.base_dir, "manifest.xml")
-        if not os.path.exists(self.manifest_xml):
-            raise Exception("%s does not exist" % self.manifest_xml)
-        self.pkg_name = pkg_name(self.manifest_xml)
 
         self.worktree = worktree
 
@@ -62,7 +58,15 @@ class PMLBuilder(object):  # pylint: disable=too-many-instance-attributes
         self._stage_path = None
         self.pml_extra_files = list()
 
+        # Set default manifest file, just in case
+        self.manifest_xml = "manifest.xml"
+
         self.load_pml(pml_path)
+
+        self.manifest_xml = os.path.join(self.base_dir, self.manifest_xml)
+        if not os.path.exists(self.manifest_xml):
+            raise Exception("%s does not exist" % self.manifest_xml)
+        self.pkg_name = pkg_name(self.manifest_xml)
 
         # read the manifest and validate it
         self.validator = qipkg.manifest.Validator(self.manifest_xml)
@@ -120,6 +124,10 @@ Error when parsing {pml_path}
             name = qisys.qixml.parse_required_attr(qilinguist_elem, "name", pml_path)
             project = self.linguist_worktree.get_linguist_project(name, raises=True)
             self.linguist_builder.projects.append(project)
+
+        manifest = root.find("Manifest")
+        if manifest is not None:
+            self.manifest_xml = manifest.get("src")
 
         # For top, ressource, dialog, behavior
         # add stuff to self.pml_extra_files
