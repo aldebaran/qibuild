@@ -95,7 +95,7 @@ Error when parsing {pml_path}
 """
             raise Exception(mess.format(pml_path=pml_path, mess=str(e)))
 
-    def _load_pml(self, pml_path):  # pylint: disable=too-many-branches,too-many-locals
+    def _load_pml(self, pml_path):  # pylint: disable=too-many-branches,too-many-locals,too-many-statements
         for builder in self.builders:
             builder.projects = list()
         tree = qisys.qixml.read(pml_path)
