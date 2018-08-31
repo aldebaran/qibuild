@@ -186,7 +186,8 @@ Error when parsing {pml_path}
         """ Install every project to the given destination """
         qisys.sh.mkdir(destination, recursive=True)
         # Copy the manifest
-        qisys.sh.install(self.manifest_xml, destination)
+        qisys.sh.install(self.manifest_xml,
+                         os.path.join(destination, "manifest.xml"))
 
         # Use every available builder to install
         for builder in self.builders:
