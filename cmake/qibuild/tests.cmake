@@ -81,6 +81,7 @@ function(qi_create_test_lib target_name)
   install(TARGETS ${target_name}
     RUNTIME COMPONENT test DESTINATION ${_runtime_output}
     LIBRARY COMPONENT test DESTINATION ${_runtime_output}
+    ARCHIVE COMPONENT test DESTINATION ${_runtime_output}
   )
 
 endfunction()
