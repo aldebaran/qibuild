@@ -19,6 +19,11 @@ if(Qt5Widgets_FOUND)
   include("${Qt5Widgets_DIR}/Qt5WidgetsMacros.cmake")
 endif()
 
+macro(qt5_add_resources name)
+  _qt5_add_resources(${name} ${ARGN})
+  set_property(SOURCE ${${name}} PROPERTY SKIP_AUTOMOC ON)
+endmacro()
+
 function(qi_generate_qt_conf)
   # First, find qt and generate qt.conf
   # containing paths in the toolchain
