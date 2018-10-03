@@ -64,8 +64,13 @@ def dump_symbols_from_binary(binary, pool_dir, build_config=None):  # pylint: di
     else:
         cmd = [dump_syms, binary]
     ui.debug(cmd)
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
+
+    try:
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+    except OSError as e:
+        ui.error("Could not dump symbols", cmd, e)
+        return
 
     dump_ok = True
     (out, err) = process.communicate()
