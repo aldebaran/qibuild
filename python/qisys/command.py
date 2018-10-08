@@ -467,10 +467,10 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=False):
         if not os.path.exists(cwd):
             # We know we are likely to have a problem on windows here,
             # so always raise.
-            raise Exception("Trying to to run %s in non-existing %s" %
+            raise Exception("Trying to run %s in non-existing %s" %
                             (" ".join(cmd), cwd))
     ui.debug("Calling:", " ".join(cmd))
-    if env and six.PY3:
+    if env:
         env = dict(((str(key), str(val)) for key, val in env.items()))
     call_kwargs = {"env": env, "cwd": cwd}
     if quiet or ui.CONFIG.get("quiet"):
