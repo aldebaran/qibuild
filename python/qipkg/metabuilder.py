@@ -1,16 +1,22 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-from qisys import ui
-import qipkg.metapackage
 import qipkg.builder
+import qipkg.metapackage
+from qisys import ui
 
 
 class MetaPMLBuilder(object):
     """ Build a meta package from a mpml file """
 
     def __init__(self, mpml_path, worktree=None):
+        """ MetaPMLBuilder Init """
         ui.info(ui.green, "::", ui.reset, ui.bold,
                 "Reading", mpml_path, "\n")
         self.worktree = worktree
@@ -54,12 +60,10 @@ class MetaPMLBuilder(object):
                     "Deploying", pml_builder.pml_path)
             pml_builder.deploy(url)
 
-    def package(self, *args, **kwargs):  # pylint: disable=unused-argument
-        """ Generate a package containing every package.
-
-        :param: with_breakpad generate debug symbols for usage
-                               with breakpad
-
+    def package(self, *args, **kwargs):
+        """
+        Generate a package containing every package.
+        :param: with_breakpad generate debug symbols for usage with breakpad
         """
         # output = kwargs.get('output', None)
         force = kwargs.get('force', False)

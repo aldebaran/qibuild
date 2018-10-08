@@ -1,6 +1,12 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test Conf """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import mock
 import pytest
 
@@ -20,31 +26,33 @@ test_perf_one = {
 
 
 def test_can_add_tests(tmpdir):
+    """ Test Can Add Tests """
     qitest_json_path = tmpdir.join("qitest.json").strpath
     qitest.conf.add_test(qitest_json_path, **test_gtest_one)
     qitest.conf.add_test(qitest_json_path, **test_perf_one)
-    assert qitest.conf.parse_tests(qitest_json_path) == [test_gtest_one,
-                                                         test_perf_one]
+    assert qitest.conf.parse_tests(qitest_json_path) == [
+        test_gtest_one,
+        test_perf_one,
+    ]
 
 
 def test_errors(tmpdir):
+    """ Test Errors """
     qitest_json_path = tmpdir.join("qitest.json").strpath
-    # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         qitest.conf.add_test(qitest_json_path, name="foo")
     assert "Should provide a test cmd" in e.value.message
-    # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         qitest.conf.add_test(qitest_json_path, cmd="foo")
     assert "Should provide a test name" in e.value.message
     qitest.conf.add_test(qitest_json_path, name="foo", cmd=["/path/to/foo"])
-    # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         qitest.conf.add_test(qitest_json_path, name="foo", cmd=["/path/to/bar"])
     assert "A test named 'foo' already exists" in e.value.message
 
 
 def test_relocate():
+    """ Test Relocate """
     proj = mock.Mock()
     proj.sdk_directory = "/path/to/sdk"
     tests = [
@@ -57,7 +65,6 @@ def test_relocate():
             "cmd": ["/path/to/sdk/bin/test_two", "/some/other/path"]
         }
     ]
-
     qitest.conf.relocate_tests(proj, tests)
     assert tests == [
         {

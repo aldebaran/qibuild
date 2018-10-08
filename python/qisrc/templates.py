@@ -1,10 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiSrc Templates """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
 
-from qisys import ui
 import qisys.sh
+from qisys import ui
 
 
 def process(input_dir, output_dir, **kwargs):
+    """ Process """
     if not os.path.isdir(input_dir):
         if os.path.exists(input_dir):
             raise Exception("%s is not a directory" % input_dir)
@@ -33,6 +43,7 @@ def process(input_dir, output_dir, **kwargs):
 
 
 def process_file(file_path, **kwargs):
+    """ Process File """
     with open(file_path, "r") as fp:
         contents = fp.read()
     to_write = process_string(contents, **kwargs)
@@ -41,8 +52,9 @@ def process_file(file_path, **kwargs):
 
 
 def process_string(string, **kwargs):
+    """ Process String """
     res = string
-    for key, value in kwargs.iteritems():
+    for key, value in kwargs.items():
         old = key
         new = value
         res = magic_replace(res, old, new)
@@ -50,6 +62,7 @@ def process_string(string, **kwargs):
 
 
 def magic_replace(string, old, new):
+    """ Magic Replace """
     res = string
     for func in snake_case, camel_case, upper_case, mixed_case, attached_lower, attached_upper:
         sub_old = "@%s@" % func(old)
@@ -62,7 +75,6 @@ def snake_case(string):
     """
     >>> snake_case("FooBar")
     'foo_bar'
-
     """
     splitted = split_chunks(string)
     res = "_".join(x.lower() for x in splitted)
@@ -73,7 +85,6 @@ def camel_case(string):
     """
     >>> camel_case("FooBar")
     'fooBar'
-
     """
     res = mixed_case(string)
     res = res[0].lower() + res[1:]
@@ -84,7 +95,6 @@ def upper_case(string):
     """
     >>> upper_case("FooBar")
     'FOO_BAR'
-
     """
     splitted = split_chunks(string)
     return "_".join(x.upper() for x in splitted)
@@ -96,7 +106,6 @@ def mixed_case(string):
     'FooBar'
     >>> mixed_case("foo_bar")
     'FooBar'
-
     """
     splitted = split_chunks(string)
     return "".join(x.title() for x in splitted)
@@ -128,7 +137,6 @@ def split_chunks(string):
     ['foo', 'Bar']
     >>> split_chunks("foo_bar")
     ['foo', 'bar']
-
     """
     if "_" in string:
         return string.split("_")

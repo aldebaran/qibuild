@@ -1,13 +1,16 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-"""Run the same command on each source project.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+"""
+Run the same command on each source project.
 Example:
     qisrc foreach -- git reset --hard origin/mytag
-
 Use -- to seprate qisrc arguments from the arguments of the command.
 """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import qisys.actions
 import qisys.parsers
@@ -15,7 +18,7 @@ import qisrc.parsers
 
 
 def configure_parser(parser):
-    """Configure parser for this action """
+    """ Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
     qisrc.parsers.groups_parser(parser)
     parser.add_argument("--git", action="store_true", dest="git_only",
@@ -29,13 +32,12 @@ def configure_parser(parser):
 
 
 def do(args):
-    """Main entry point"""
+    """ Main entry point """
     if args.git_only:
         git_worktree = qisrc.parsers.get_git_worktree(args)
         projects = git_worktree.get_git_projects(groups=args.groups)
     else:
         worktree = qisys.parsers.get_worktree(args)
         projects = worktree.projects
-
     qisys.actions.foreach(projects, args.command,
                           ignore_errors=args.ignore_errors)

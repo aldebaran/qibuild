@@ -1,17 +1,16 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-"""This module contains function to import binary packages in qiBuild
-toolchains.
-
-qiBuild toolchains contain a set of packages which can be extended.
-
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+"""
+This module contains function to import binary packages in qiBuild toolchains.
 This module provides utility functions to import binary packages used by some
 other compatible distribution into a qiBuild toolchain.
-
 All qiBuild packages should have the same layout.
 """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 
@@ -19,19 +18,20 @@ import qisys
 import qisys.sh
 import qisys.ui
 from qisys.qixml import etree
-from qitoolchain.binary_package.core import BinaryPackage  # pylint: disable=ungrouped-imports
-from qitoolchain.binary_package.core import BinaryPackageException  # pylint: disable=ungrouped-imports
 
 WITH_PORTAGE = True
 try:
-    # pylint: disable-msg=F0401
     import portage
 except ImportError:
     WITH_PORTAGE = False
 
 if WITH_PORTAGE:
+    from qitoolchain.binary_package.core import BinaryPackage
+    from qitoolchain.binary_package.core import BinaryPackageException
     from qitoolchain.binary_package.gentoo_portage import GentooPackage
 else:
+    from qitoolchain.binary_package.core import BinaryPackage
+    from qitoolchain.binary_package.core import BinaryPackageException
     from qitoolchain.binary_package.gentoo import GentooPackage
 
 _PKG_TYPES = {
@@ -56,17 +56,17 @@ _PKG_TYPES = {
 
 
 def _guess_package_type(package_path):
-    for typename, data in _PKG_TYPES.iteritems():
+    """ Guess Package Type """
+    for typename, data in _PKG_TYPES.items():
         if package_path.endswith(data.get('extension')):
             return typename
     return None
 
 
 def open_package(package_path):
-    """ Open the given binary package.
-
+    """
+    Open the given binary package.
     :return: A ``Package`` instance
-
     """
     if not os.path.exists(package_path):
         mess = "No such file or directory: {0}".format(package_path)
@@ -82,16 +82,13 @@ def open_package(package_path):
 
 
 def _fix_package_tree(root_dir):
-    """ Make the package tree comply with qiBuild.
-
-    """
+    """ Make the package tree comply with qiBuild. """
     # move stuff from usr/lib to lib
     # this is just for qibuild deploy to work,
     # we could do better with cmake.
     usr_dir = os.path.join(root_dir, "usr")
     if not os.path.exists(usr_dir):
         return
-
     for (root, dirs, files) in os.walk(usr_dir):
         for directory in dirs:
             dst = os.path.join(root, directory)
@@ -104,10 +101,9 @@ def _fix_package_tree(root_dir):
     qisys.sh.rm(usr_dir)
 
 
-def convert_to_qibuild(package, package_metadata=None,  # pylint: disable=too-many-locals
-                       output_dir=None, output_name=None):
-    """ Convert a binary package into a qiBuild package.
-
+def convert_to_qibuild(package, package_metadata=None, output_dir=None, output_name=None):
+    """
+    Convert a binary package into a qiBuild package.
     :param package: an instance of qitoolchain.binary_package.BinaryPackage.
     :param package_metadata: a dict to override the metadata of the package,
                              or to provide the metadata if the could not be
@@ -119,7 +115,6 @@ def convert_to_qibuild(package, package_metadata=None,  # pylint: disable=too-ma
     :param gen_cmake: whether we should try to generate a CMake module for
                       this package
     :return: path to the converted qiBuild package
-
     """
     metadata = package.get_metadata()
     if package_metadata:

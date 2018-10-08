@@ -1,6 +1,11 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Fake Git """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import pytest
 
@@ -8,6 +13,7 @@ from qisrc.test.conftest import FakeGit
 
 
 def test_persistent_config():
+    """ Test Persistent Config """
     git1 = FakeGit("repo")
     git1.set_config("foo.bar", 42)
     git2 = FakeGit("repo")
@@ -16,6 +22,7 @@ def test_persistent_config():
 
 
 def test_fake_call():
+    """ Test Fake Call """
     git = FakeGit("repo")
     git.add_result("fetch", 0, "")
     (retcode, _) = git.fetch(raises=False)
@@ -28,21 +35,21 @@ def test_fake_call():
 
 
 def test_wrong_setup():
+    """ Test Wrong Setup """
     git = FakeGit("repo")
     git.add_result("checkout", 0, "")
     git.checkout("-f", "master")
-    # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         git.fetch()
     assert "Unexpected call to fetch" in e.value.message
 
 
 def test_configured_but_not_called_enough():
+    """ Test Configured But Not Called Enough """
     git = FakeGit("repo")
     git.add_result("checkout", 0, "")
     git.add_result("checkout", 1, "Unstaged changes")
     git.checkout("next")
-    # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         git.check()
     assert "checkout was configured to be called 2 times" in e.value.message
@@ -50,10 +57,10 @@ def test_configured_but_not_called_enough():
 
 
 def test_configured_but_not_called():
+    """ Test Configured But Not Called """
     git = FakeGit("repo")
     git.add_result("checkout", 1, "")
     git.add_result("reset", 0, "")
-    # pylint: disable-msg=E1101
     git.checkout(raises=False)
     with pytest.raises(Exception) as e:
         git.check()
@@ -61,6 +68,7 @@ def test_configured_but_not_called():
 
 
 def test_commands_are_logged():
+    """ Test Commands Are Logged """
     git = FakeGit("repo")
     git.add_result("fetch", 0, "")
     git.add_result("reset", 0, "")

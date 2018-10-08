@@ -174,7 +174,7 @@ This is how to do it:
 
     import pytest
 
-    # pylint: disable-msg=E1101
+    # pylint:disable-msg=E1101
     with pytest.raises(Exception) as e:
         do_something_that_should_raise()
     assert "Bad input"  in e.value.message
@@ -217,7 +217,7 @@ You can just use ``StringIO``
 
 .. code-block:: python
 
-    from StringIO import StringIO
+    from io import StringIO
 
 
     def test_parse_config():

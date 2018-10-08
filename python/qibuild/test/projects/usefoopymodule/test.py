@@ -1,14 +1,21 @@
-""""
-This is an equivalent of a C++ program trying to load a Python module
-using libqi, but written in Python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
 """
+This is an equivalent of a C++ program trying to load a
+Python module using libqi, but written in Python.
+"""
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
-import os.path
 import sys
 
 
 def main():
+    """ Main Entry Point """
     from_env = os.environ.get("QI_ADDITIONAL_SDK_PREFIXES")
     if not from_env:
         sys.exit("QI_ADDITIONAL_SDK_PREFIXES not set")
@@ -24,7 +31,6 @@ def main():
                     sys.exit("Expected python\\n, got: " + contents)
     if not found:
         sys.exit("foo.mod not found")
-
     import foo
 
 

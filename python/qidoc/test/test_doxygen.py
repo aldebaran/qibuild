@@ -1,18 +1,22 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-import os
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
+import os
 import pytest
 
 import qidoc.doxygen
 import qidoc.builder
 from qidoc.test.conftest import find_link
 
-# pylint: disable=unused-variable
-
 
 def test_read_doxyfile(tmpdir):
+    """ Test Read DoxyFile """
     doxyfile = tmpdir.join("Doxyfile")
     doxyfile.write(
         r"""
@@ -30,34 +34,28 @@ PREDEFINED += "BAR=0"
 
 
 def test_bad_doxyfile(tmpdir):
+    """ Test Bad DoxyFile """
     doxyfile = tmpdir.join("Doxyfile")
-    doxyfile.write(""""
-FOO = 1
-BAR += 2
-""")
-    # pylint: disable-msg=E1101
+    doxyfile.write(""""\nFOO = 1\nBAR += 2\n""")
     with pytest.raises(Exception) as e:
         qidoc.doxygen.read_doxyfile(doxyfile.strpath)
     assert "does not match" in e.value.message
 
 
 def test_appending_values(tmpdir):
+    """ Test Appending Values """
     doxyfile = tmpdir.join("Doxyfile")
-    contents = """\
-PREDEFINED = "FOO=1"
-PREDEFINED += "BAR=0"
-"""
+    contents = """PREDEFINED = "FOO=1"\nPREDEFINED += "BAR=0"\n"""
     doxyfile.write(contents)
     parsed = qidoc.doxygen.read_doxyfile(doxyfile.strpath)
     assert parsed["PREDEFINED"] == '"FOO=1" "BAR=0"'
     generated = tmpdir.join("generated")
     qidoc.doxygen.write_doxyfile(parsed, generated.strpath)
-    assert generated.read() == """\
-PREDEFINED = "FOO=1" "BAR=0"
-"""
+    assert generated.read() == """PREDEFINED = "FOO=1" "BAR=0"\n"""
 
 
 def test_forced_settings(doc_worktree):
+    """ Test Forced Settings """
     foo_dox = doc_worktree.create_doxygen_project("foo")
     foo_dox.configure()
     conf = qidoc.doxygen.read_doxyfile(foo_dox.out_doxyfile)
@@ -68,6 +66,7 @@ def test_forced_settings(doc_worktree):
 
 
 def test_rewrite_relative_paths(doc_worktree):
+    """ Test Rewrite Relative Path """
     foo_dox = doc_worktree.create_doxygen_project("foo")
     conf = dict()
     conf["INPUT"] = "src/ include/foo"
@@ -83,6 +82,7 @@ def test_rewrite_relative_paths(doc_worktree):
 
 
 def test_with_version(doc_worktree):
+    """ Test With Version """
     foo_dox = doc_worktree.create_doxygen_project("foo")
     foo_dox.configure(version="1.2.3")
     conf = qidoc.doxygen.read_doxyfile(foo_dox.out_doxyfile)
@@ -90,6 +90,7 @@ def test_with_version(doc_worktree):
 
 
 def test_ovewrite_name(doc_worktree):
+    """ Test Overwrite Name """
     foo_dox = doc_worktree.create_doxygen_project("foo")
     conf = dict()
     conf["PROJECT_NAME"] = "foo_overwrite"
@@ -100,7 +101,8 @@ def test_ovewrite_name(doc_worktree):
 
 
 def test_depends_on_doxygen(doc_worktree, tmpdir):
-    libworld_proj = doc_worktree.add_test_project("libworld")
+    """ Test Depends On DoxyGen """
+    _libworld_proj = doc_worktree.add_test_project("libworld")
     libhello_proj = doc_worktree.add_test_project("libhello")
     doc_builder = qidoc.builder.DocBuilder(doc_worktree, "libhello")
     doc_builder.configure()
@@ -115,10 +117,9 @@ def test_depends_on_doxygen(doc_worktree, tmpdir):
 
 
 def test_build(doc_worktree):
+    """ Test Build """
     doc_worktree.add_test_project("libqi")
     qi_dox = doc_worktree.get_doc_project("qi-api", raises=True)
-
     qi_dox.configure()
     qi_dox.build()
-
     assert os.path.exists(qi_dox.index_html)

@@ -1,0 +1,8 @@
+v3.12
+========
+
+qibuild
+-----------
+
+* PyLint and PyCodeStyle Cleanup
+* Python 3 Compatibility Preparation

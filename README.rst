@@ -48,7 +48,7 @@ http://doc.aldebaran.com/qibuild/
 Installation
 ------------
 
-Requirements: ``Python 2.7`` with ``pip``
+Requirements: ``Python`` with ``pip``
 
 Just run::
 

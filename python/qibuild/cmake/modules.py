@@ -1,14 +1,21 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Modules """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
+
 import qisys.sh
 import qisys.interact
 import qibuild.config
 
 
 def find_libs(directory):
+    """ Find Libs """
     lib_directory = os.path.join(directory, "lib")
     res = list()
     if not os.path.exists(lib_directory):
@@ -17,11 +24,11 @@ def find_libs(directory):
     for candidate in candidates:
         if candidate.endswith((".so", ".a", ".lib", ".dylib")):
             res.append("lib/" + candidate)
-    res.sort()
-    return res
+    return sorted(res)
 
 
 def generate_cmake_module(directory, name):
+    """ Generate CMake Module """
     libraries = find_libs(directory)
     libs_string = ""
     for library in libraries:
@@ -55,10 +62,7 @@ export_lib(@NAME@)
 
 
 def edit_module(module_path):
-    """Handle interactive edition of the CMake module.
-
-    """
-    # pep8-ignore: E501
+    """ Handle interactive edition of the CMake module. """
     question = "Edit generated CMake module (highly recommended)?"
     answer = qisys.interact.ask_yes_no(question, default=True)
     if not answer:
@@ -73,9 +77,9 @@ def edit_module(module_path):
 
 
 def add_cmake_module_to_archive(archive_path, name, interactive=True):
+    """ Add CMake Module To Archive """
     algo = qisys.archive.guess_algo(archive_path)
     with qisys.sh.TempDir() as work_dir:
-        # pep8-ignore: E501
         root_dir = qisys.archive.extract(archive_path, work_dir, algo=algo,
                                          quiet=True, strict_mode=False)
         if name is None:

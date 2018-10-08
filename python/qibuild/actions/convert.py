@@ -1,10 +1,11 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-""" Convert an existing project to a qiBuild project
-
-"""
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Convert an existing project to a qiBuild project. """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import re
@@ -12,14 +13,12 @@ import sys
 import difflib
 from xml.etree import ElementTree as etree
 
-from qisys import ui
 import qisys.parsers
+from qisys import ui
 
 
 def guess_project_name(source_dir):
-    """ Try to guess the project name
-
-    """
+    """ Try to guess the project name. """
     res = None
     qiproj_xml = os.path.join(source_dir, "qiproject.xml")
     res = name_from_xml(qiproj_xml)
@@ -34,20 +33,17 @@ def guess_project_name(source_dir):
 
 
 def name_from_xml(xml_path):
-    """ Get a name from an qiproject.xml file
-
-    """
-    mess = "Invalid qiproject.xml file detected!\n"
-    mess += "(%s)\n" % xml_path
+    """ Get a name from an qiproject.xml file. """
     if not os.path.exists(xml_path):
         return None
     tree = etree.ElementTree()
     try:
         tree.parse(xml_path)
-    except Exception, e:
+    except Exception as e:
+        mess = "Invalid qiproject.xml file detected!\n"
+        mess += "(%s)\n" % xml_path
         mess += str(e)
         raise Exception(mess)
-
     # Read name
     root = tree.getroot()
     if root.tag != "project":
@@ -56,22 +52,18 @@ def name_from_xml(xml_path):
     if root.get("version") == "3":
         project_elem = root.find("qbuild")
         if not project_elem:
-            return
+            return None
     else:
         project_elem = root
-
     name = project_elem.get('name')
     if not name:
         mess += "'project' node must have a 'name' attribute"
         raise Exception(mess)
-
     return name
 
 
 def name_from_cmakelists(cmakelists):
-    """ Get a project name from a CMakeLists.txt file
-
-    """
+    """ Get a project name from a CMakeLists.txt file. """
     if not os.path.exists(cmakelists):
         return None
     res = None
@@ -89,16 +81,13 @@ def name_from_cmakelists(cmakelists):
     return res
 
 
-def fix_root_cmake(cmakelists, project_name, dry_run=True):  # pylint: disable=too-many-branches
-    """ Fix the root CMakeLists.txt file
-
+def fix_root_cmake(cmakelists, project_name, dry_run=True):
+    """
+    Fix the root CMakeLists.txt file
     If not found, create a new one
     If include(qibuild.cmake) is found, replace by find_package(qibuild)
     If include(boostrap.cmake) is found, replace by find_package(qibuild)
-
-    If no find_package(qibuild) is found, add the line next to the
-    first project() line
-
+    If no find_package(qibuild) is found, add the line next to the first project() line
     """
     template = """# CMake file for {project_name}
 
@@ -117,10 +106,9 @@ find_package(qibuild)
             with open(cmakelists, "w") as fp:
                 fp.write(template)
         return
-
     with open(cmakelists, "r") as fp:
         old_lines = fp.readlines()
-
+    fp.close()
     new_lines = list()
     # Replace old include() by new find_package
     seen_find_package_qibuild = False
@@ -142,7 +130,6 @@ find_package(qibuild)
                 seen_find_package_qibuild = True
             else:
                 new_lines.append(line)
-
     # Add find_package(qibuild) after project() if it is not there
     if not seen_find_package_qibuild:
         tmp_lines = new_lines[:]
@@ -152,29 +139,25 @@ find_package(qibuild)
             regexp = re.compile(r'^\s*project\s*\((.*)\)', re.IGNORECASE)
             if re.match(regexp, line):
                 new_lines.append('find_package(qibuild)\n')
-
     if dry_run:
         ui.info("Would patch", cmakelists)
         # Print a nice diff
         for line in difflib.unified_diff(old_lines, new_lines):
             sys.stdout.write(line)
         return
-
     with open(cmakelists, "w") as fp:
         ui.info("Patching", cmakelists)
         fp.writelines(new_lines)
+    fp.close()
 
 
 def create_qiproj_xml(args):
-    """ Create a new qiproject.xml
-
-    """
+    """ Create a new qiproject.xml. """
     source_dir = args.source_dir
     project_name = args.project_name
     qiproj_xml = os.path.join(source_dir, "qiproject.xml")
     if os.path.exists(qiproj_xml):
         return
-
     proj_elem = etree.Element("project")
     proj_elem.set("version", "3")
     tree = etree.ElementTree(element=proj_elem)
@@ -186,13 +169,12 @@ def create_qiproj_xml(args):
         ui.info("Would create", qiproj_xml, "\n"
                 "with", "\n", etree.tostring(proj_elem))
         return
-
     ui.info("Creating", qiproj_xml)
     tree.write(qiproj_xml)
 
 
 def configure_parser(parser):
-    """Configure parser for this action """
+    """ Configure parser for this action. """
     qisys.parsers.default_parser(parser)
     parser.add_argument("source_dir", nargs="?",
                         help="Top source directory of the project. "
@@ -214,26 +196,21 @@ def configure_parser(parser):
 
 
 def do(args):
-    """Main entry point """
+    """ Main entry point. """
     if not args.source_dir:
         args.source_dir = os.getcwd()
     args.source_dir = qisys.sh.to_native_path(args.source_dir)
-
     if not args.project_name:
         args.project_name = guess_project_name(args.source_dir)
         ui.info(ui.green, "Detected project name:", args.project_name)
-
     # Create qiproject.xml
     create_qiproj_xml(args)
-
     if not args.fix_cmake:
         return
-
     # Fix the root CMakeLists.txt:
     source_dir = args.source_dir
     project_name = args.project_name
     cmakelists = os.path.join(source_dir, "CMakeLists.txt")
     fix_root_cmake(cmakelists, project_name, dry_run=args.dry_run)
-
     if args.dry_run:
         ui.info(ui.green, "Re-run with `qibuild convert --go` to proceed")

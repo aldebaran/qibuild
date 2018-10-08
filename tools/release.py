@@ -1,12 +1,15 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-"""" To be run for each qibuild release """
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" To be run for each qibuild release. """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-import argparse
 import os
+import argparse
 
-import qisys.sh
 import qisrc.git
 
 FILES_TO_PATCH = [
@@ -16,6 +19,7 @@ FILES_TO_PATCH = [
 
 
 def fix_version_for_file(filename, old_version, new_version):
+    """ Fix Version For File """
     with open(filename, "r") as fp:
         old_contents = fp.read()
     new_contents = old_contents.replace(old_version, new_version)
@@ -24,6 +28,7 @@ def fix_version_for_file(filename, old_version, new_version):
 
 
 def main():
+    """ Main Entry Point """
     parser = argparse.ArgumentParser()
     parser.add_argument("version")
     args = parser.parse_args()
@@ -43,7 +48,7 @@ def main():
         full_path = os.path.join(qibuild_root, filename)
         fix_version_for_file(filename, version, "next")
     git.commit("--all", "-m", "start next development")
-    print "All OK feel free to push"
+    print("All OK feel free to push")
 
 
 if __name__ == "__main__":

@@ -1,15 +1,21 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test Gdb """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import subprocess
 
-import qisys.command
 import qibuild.gdb
+import qisys.command
 
 
 def check_gdb():
+    """ Check Gdb """
     gdb = qisys.command.find_program("gdb", raises=False)
     if not gdb:
         return False
@@ -17,13 +23,14 @@ def check_gdb():
 
 
 def run_gdb(base_dir):
+    """ Run Gdb """
     gdb_ini = os.path.join(base_dir, "gdb.ini")
     with open(gdb_ini, "w") as fp:
-        fp.write("""file {binary}
-run
-bt
-q
-""".format(binary=os.path.join(base_dir, "bin/debugme")))
+        fp.write(
+            """file {binary}\nrun\nbt\nq\n""".format(
+                binary=os.path.join(base_dir, "bin/debugme")
+            )
+        )
     cmd = ["gdb", "-batch", "-x", gdb_ini]
     process = subprocess.Popen(cmd,
                                stdout=subprocess.PIPE,
@@ -32,6 +39,7 @@ q
 
 
 def test_normal_debug(qibuild_action):
+    """ Test Normal Debug """
     if not check_gdb():
         return
     proj = qibuild_action.add_test_project("debugme")
@@ -43,6 +51,7 @@ def test_normal_debug(qibuild_action):
 
 
 def test_split_debug(qibuild_action):
+    """ Test Split Debug """
     if not check_gdb():
         return
     proj = qibuild_action.add_test_project("debugme")
@@ -55,6 +64,7 @@ def test_split_debug(qibuild_action):
 
 
 def test_split_debug_install(qibuild_action, tmpdir):
+    """ Test Split Debug Install """
     if not check_gdb():
         return
     tmpdir = tmpdir.strpath
@@ -68,6 +78,7 @@ def test_split_debug_install(qibuild_action, tmpdir):
 
 
 def test_gdb_not_installed(qibuild_action, tmpdir, record_messages):
+    """ Test Gdb Not Installed """
     if check_gdb():
         return
     qibuild_action.add_test_project("debugme")

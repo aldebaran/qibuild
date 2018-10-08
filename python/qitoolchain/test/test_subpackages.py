@@ -1,8 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test SubPackages """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import qisys
 import qitoolchain.toolchain
 
 
 def test_subpackage_parsing(tmpdir):
+    """ Test SubPackage Parsing """
     tmp = tmpdir.mkdir("feed")
     subpackage_xml = tmp.join("subpackage.xml")
     subpackage_xml.write("""
@@ -15,7 +25,6 @@ def test_subpackage_parsing(tmpdir):
     parser = qitoolchain.feed.ToolchainFeedParser("test_subpackage")
     parser.parse(subpackage_xml.strpath)
     pkgs = parser.get_packages()
-
     toolchain_path = qisys.sh.get_share_path("qi", "toolchains", parser.name, "rootpkg")
     assert len(pkgs) == 3
     assert pkgs[0].name == "rootpkg"

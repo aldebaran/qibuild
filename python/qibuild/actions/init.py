@@ -1,19 +1,23 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-"""Initialize a new qibuild worktree """
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Initialize a new qibuild worktree. """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-import argparse
 import os
+import argparse
 
-from qisys import ui
-import qisys.worktree
 import qibuild.parsers
 import qibuild.worktree
+import qisys.worktree
+from qisys import ui
 
 
 def configure_parser(parser):
-    """Configure parser for this action """
+    """ Configure parser for this action. """
     qisys.parsers.worktree_parser(parser)
     # backward-compat:
     parser.add_argument("-c", "--config", help=argparse.SUPPRESS)
@@ -23,7 +27,7 @@ def configure_parser(parser):
 
 
 def do(args):
-    """Main entry point"""
+    """ Main entry point. """
     root = args.worktree or os.getcwd()
     if os.path.exists(os.path.join(root, '.qi')):
         raise Exception("A .qi directory already exists here. " +

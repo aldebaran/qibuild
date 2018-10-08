@@ -1,24 +1,29 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import qisys.sh
 import qisys.parsers
 import qilinguist.builder
-
 from qilinguist.worktree import LinguistWorkTree, new_linguist_project
 from qilinguist.pml_translator import new_pml_translator
 
 
 def get_linguist_worktree(args):
+    """ Get Linguist Worktree """
     worktree = qisys.parsers.get_worktree(args, raises=False)
     if worktree:
         return LinguistWorkTree(worktree)
-
     return None
 
 
 def get_linguist_projects(args, default_all=False):
+    """ Get Linguist Projects """
     worktree = get_linguist_worktree(args)
     project_args = args.projects
     pml_paths = list()
@@ -43,12 +48,12 @@ def get_linguist_projects(args, default_all=False):
             res.extend(parser.parse_args(args, default_all=default_all))
         except CouldNotGuessProjectName:
             pass
-
     res.extend(get_pml_projects(pml_paths))
     return res
 
 
 def get_pml_projects(pml_paths):
+    """ Get Pml Projects """
     res = list()
     for pml_path in pml_paths:
         res.append(new_pml_translator(pml_path))
@@ -56,7 +61,8 @@ def get_pml_projects(pml_paths):
 
 
 def get_linguist_builder(args, with_projects=True):
-    __worktree = get_linguist_worktree(args)  # pylint: disable=unused-variable
+    """ Get Linguits Builder """
+    _worktree = get_linguist_worktree(args)
     builder = qilinguist.builder.QiLinguistBuilder()
     if with_projects:
         projects = get_linguist_projects(args)
@@ -64,50 +70,44 @@ def get_linguist_builder(args, with_projects=True):
     return builder
 
 
-##
-# Implementation details
-
 class LinguistProjectParser(qisys.parsers.AbstractProjectParser):
     """ Implements AbstractProjectParser for a LinguistWorkTree """
 
     def __init__(self, linguist_worktree):
+        """ LinguistProjectParser Init """
         super(LinguistProjectParser, self).__init__()
         self.linguist_worktree = linguist_worktree
         self.linguist_projects = linguist_worktree.linguist_projects
 
     def all_projects(self, args):
+        """ All Projects """
         return self.linguist_projects
 
     def parse_no_project(self, args):
-        """ Try to find the closest worktree project that
-        matches the current directory
-
-        """
+        """ Try to find the closest worktree project that matches the current directory """
         worktree = self.linguist_worktree.worktree
         parser = qisys.parsers.WorkTreeProjectParser(worktree)
         worktree_projects = parser.parse_no_project(args)
         if not worktree_projects:
             raise CouldNotGuessProjectName()
-
         # WorkTreeProjectParser returns None or a list of one element
         worktree_project = worktree_projects[0]
-        linguist_project = new_linguist_project(self.linguist_worktree,
-                                                worktree_project)
+        linguist_project = new_linguist_project(self.linguist_worktree, worktree_project)
         if not linguist_project:
             raise CouldNotGuessProjectName()
-
         return self.parse_one_project(args, linguist_project.name)
 
     def parse_one_project(self, args, project_arg):
         """ Get one linguist project given its name """
-
-        project = self.linguist_worktree.get_linguist_project(project_arg,
-                                                              raises=True)
+        project = self.linguist_worktree.get_linguist_project(project_arg, raises=True)
         return [project]
 
 
 class CouldNotGuessProjectName(Exception):
+    """ CouldNotGuessProjectName Exception """
+
     def __str__(self):
+        """ String Representation """
         return """
 Could not guess linguist project name from current working directory
 Please go inside a translatable project, or specify the project name

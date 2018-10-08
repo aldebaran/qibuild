@@ -1,24 +1,27 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
 
+import qipy.venv
 import qisys.remote
-
+import qisys.command
 from qisys import ui
 from qisys.abstractbuilder import AbstractBuilder
-import qisys.command
-import qipy.venv
 from qibuild.project import write_qi_path_conf
 
 
 class PythonBuilder(AbstractBuilder):
-    """
-    Managing python projects
-
-    """
+    """ Managing python projects """
 
     def __init__(self, python_worktree, build_worktree=None):
+        """ PythonBuilder Init """
         super(PythonBuilder, self).__init__(self.__class__.__name__)
         self.python_worktree = python_worktree
         self.build_worktree = build_worktree
@@ -26,14 +29,12 @@ class PythonBuilder(AbstractBuilder):
 
     @property
     def config(self):
+        """ Config """
         return self.python_worktree.config
 
     def bootstrap(self, remote_packages=None, site_packages=True,
                   python_executable=None, env=None):
-        """ Configure the virtualenv so that importing any
-        Python module works
-
-        """
+        """ Configure the virtualenv so that importing any Python module works """
         ok = qipy.venv.configure_virtualenv(self.config,
                                             self.python_worktree,
                                             build_worktree=self.build_worktree,
@@ -46,18 +47,18 @@ class PythonBuilder(AbstractBuilder):
         return ok
 
     def configure(self, *args, **kwargs):
-        "no -op"
+        "Configure, no -op"
         pass
 
     def build(self, *args, **kwargs):
-        "no -op"
+        "Build, no -op"
         pass
 
     def install(self, dest, *args, **kwargs):
-        """ Just copy the Python scripts, modules and packages
+        """
+        Just copy the Python scripts, modules and packages.
         If there are extensions written in CMake, they will be
-        installed by the CMakeBuilder
-
+        installed by the CMakeBuilder.
         """
         if not self.projects:
             return
@@ -66,7 +67,6 @@ class PythonBuilder(AbstractBuilder):
             ui.info_count(i, n, ui.green, "Installing",
                           ui.reset, ui.blue, project.name)
             project.install(dest)
-
         # Also install a python wrapper so that everything goes smoothly
         to_write = """\
 #!/bin/bash
@@ -78,12 +78,10 @@ exec python "$@"
         python_wrapper = os.path.join(dest, "python")
         with open(python_wrapper, "w") as fp:
             fp.write(to_write)
-        os.chmod(python_wrapper, 0755)
+        os.chmod(python_wrapper, 0o755)
 
     def deploy(self, url):
-        """ Deploy scripts, modules and packages to the remote url
-
-        """
+        """ Deploy scripts, modules and packages to the remote url """
         with qisys.sh.TempDir() as tmp:
             self.install(tmp)
             qisys.remote.deploy(tmp, url)

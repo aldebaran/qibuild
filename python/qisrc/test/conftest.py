@@ -1,34 +1,38 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-from qisys.test.conftest import *  # pylint: disable=wildcard-import,unused-wildcard-import
-import qisys.script
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" ConfTest """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
+import os
+import py
+import pytest
 
 import qisrc.git
 import qisrc.worktree
 import qisrc.manifest
-
-# pylint: disable=redefined-outer-name
-# pylint: disable=unused-variable
+import qisys.script
+from qisys.test.conftest import *  # pylint:disable=W0401,W0614
 
 
 class TestGitWorkTree(qisrc.worktree.GitWorkTree):
-    """ A subclass of qisrc.worktree.WorkTree that
-    can create git projects
-
-    """
+    """ A subclass of qisrc.worktree.WorkTree that can create git projects """
 
     __test__ = False  # Tell PyTest to ignore this Test* named class: This is as test to collect
 
     def __init__(self, worktree=None):
+        """ TestGitWorkTree Init """
         if not worktree:
             worktree = TestWorkTree()
         super(TestGitWorkTree, self).__init__(worktree)
 
     @property
     def tmpdir(self):
-        # pylint: disable-msg=E1101
-        return py.path.local(self.root)
+        """ Tmp Dir """
+        return py.path.local(self.root)  # pylint:disable=no-member
 
     def create_git_project(self, src, branch="master"):
         """ Create a new git project """
@@ -36,46 +40,42 @@ class TestGitWorkTree(qisrc.worktree.GitWorkTree):
         qisys.sh.mkdir(to_make, recursive=True)
         test_git = TestGit(to_make)
         test_git.initialize(branch=branch)
-
         new_project = super(TestGitWorkTree, self).add_git_project(src)
         return new_project
 
 
-class TestGitServer(object):  # pylint: disable=too-many-instance-attributes
-    """ Represent a set of git urls
-
-    everything is done relative to the <root> parameter
-
-<root>
-  |__ srv
-       # here be bare repos
-       foo.git
-       bar.git
-  |_ gerrit
-      # here be clones of bare repos,
-      # used to test qisrc review for instance
-      foo.git
-      bar.git
-  |__ src
-        # temporary clones use to populate the
-        # bare repos in srv/ and gerrit/
-        foo
-        bar
- |__ work
-        # where we will create worktrees and make our testing
-        # (used by qisrc_action fixture for instance)
-
+class TestGitServer(object):
+    """
+    Represent a set of git urls.
+    everything is done relative to the <root> parameter.
+    <root>
+      |__ srv
+           # here be bare repos
+           foo.git
+           bar.git
+      |_ gerrit
+          # here be clones of bare repos,
+          # used to test qisrc review for instance
+          foo.git
+          bar.git
+      |__ src
+            # temporary clones use to populate the
+            # bare repos in srv/ and gerrit/
+            foo
+            bar
+     |__ work
+            # where we will create worktrees and make our testing
+            # (used by qisrc_action fixture for instance)
     Two remotes are created by default: "origin" and "gerrit"
-
     """
 
     def __init__(self, root):
+        """ TestGitServer Init """
         self.root = root
         self.srv = root.mkdir("srv")
         self.src = root.mkdir("src")
         self.gerrit = root.mkdir("gerrit")
         self.work = root.mkdir("work")
-
         # Manifest itself can not be handled as a normal repo:
         self._create_repo("manifest.git")
         self.push_file("manifest.git", "manifest.xml", "<manifest />")
@@ -100,23 +100,19 @@ class TestGitServer(object):  # pylint: disable=too-many-instance-attributes
             self.manifest.add_repo(project, src, ["origin"])
         repo = self.manifest.get_repo(project)
         self.push_manifest("Add %s" % project)
-
         return repo
 
     def _create_repo(self, project, src=None, review=False, empty=False):
         """ Helper for self.create_repo """
         if not src:
             src = project.replace(".git", "")
-
         if review:
             repo_srv = self.gerrit.ensure(project, dir=True)
         else:
             repo_srv = self.srv.ensure(project, dir=True)
-
         repo_url = "file://" + qisys.sh.to_posix_path(repo_srv.strpath)
         git = qisrc.git.Git(repo_srv.strpath)
         git.init("--bare")
-
         repo_src = self.src.ensure(src, dir=True)
         git = TestGit(repo_src.strpath)
         git.initialize()
@@ -124,17 +120,18 @@ class TestGitServer(object):  # pylint: disable=too-many-instance-attributes
             remote_name = "gerrit"
         else:
             remote_name = "origin"
-
         git.set_remote(remote_name, repo_url)
         if not empty:
             git.push(remote_name, "master:master")
         return repo_src.strpath
 
     def switch_manifest_branch(self, branch):
+        """ Switch Manifest Branch """
         self.manifest_branch = branch
         self.push_manifest("Switch to %s" % branch, allow_empty=True)
 
     def add_qibuild_test_project(self, src):
+        """ Add QiBuild Test Projects """
         project_name = src + ".git"
         repo_src = self._create_repo(project_name, src=src, review=False)
         this_dir = os.path.dirname(__file__)
@@ -145,10 +142,11 @@ class TestGitServer(object):  # pylint: disable=too-many-instance-attributes
         git.commit("--message", "Add sources from qibuild test project %s" % src)
         git.push("origin", "master:master")
         self.manifest.add_repo(project_name, src, ["origin"])
-        repo = self.manifest.get_repo(project_name)
+        _repo = self.manifest.get_repo(project_name)
         self.push_manifest("Add qibuild test project: %s" % src)
 
     def add_build_profile(self, name, flags):
+        """ Add Build Profile """
         # avoid circular deps
         import qibuild.profile
         manifest_repo = self.root.join("src", "manifest")
@@ -197,6 +195,7 @@ class TestGitServer(object):  # pylint: disable=too-many-instance-attributes
         self.push_manifest("add group %s" % name)
 
     def remove_group(self, name):
+        """ Remove Group """
         self.manifest.remove_group(name)
         self.push_manifest("remove group %s" % name)
 
@@ -219,6 +218,7 @@ class TestGitServer(object):  # pylint: disable=too-many-instance-attributes
         self.manifest.load()
 
     def change_branch(self, project, new_branch):
+        """ Change Branch """
         repo = self.get_repo(project)
         repo_src = self.src.join(repo.src)
         git = qisrc.git.Git(repo_src.strpath)
@@ -231,6 +231,7 @@ class TestGitServer(object):  # pylint: disable=too-many-instance-attributes
         self.manifest.load()
 
     def set_fixed_ref(self, project, ref):
+        """ Set Fixed Ref """
         repo = self.get_repo(project)
         repo.fixed_ref = ref
         repo.default_branch = None
@@ -239,6 +240,7 @@ class TestGitServer(object):  # pylint: disable=too-many-instance-attributes
         self.manifest.load()
 
     def set_branch(self, project, branch):
+        """ Set Branch """
         repo = self.get_repo(project)
         repo.fixed_ref = None
         repo.default_branch = branch
@@ -249,9 +251,9 @@ class TestGitServer(object):  # pylint: disable=too-many-instance-attributes
     def push_file(self, project, filename, contents,
                   branch="master", fast_forward=True,
                   message=None):
-        """ Push a new file with the given contents to the given project
-        It is assumed that the project has been created
-
+        """
+        Push a new file with the given contents to the given project.
+        It is assumed that the project has been created.
         """
         src = project.replace(".git", "")
         repo_src = self.src.join(src)
@@ -316,18 +318,19 @@ class TestGit(qisrc.git.Git):
     __test__ = False  # Tell PyTest to ignore this Test* named class: This is as test to collect
 
     def __init__(self, repo=None):
+        """ TestGit Init """
         if repo is None:
             repo = os.getcwd()
         super(TestGit, self).__init__(repo)
 
     @property
     def root(self):
-        # pylint: disable-msg=E1101
-        return py.path.local(self.repo)
+        """ Root """
+        return py.path.local(self.repo)  # pylint:disable=no-member
 
     def initialize(self, branch="master"):
         """ Make sure there is at least one commit and one branch """
-        rc, __out = self.call("show", raises=False)  # pylint: disable=unused-variable
+        rc, __out = self.call("show", raises=False)
         if rc == 0:
             return
         self.init()
@@ -356,13 +359,12 @@ class TestGit(qisrc.git.Git):
 
 
 class FakeGit(qisrc.git.Git):
-    """ To be used as a mock object for testing
-
-    """
+    """ To be used as a mock object for testing """
     # Pseudo persistent config
     repo_configs = dict()
 
     def __init__(self, repo):
+        """ FakeGit Init """
         super(FakeGit, self).__init__(repo)
         if self.repo not in FakeGit.repo_configs:
             FakeGit.repo_configs[repo] = dict()
@@ -405,7 +407,7 @@ class FakeGit(qisrc.git.Git):
 
     def check(self):
         """ Check that everything that was configured has been called """
-        for (k, v) in self.results.iteritems():
+        for (k, v) in self.results.items():
             call_index = self.calls_index.get(k)
             if call_index is None:
                 mess = "%s was added as result but never called" % k
@@ -423,9 +425,9 @@ class FakeGit(qisrc.git.Git):
         return False
 
     def _call(self, *args, **kwargs):
-        """ Look for the return of the command in the list.
+        """
+        Look for the return of the command in the list.
         If not found, assume it succeeds.
-
         """
         self.calls.append((args, kwargs))
         (retcode, out) = self.get_result(args[0])
@@ -435,64 +437,68 @@ class FakeGit(qisrc.git.Git):
         else:
             if retcode != 0:
                 raise Exception("%s failed" % " ".join(args))
+        return None
 
 
-# pylint: disable-msg=E1101
 @pytest.fixture
-def git_worktree(cd_to_tmpdir):  # pylint: disable=unused-argument
+def git_worktree(cd_to_tmpdir):
+    """ Git Worktree """
     return TestGitWorkTree()
 
-# pylint: disable-msg=E1101
-
 
 @pytest.fixture
-def test_git(request):  # pylint: disable=unused-argument
+def test_git(request):
+    """ Test Git """
     return TestGit
-
-# pylint: disable-msg=E1101
 
 
 @pytest.fixture
 def git_server(tmpdir):
-    # pylint: disable-msg=E1101
-    git_srv = TestGitServer(tmpdir.mkdir("git"))
-    return git_srv
-
-# pylint: disable-msg=E1101
+    """ Git Server """
+    return TestGitServer(tmpdir.mkdir("git"))
 
 
 @pytest.fixture
-def mock_git(request):  # pylint: disable=unused-argument
+def mock_git(request):
+    """ Mock Git """
     return FakeGit("repo")
 
-# pylint: disable-msg=E1101
-
 
 @pytest.fixture
-def qisrc_action(cd_to_tmpdir):  # pylint: disable=unused-argument
+def qisrc_action(cd_to_tmpdir):
+    """ QiSrc Action """
     return QiSrcAction()
 
 
 class QiSrcAction(TestAction):
+    """ QiSrcAction Class """
+
     def __init__(self):
+        """ QiSrcAction Init """
         super(QiSrcAction, self).__init__("qisrc.actions")
         self.root = self.worktree.root
         self.git_worktree = TestGitWorkTree(worktree=self.worktree)
 
     def create_git_project(self, src, branch="master"):
+        """ Create Git Project """
         return self.git_worktree.create_git_project(src, branch=branch)
 
     def reload_worktree(self):
+        """ Reload Worktree """
         self.worktree = TestWorkTree(root=self.root)
         self.git_worktree = TestGitWorkTree(worktree=self.worktree)
 
     @property
     def tmpdir(self):
+        """ Tmp Dir """
         return self.git_worktree.tmpdir
 
 
 class SvnServer(object):
+    """ SvnServer Class """
+
     def __init__(self, tmpdir):
+        """" SvnServer Init """
         self.tmpdir = tmpdir
         self.srv = tmpdir.ensure("srv", dir=True)
         self.src = tmpdir.join("src", dir=True)
@@ -501,6 +507,7 @@ class SvnServer(object):
         self.base_url = "file://" + self.srv.strpath
 
     def create_repo(self, name):
+        """ Create Repo """
         src = self.src.join(name).ensure(dir=True)
         url = os.path.join(self.base_url, name)
         cmd = ["svn", "import", src.strpath, url, "--message", "init %s" % name]
@@ -508,6 +515,7 @@ class SvnServer(object):
         return url
 
     def commit_file(self, repo, filename, contents, message=None):
+        """ Commit File """
         src = self.src.join(repo)
         src.remove()
         url = os.path.join(self.base_url, repo)
@@ -524,4 +532,5 @@ class SvnServer(object):
 
 @pytest.fixture
 def svn_server(tmpdir):
+    """ Svn Server """
     return SvnServer(tmpdir)

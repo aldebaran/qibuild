@@ -1,26 +1,27 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
 """ Tools for doxygen """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import collections
 
 
 def read_doxyfile(doxyfile):
-    """ Parse a doxyfile path.
-
-    :returns: a dict key, value containing
-              the settings if the doxyfile exists,
-              else an empty dict
-
+    """
+    Parse a doxyfile path.
+    :returns: a dict key, value containing the settings
+              if the doxyfile exists, else an empty dict.
     """
     res = collections.OrderedDict()
     if not os.path.exists(doxyfile):
         return res
     with open(doxyfile, "r") as fp:
         lines = fp.readlines()
-
     # Handle lines ending with backshlash
     contents = ""
     for line in lines:
@@ -28,7 +29,6 @@ def read_doxyfile(doxyfile):
             contents += line.strip()[:-1]
         else:
             contents += line
-
     lines = contents.splitlines()
     for line in lines:
         if line.startswith("#"):
@@ -47,12 +47,11 @@ def read_doxyfile(doxyfile):
             key = key.strip()
             value = value.strip()
             res[key] = value
-
     return res
 
 
 def write_doxyfile(config, doxyfile):
     """ Write a doxyfile """
     with open(doxyfile, "w") as fp:
-        for key, value in config.iteritems():
+        for key, value in config.items():
             fp.write("%s = %s\n" % (key, value))

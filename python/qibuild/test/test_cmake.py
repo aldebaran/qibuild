@@ -1,22 +1,28 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test CMake """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
-import pytest
 import mock
+import pytest
 
 import qibuild.cmake
-
 from qisys.test.conftest import skip_on_win
 
 
 def test_get_cmake_qibuild_dir_no_worktree():
+    """ Test Get CMake QiBuild Dir No Worktree """
     res = qibuild.cmake.get_cmake_qibuild_dir()
     assert os.path.exists(os.path.join(res, "qibuild/general.cmake"))
 
 
 def test_pip_std_install(tmpdir):
+    """ Test Pip Standard Install """
     python_dir = tmpdir.join("lib", "python2.7", "site-packages", "qibuild")
     python_dir.ensure("__init__.py", file=True)
     cmake_dir = tmpdir.join("share", "cmake")
@@ -27,6 +33,7 @@ def test_pip_std_install(tmpdir):
 
 @skip_on_win
 def test_pip_debian_install(tmpdir):
+    """ Test Pip Debian Install """
     local = tmpdir.mkdir("local")
     lib = tmpdir.mkdir("lib")
     local.join("lib").mksymlinkto(lib)
@@ -39,43 +46,38 @@ def test_pip_debian_install(tmpdir):
 
 
 def test_check_root_cmake_no_cmake_minimum_required(tmpdir):
+    """ Test Check Root CMake No CMake Minimum Required """
     cmake_list = tmpdir.join("CMakeLists.txt")
-    cmake_list.write("""
-project(foo)
-find_package(qibuild)
-""")
-    # # pylint:disable-msg=E1101
+    cmake_list.write("""\nproject(foo)\nfind_package(qibuild)\n""")
     with pytest.raises(qibuild.cmake.IncorrectCMakeLists) as e:
         qibuild.cmake.check_root_cmake_list(cmake_list.strpath)
     assert "Missing call to cmake_minimum_required" in e.value.message
 
 
 def test_check_root_cmake_find_package_before_project(tmpdir):
+    """ Test Check Root CMake Find Package Before Project """
     cmake_list = tmpdir.join("CMakeLists.txt")
     cmake_list.write("""
 cmake_minimum_required(VERSION 2.8)
 find_package(qibuild)
 project(foo)
 """)
-    # # pylint:disable-msg=E1101
     with pytest.raises(qibuild.cmake.IncorrectCMakeLists) as e:
         qibuild.cmake.check_root_cmake_list(cmake_list.strpath)
     assert "The call to find_package(qibuild) should be AFTER" in e.value.message
 
 
 def test_check_root_cmake_no_project(tmpdir):
+    """ Test Check Root CMake No Project """
     cmake_list = tmpdir.join("CMakeLists.txt")
-    cmake_list.write("""
-cmake_minimum_required(VERSION 2.8)
-find_package(qibuild)
-""")
-    # # pylint:disable-msg=E1101
+    cmake_list.write("""\ncmake_minimum_required(VERSION 2.8)\nfind_package(qibuild)\n""")
     with pytest.raises(qibuild.cmake.IncorrectCMakeLists) as e:
         qibuild.cmake.check_root_cmake_list(cmake_list.strpath)
     assert "Missing call to project()" in e.value.message
 
 
 def test_get_known_generators():
+    """ Test Get Known Generators """
     with mock.patch("subprocess.Popen") as mock_popen:
         mock_process = mock.Mock()
         mock_popen.return_value = mock_process
@@ -106,6 +108,7 @@ The following generators are available on this platform:
 
 
 def test_generators_on_windows_cmake_3_3():
+    """ Test Generators On Window CMake 3.3 """
     with mock.patch("subprocess.Popen") as mock_popen:
         mock_process = mock.Mock()
         mock_popen.return_value = mock_process

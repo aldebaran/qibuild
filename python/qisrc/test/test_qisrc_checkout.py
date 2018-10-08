@@ -1,14 +1,21 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test QiSrc Checkout """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
 
 import qisrc.git
-from qisrc.test.conftest import TestGitWorkTree
 from qisrc.test.conftest import TestGit
+from qisrc.test.conftest import TestGitWorkTree
 
 
 def test_checkout_happy(qisrc_action, git_server):
+    """ Test Checkout Happy """
     manifest_url = git_server.manifest_url
     git_server.create_repo("foo.git")
     git_server.create_repo("bar.git")
@@ -26,6 +33,7 @@ def test_checkout_happy(qisrc_action, git_server):
 
 
 def test_checkout_preserve_changes_when_checkout_fails(qisrc_action, git_server):
+    """ Test Checkout Preserve Changes When Checkout Fails """
     manifest_url = git_server.manifest_url
     git_server.create_repo("foo.git")
     git_server.push_file("foo.git", "README.txt", "readme\n")
@@ -48,6 +56,7 @@ def test_checkout_preserve_changes_when_checkout_fails(qisrc_action, git_server)
 
 
 def test_checkout_creates_at_correct_place(qisrc_action, git_server):
+    """ Test Checkout Creates At Correct Place """
     manifest_url = git_server.manifest_url
     git_server.create_repo("foo.git")
     git_server.switch_manifest_branch("devel")
@@ -62,6 +71,7 @@ def test_checkout_creates_at_correct_place(qisrc_action, git_server):
 
 
 def test_checkout_non_existing_branch(qisrc_action, git_server):
+    """ Test Checkout Non Existing Branch """
     manifest_url = git_server.manifest_url
     git_server.create_repo("foo.git")
     git_server.switch_manifest_branch("devel")
@@ -72,6 +82,7 @@ def test_checkout_non_existing_branch(qisrc_action, git_server):
 
 
 def test_skip_checkout_when_possible(qisrc_action, git_server, record_messages):
+    """ Test Skip Checkout Wen Possible """
     manifest_url = git_server.manifest_url
     git_server.create_repo("foo.git")
     git_server.create_repo("bar.git")
@@ -82,7 +93,8 @@ def test_skip_checkout_when_possible(qisrc_action, git_server, record_messages):
     assert not record_messages.find("Checkout bar")
 
 
-def test_using_force_when_not_an_a_branch(qisrc_action, git_server):
+def test_using_force_when_not_a_branch(qisrc_action, git_server):
+    """ Test Using Force When Not a Branch """
     git_server.create_repo("foo.git")
     git_server.push_file("foo.git", "foo.txt", "this is foo")
     manifest_url = git_server.manifest_url
@@ -97,34 +109,33 @@ def test_using_force_when_not_an_a_branch(qisrc_action, git_server):
 
 
 def test_retcode_when_checkout_fails(qisrc_action, git_server):
+    """ Test RetCode When Checkout """
     git_server.create_repo("foo.git")
     qisrc_action("init", git_server.manifest_url)
-
     git_server.switch_manifest_branch("devel")
     git_server.change_branch("foo.git", "devel")
-
     git_worktree = TestGitWorkTree()
     foo_proj = git_worktree.get_git_project("foo")
     gitignore = os.path.join(foo_proj.path, ".gitignore")
     with open(gitignore, "w") as fp:
         fp.write("unstaged\n")
-
     rc = qisrc_action("checkout", "devel", retcode=True)
     assert rc != 0
 
 
 def test_qisrc_checkout_when_no_group(qisrc_action, git_server):
+    """ Test QiSrc Checkout When No Group """
     git_server.create_group("default", ["a", "b"], default=True)
     qisrc_action("init", git_server.manifest_url)
     qisrc_action("rm-group", "default")
     git_server.switch_manifest_branch("devel")
     qisrc_action("checkout", "devel")
-
     git_worktree = TestGitWorkTree()
     assert not git_worktree.git_projects
 
 
 def test_qisrc_checkout_with_ref_to_branch(qisrc_action, git_server):
+    """ Test QiSrc Checkout With Ref To Branch """
     manifest_url = git_server.manifest_url
     git_server.create_repo("foo.git")
     git_server.create_repo("bar.git")
@@ -150,6 +161,7 @@ def test_qisrc_checkout_with_ref_to_branch(qisrc_action, git_server):
 
 
 def test_qisrc_checkout_with_branch_to_ref(qisrc_action, git_server):
+    """ Test QiSrc Checkout With Branch to Ref """
     manifest_url = git_server.manifest_url
     git_server.create_repo("foo.git")
     git_server.create_repo("bar.git")

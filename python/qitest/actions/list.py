@@ -1,26 +1,31 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-""" List the tests"""
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" List the tests """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import re
-from qisys import ui
 
-import qisys.parsers
 import qitest.conf
 import qitest.parsers
 import qibuild.parsers
+import qisys.parsers
+from qisys import ui
 
 
 def configure_parser(parser):
+    """ Configure Parser """
     qitest.parsers.test_parser(parser)
     qibuild.parsers.project_parser(parser)
     qisys.parsers.build_parser(parser, include_worktree_parser=False)
 
 
 def do(args):
+    """ Main Entry Point """
     test_runners = qitest.parsers.get_test_runners(args)
-
     # rule to check for tests which doesn't follow naming convention
     expr = re.compile("^test_.*")
     warn_name_count = 0
@@ -43,10 +48,15 @@ def do(args):
                     warn_type_count += 1
                     message += "(no type)"
                 ui.info_count(i, n, name, ui.brown, message)
-
         if warn_name_count:
-            msg = "%i on %i tests do not respect naming convention" % (warn_name_count, len(test_runner.tests))
+            msg = "%i on %i tests do not respect naming convention" % (
+                warn_name_count,
+                len(test_runner.tests)
+            )
             ui.warning(msg)
         if warn_type_count:
-            msg = "%i on %i tests do not have any type" % (warn_type_count, len(test_runner.tests))
+            msg = "%i on %i tests do not have any type" % (
+                warn_type_count,
+                len(test_runner.tests)
+            )
             ui.warning(msg)

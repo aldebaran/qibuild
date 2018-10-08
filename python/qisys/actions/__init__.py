@@ -1,21 +1,23 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-""" Common tools for actions
-
-"""
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Common tools for actions """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import sys
-from qisys import ui
-import qisys.command
+
 import qisys
+import qisys.command
+from qisys import ui
 
 
 def foreach(projects, cmd, ignore_errors=True):
-    """ Execute the command on every project
-    :param ignore_errors: whether to stop at first
-    failure
-
+    """
+    Execute the command on every project
+    :param ignore_errors: whether to stop at first failure
     """
     errors = list()
     ui.info(ui.green, "Running `%s` on every project" % " ".join(cmd))
@@ -32,7 +34,7 @@ def foreach(projects, cmd, ignore_errors=True):
                 raise
     if not errors:
         return
-    print
+    print()
     ui.info(ui.red, "Command failed on the following projects:")
     for project in errors:
         ui.info(ui.green, " * ", ui.reset, ui.blue, project.src)

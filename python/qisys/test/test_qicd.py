@@ -1,20 +1,29 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test QiCd """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
 
 import qicd
 
 
 def get_best_match(worktree, token):
+    """ Get Best Match """
     # qicd.find_best_match returns an absolute path,
     # this is used to simplify assertions
     res = qicd.find_best_match(worktree, token)
     if res:
         return os.path.relpath(res, worktree.root)
+    return None
 
 
 def test_matches_closest(worktree):
+    """ Test Matches Closest """
     worktree.create_project("agility/motion")
     worktree.create_project("apps/behaviors")
     worktree.create_project("apps/core")

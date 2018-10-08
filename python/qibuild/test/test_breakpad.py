@@ -1,22 +1,25 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test Breakpad """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import sys
-
 import pytest
 
 import qisys.command
+import qibuild.find
 import qibuild.breakpad
 import qibuild.cmake_builder
-import qibuild.find
 
 
-# pylint: disable-msg=E1101
-@pytest.mark.skipif(not qisys.command.find_program("dump_syms"),
-                    reason="dump_syms not found")
+@pytest.mark.skipif(not qisys.command.find_program("dump_syms"), reason="dump_syms not found")
 def test_generate_symbols(build_worktree, tmpdir):
+    """ Test Generate Symbols """
     build_worktree.add_test_project("world")
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree)
     build_config = cmake_builder.build_config
@@ -34,6 +37,7 @@ def test_generate_symbols(build_worktree, tmpdir):
 
 
 def test_is_macho(qibuild_action):
+    """ Test Is Macho """
     if sys.platform != "darwin":
         return
     world_project = qibuild_action.add_test_project("world")
@@ -49,6 +53,7 @@ def test_is_macho(qibuild_action):
 
 
 def test_is_exe():
+    """ Test Is Exe """
     assert qibuild.breakpad.is_exe("foo.exe")
     assert qibuild.breakpad.is_exe("foo.dll")
     assert not qibuild.breakpad.is_exe("foo.lib")

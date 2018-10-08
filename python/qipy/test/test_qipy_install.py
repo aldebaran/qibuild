@@ -1,12 +1,16 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-# pylint: disable=unused-variable
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 
 def test_install(qipy_action, tmpdir):
-    big_project = qipy_action.add_test_project("big_project")
+    """ Test Install """
+    _big_project = qipy_action.add_test_project("big_project")
     dest = tmpdir.join("dest")
     qipy_action("install", "big_project", dest.strpath)
     site_packages = dest.join("lib", "python2.7", "site-packages")
@@ -16,7 +20,8 @@ def test_install(qipy_action, tmpdir):
 
 
 def test_install_with_distutils(qipy_action, tmpdir):
-    with_distutils = qipy_action.add_test_project("with_distutils")
+    """ Test INstall With DistUtils """
+    _with_distutils = qipy_action.add_test_project("with_distutils")
     dest = tmpdir.join("dest")
     # ipython 5 is the last version compatible with Python 2.7
     qipy_action("bootstrap", "pip", "virtualenv", "ipython<=5")
@@ -25,7 +30,8 @@ def test_install_with_distutils(qipy_action, tmpdir):
 
 
 def test_empty_install(qipy_action, tmpdir):
-    empty = qipy_action.add_test_project("empty")
+    """ Test Empty Install """
+    _empty = qipy_action.add_test_project("empty")
     dest = tmpdir.join("dest")
     # ipython 5 is the last version compatible with Python 2.7
     qipy_action("bootstrap", "pip", "virtualenv", "ipython<=5")

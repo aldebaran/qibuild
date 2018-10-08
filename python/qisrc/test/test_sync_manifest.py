@@ -1,25 +1,25 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test Sync Manifest """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-
+import qisys.sh
+import qisrc.git
 import qisrc.sync
 import qisrc.manifest
-import qisrc.git
 from qisrc.test.conftest import TestGitWorkTree
-import qisys.sh
-
-# allow the existing foo/bar/baz names
-# pylint: disable=blacklisted-name
-# pylint: disable=unused-variable
 
 
 def test_stores_url_and_groups(git_worktree, git_server):
+    """ Test Stores Url And Group """
     git_server.create_group("mygroup", ["foo", "bar"])
     manifest_url = git_server.manifest_url
     worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
     worktree_syncer.configure_manifest(manifest_url, groups=["mygroup"])
-
     worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
     manifest = worktree_syncer.manifest
     assert manifest.url == manifest_url
@@ -27,6 +27,7 @@ def test_stores_url_and_groups(git_worktree, git_server):
 
 
 def test_stores_branches(git_worktree, git_server):
+    """ Test Stores Branches """
     git_server.switch_manifest_branch("devel")
     manifest_url = git_server.manifest_url
     worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
@@ -38,11 +39,11 @@ def test_stores_branches(git_worktree, git_server):
 
 
 def test_pull_manifest_changes_when_syncing(git_worktree, git_server):
+    """ Test Pull Manifest Changes When Syncing """
     manifest_url = git_server.manifest_url
     worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
     worktree_syncer.configure_manifest(manifest_url)
     git_worktree.tmpdir.join(".qi", "manifests", "default", "manifest.xml")
-
     # Push a random file
     git_server.push_file("manifest.git", "a_file", "some contents\n")
     worktree_syncer.sync()
@@ -51,6 +52,7 @@ def test_pull_manifest_changes_when_syncing(git_worktree, git_server):
 
 
 def test_use_correct_manifest_branch(git_worktree, git_server):
+    """ Test Use Correct Manifest Branch """
     git_server.switch_manifest_branch("devel")
     # Push a random file to the 'devel' branch
     git_server.push_file("manifest.git", "a_file", "some contents\n", branch="devel")
@@ -58,12 +60,13 @@ def test_use_correct_manifest_branch(git_worktree, git_server):
     worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
     worktree_syncer.configure_manifest(manifest_url, branch="devel")
     local_manifest = git_worktree.tmpdir.join(".qi", "manifests", "default")
-    git = qisrc.git.Git(local_manifest.strpath)
+    _git = qisrc.git.Git(local_manifest.strpath)
     a_file = git_worktree.tmpdir.join(".qi", "manifests", "default", "a_file")
     assert a_file.read() == "some contents\n"
 
 
 def test_new_repos(git_worktree, git_server):
+    """ Test New Repos """
     git_server.create_repo("foo.git")
     manifest_url = git_server.manifest_url
     git_worktree.configure_manifest(manifest_url)
@@ -71,6 +74,7 @@ def test_new_repos(git_worktree, git_server):
 
 
 def test_moving_repos_simple_case(git_worktree, git_server):
+    """ Test Moving Repos Simple Case """
     git_server.create_repo("foo.git")
     manifest_url = git_server.manifest_url
     git_worktree.configure_manifest(manifest_url)
@@ -80,6 +84,7 @@ def test_moving_repos_simple_case(git_worktree, git_server):
 
 
 def test_moving_repos_rename_fails(git_worktree, git_server):
+    """ Test Moving Repos Rename Fails """
     git_server.create_repo("foo.git")
     manifest_url = git_server.manifest_url
     git_worktree.configure_manifest(manifest_url)
@@ -97,6 +102,7 @@ def test_moving_repos_rename_fails(git_worktree, git_server):
 
 
 def test_moving_repos_with_force(git_worktree, git_server):
+    """ Test Moving Repos With Force """
     git_server.create_repo("foo.git")
     manifest_url = git_server.manifest_url
     git_worktree.configure_manifest(manifest_url)
@@ -108,6 +114,7 @@ def test_moving_repos_with_force(git_worktree, git_server):
 
 
 def test_removing_repos(git_worktree, git_server):
+    """ Test Removing Repos """
     git_server.create_repo("foo.git")
     manifest_url = git_server.manifest_url
     git_worktree.configure_manifest(manifest_url)
@@ -117,6 +124,7 @@ def test_removing_repos(git_worktree, git_server):
 
 
 def test_changing_manifest_groups(git_worktree, git_server):
+    """ Test Changing Manifest Groups """
     git_server.create_group("a_group", ["a", "b"])
     git_server.create_group("foo_group", ["bar", "baz"])
     git_server.create_repo("c")
@@ -136,15 +144,17 @@ def test_changing_manifest_groups(git_worktree, git_server):
 
 
 def test_add_on_empty(git_worktree, git_server):
-    foo = git_worktree.tmpdir.join("foo")
-    foo.ensure(dir=True)
-    foo_git = qisrc.git.Git(foo.strpath)
+    """ Test Add On Empty """
+    foo1 = git_worktree.tmpdir.join("foo")
+    foo1.ensure(dir=True)
+    foo_git = qisrc.git.Git(foo1.strpath)
     foo_git.init()
     git_server.create_repo("foo")
     git_worktree.configure_manifest(git_server.manifest_url)
 
 
 def test_evil_nested(git_worktree, git_server):
+    """ Test Evil Nested """
     git_server.create_repo("foo/bar")
     git_worktree.configure_manifest(git_server.manifest_url)
     git_server.create_repo("foo")
@@ -153,6 +163,7 @@ def test_evil_nested(git_worktree, git_server):
 
 
 def test_moving_repos_sync_action(git_worktree, git_server, qisrc_action):
+    """ Test Mofin Repos Sync Action """
     git_server.create_repo("lib/foo.git")
     manifest_url = git_server.manifest_url
     git_worktree.configure_manifest(manifest_url)
@@ -166,11 +177,12 @@ def test_moving_repos_sync_action(git_worktree, git_server, qisrc_action):
 
 
 def test_rm_nested_repos_root(git_worktree, git_server, qisrc_action):
-    foo = git_server.create_repo("foo")
+    """ Test Rm Nested Repos Root """
+    foo1 = git_server.create_repo("foo")
     git_server.create_repo("foo/bar")
     git_server.create_repo("foo/lol")
     git_worktree.configure_manifest(git_server.manifest_url)
-    qisys.sh.rm(foo.src)
+    qisys.sh.rm(foo1.src)
     qisrc_action("sync")
     assert git_worktree.get_git_project("foo")
     assert git_worktree.get_git_project("foo/bar")
@@ -178,6 +190,7 @@ def test_rm_nested_repos_root(git_worktree, git_server, qisrc_action):
 
 
 def test_all_repos(git_worktree, git_server):
+    """ Test All Repos """
     git_server.create_group("default", ["a.git", "b.git"])
     git_server.create_repo("c.git")
     git_worktree.configure_manifest(git_server.manifest_url, all_repos=True)

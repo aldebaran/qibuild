@@ -1,15 +1,21 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test QiSrc Reset """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
 
 import qisys.sh
 import qisrc.snapshot
-
 from qisrc.test.conftest import TestGit, TestGitWorkTree
 
 
 def test_reset_dash_f_simple(qisrc_action, git_server):
+    """ Test Reset Dash f Simple """
     git_server.create_repo("foo")
     manifest_url = git_server.manifest_url
     git_worktree = qisrc_action.git_worktree
@@ -23,6 +29,7 @@ def test_reset_dash_f_simple(qisrc_action, git_server):
 
 
 def test_reset_undo_local_changes(qisrc_action, git_server):
+    """ Test Reset Undo Local Changes """
     git_server.create_repo("foo")
     manifest_url = git_server.manifest_url
     qisrc_action("init", manifest_url)
@@ -36,6 +43,7 @@ def test_reset_undo_local_changes(qisrc_action, git_server):
 
 
 def test_reset_non_overlapping_groups(qisrc_action, git_server, tmpdir):
+    """ Test Reset Non Overlapping Groups """
     git_server.create_group("group1", ["foo", "bar"])
     git_server.create_group("group2", ["spam"])
     git_worktree = qisrc_action.git_worktree
@@ -57,6 +65,7 @@ def test_reset_non_overlapping_groups(qisrc_action, git_server, tmpdir):
 
 
 def test_reset_clone_missing(qisrc_action, git_server):
+    """ Test Reset Clone Missing """
     git_server.create_repo("foo")
     manifest_url = git_server.manifest_url
     git_worktree = qisrc_action.git_worktree
@@ -73,6 +82,7 @@ def test_reset_clone_missing(qisrc_action, git_server):
 
 
 def test_fails_when_cloning_fails(qisrc_action, git_server):
+    """ Test Reset When Cloning Fails """
     git_server.create_repo("foo")
     manifest_url = git_server.manifest_url
     git_worktree = qisrc_action.git_worktree
@@ -90,6 +100,7 @@ def test_fails_when_cloning_fails(qisrc_action, git_server):
 
 
 def test_no_files_in_repo(qisrc_action, git_server):
+    """ Test No Files In Repo """
     git_server.create_repo("foo")
     git_server.delete_file("foo", ".gitignore")
     qisrc_action("init", git_server.manifest_url)
@@ -97,6 +108,7 @@ def test_no_files_in_repo(qisrc_action, git_server):
 
 
 def test_fixed_ref(qisrc_action, git_server):
+    """ Test Fixed Ref """
     git_server.create_repo("foo.git")
     git_server.push_tag("foo.git", "v0.1")
     git_server.set_fixed_ref("foo.git", "v0.1")
@@ -112,6 +124,7 @@ def test_fixed_ref(qisrc_action, git_server):
 
 
 def test_ignore_groups(qisrc_action, git_server):
+    """ Test Ignore Group """
     git_server.create_group("a", ["a.git"])
     git_server.create_group("b", ["b.git"])
     qisrc_action("init", git_server.manifest_url,

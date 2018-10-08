@@ -1,16 +1,24 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
 
-
-from qisys import ui
-import qisys.worktree
 import qisys.qixml
+import qisys.worktree
+from qisys import ui
 
 
 class LinguistWorkTree(qisys.worktree.WorkTreeObserver):
+    """ LinguistWorkTree Class """
+
     def __init__(self, worktree):
+        """ LinguistWorkTree Init """
         self.worktree = worktree
         self.root = worktree.root
         self.linguist_projects = list()
@@ -18,6 +26,7 @@ class LinguistWorkTree(qisys.worktree.WorkTreeObserver):
         worktree.register(self)
 
     def _load_linguist_projects(self):
+        """ Load Linguist Projects """
         self.linguist_projects = list()
         for worktree_project in self.worktree.projects:
             linguist_project = new_linguist_project(self, worktree_project)
@@ -26,9 +35,11 @@ class LinguistWorkTree(qisys.worktree.WorkTreeObserver):
                 self.linguist_projects.append(linguist_project)
 
     def reload(self):
+        """ Reload """
         self._load_linguist_projects()
 
     def get_linguist_project(self, name, raises=False):
+        """ Get Linguits Project """
         for project in self.linguist_projects:
             if project.name == name:
                 return project
@@ -40,18 +51,21 @@ class LinguistWorkTree(qisys.worktree.WorkTreeObserver):
             return None
 
     def check_unique_name(self, new_project):
+        """ Check Unique Name """
         project_with_same_name = self.get_linguist_project(new_project.name,
                                                            raises=False)
         if project_with_same_name:
-            raise Exception("""\
-Found two projects with the same name ({0})
-In:
-* {1}
-* {2}
-""".format(new_project.name, project_with_same_name.path, new_project.path))
+            raise Exception(
+                """Found two projects with the same name ({0})\nIn:\n* {1}\n* {2}\n""".format(
+                    new_project.name,
+                    project_with_same_name.path,
+                    new_project.path
+                )
+            )
 
 
-def new_linguist_project(linguist_worktree, project):  # pylint: disable=unused-argument
+def new_linguist_project(_linguist_worktree, project):
+    """ New Linguist Project """
     if not os.path.exists(project.qiproject_xml):
         return None
     tree = qisys.qixml.read(project.qiproject_xml)
@@ -66,29 +80,22 @@ def new_linguist_project(linguist_worktree, project):  # pylint: disable=unused-
             return None
     name = elem.get("name")
     if not name:
-        raise BadProjectConfig(project.qiproject_xml,
-                               "Expecting a 'name' attribute")
-
+        raise BadProjectConfig(project.qiproject_xml, "Expecting a 'name' attribute")
     domain = elem.get("domain")
     if not domain:
         domain = name
-
     linguas = elem.get("linguas").split()
     if not linguas:
         linguas = ["en_US"]
-
     tr_framework = elem.get("tr")
     if not tr_framework:
-        raise BadProjectConfig(project.qiproject_xml,
-                               "Expecting a 'tr' attribute")
-
+        raise BadProjectConfig(project.qiproject_xml, "Expecting a 'tr' attribute")
     if tr_framework not in ["linguist", "gettext"]:
         mess = """ \
 Unknow translation framework: {}.
 Choose between 'linguist' or 'gettext'
 """
         raise BadProjectConfig(mess.format(tr_framework))
-
     if tr_framework == "linguist":
         from qilinguist.qtlinguist import QtLinguistProject
         new_project = QtLinguistProject(name, project.path, domain=domain,
@@ -101,8 +108,8 @@ Choose between 'linguist' or 'gettext'
 
 
 class BadProjectConfig(Exception):
+    """ BadProjectConfig Exception """
+
     def __str__(self):
-        return """
-Incorrect configuration detected for project in {0}
-{1}
-""".format(*self.args)
+        """ String Representation """
+        return """\nIncorrect configuration detected for project in {0}\n{1}\n""".format(*self.args)

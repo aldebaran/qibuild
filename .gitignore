@@ -27,3 +27,6 @@ debian/qibuild/
 # PyTest transient files
 .cache
 .pytest_cache
+
+# Others
+desktop.ini

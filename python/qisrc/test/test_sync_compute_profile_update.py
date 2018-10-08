@@ -1,12 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test Sync Comput Profile Update """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import qibuild.profile
 from qisrc.sync import compute_profile_updates
 
 
 def make_profiles(*args):
+    """ Make Profiles """
     res = dict()
     for (name, flags) in args:
         profile = qibuild.profile.Profile(name)
@@ -16,6 +22,7 @@ def make_profiles(*args):
 
 
 def test_remote_added():
+    """ Test Remote Added """
     local = make_profiles()
     remote = make_profiles(
         ("foo", [("WITH_FOO", "ON")]),
@@ -27,6 +34,7 @@ def test_remote_added():
 
 
 def test_remote_updated():
+    """ Test Remote Updated """
     local = make_profiles(
         ("eggs", [("WITH_EGGS"), "ON"]),
         ("foo", [("WITH_FOO", "ON"), ("WITH_BAR", "OFF")]),
@@ -42,6 +50,7 @@ def test_remote_updated():
 
 
 def test_same_remote():
+    """ Test Same Remote """
     local = make_profiles(
         ("eggs", [("WITH_EGGS"), "ON"]),
         ("foo", [("WITH_FOO", "ON")]),

@@ -1,24 +1,27 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Functions to generate and load snapshot. """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-"""Functions to generate and load snapshot."""
-
-import collections
 import json
-
-from qisys import ui
+import collections
 
 import qisrc.git
+import qisrc.sync
 import qisrc.status
 import qisrc.reset
-import qisrc.sync
+from qisys import ui
 
 
 class Snapshot(object):
     """ Just a container for a git worktree snapshot """
 
     def __init__(self):
+        """ Snapshot Init """
         self.refs = collections.OrderedDict()
         self.manifest = qisrc.sync.LocalManifest()
         self.format_version = None
@@ -31,12 +34,14 @@ class Snapshot(object):
             self._dump_json(output_path)
 
     def _dump_deprecated(self, output_path):
+        """ Dump Deprecated """
         srcs = self.refs.keys()
         with open(output_path, 'w') as fp:
             for src in srcs:
                 fp.write(src + ":" + self.refs[src] + "\n")
 
     def _dump_json(self, output_path):
+        """ Dump JSON """
         with open(output_path, "w") as fp:
             serializable_manifest = dict()
             serializable_manifest["url"] = self.manifest.url
@@ -70,6 +75,7 @@ class Snapshot(object):
             pass
 
     def _load_deprecated(self, source):
+        """ Load Deprecated """
         for line in source.splitlines():
             try:
                 (src, sha1) = line.split(":")
@@ -81,6 +87,7 @@ class Snapshot(object):
             self.refs[src] = sha1
 
     def _load_json(self, parsed_json):
+        """ Load JSON """
         self.format_version = parsed_json["format"]
         if self.format_version == 1:
             manifest_json = parsed_json["manifests"]["default"]
@@ -89,30 +96,33 @@ class Snapshot(object):
         else:
             raise Exception("unknown format: %s" % self.format_version)
         self.refs = parsed_json["refs"]
-        for key, value in manifest_json.iteritems():
+        for key, value in manifest_json.items():
             setattr(self.manifest, key, value)
 
     def __eq__(self, other):
+        """ Return True if other is equal to self """
         if not isinstance(other, Snapshot):
             return False
         return other.refs == self.refs and other.manifest == self.manifest
 
     def __ne__(self, other):
+        """ Return True if other is not equal to self """
         return not self.__eq__(other)
 
 
 def generate_snapshot(git_worktree, output_path, deprecated_format=True):
+    """ Generate Snapshot """
     snapshot = git_worktree.snapshot()
     ui.info(ui.green, "Snapshot generated in", ui.white, output_path)
     return snapshot.dump(output_path, deprecated_format=deprecated_format)
 
 
 def load_snapshot(git_worktree, input_path):
-    """Load a snapshot file and reset projects."""
+    """ Load a snapshot file and reset projects. """
     snapshot = Snapshot()
     ui.info(ui.green, "Loading snapshot from", ui.white, input_path)
     snapshot.load(input_path)
-    for (src, ref) in snapshot.refs.iteritems():
+    for (src, ref) in snapshot.refs.items():
         ui.info("Loading", src)
         git_project = git_worktree.get_git_project(src, raises=False)
         if git_project:

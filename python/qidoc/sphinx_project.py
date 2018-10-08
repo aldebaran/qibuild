@@ -1,13 +1,19 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
 import sys
 
-from qisys import ui
-import qisys.archive
-import qisys.sh
 import qidoc.project
+import qisys.sh
+import qisys.archive
+from qisys import ui
 
 
 class SphinxProject(qidoc.project.DocProject):
@@ -15,6 +21,7 @@ class SphinxProject(qidoc.project.DocProject):
 
     def __init__(self, doc_worktree, project, name,
                  depends=None, dest=None):
+        """ SphinxProject Init """
         self.doc_type = "sphinx"
         self.examples = list()
         self.translated = False
@@ -24,6 +31,7 @@ class SphinxProject(qidoc.project.DocProject):
 
     @property
     def source_dir(self):
+        """ Source Dir """
         return os.path.join(self.path, "source")
 
     def configure(self, **kwargs):
@@ -38,10 +46,8 @@ class SphinxProject(qidoc.project.DocProject):
             if not os.path.exists(in_conf_py):
                 ui.error("Could not find a conf.py or a conf.in.py in", self.source_dir)
                 return
-
         with open(in_conf_py) as fp:
             conf = fp.read()
-
         if should_use_template:
             if self.template_project:
                 from_template = self.template_project.sphinx_conf
@@ -50,41 +56,35 @@ class SphinxProject(qidoc.project.DocProject):
             else:
                 ui.warning("Found a conf.in.py but no template project found "
                            "in the worktree")
-
         from_conf = dict()
         try:
             # quick hack if conf.in.py used __file__
-            from_conf["__file__"] = in_conf_py
-            exec(conf, from_conf)  # pylint: disable=exec-used
+            from_conf[b"__file__"] = in_conf_py.encode("utf-8")
+            exec(conf, from_conf)
             conf = conf.replace("__file__", 'r"%s"' % in_conf_py)
-        except Exception, e:
+        except Exception as e:
             ui.error("Could not read", in_conf_py, "\n", e)
             return
-
         if "project" not in from_conf:
             conf += '\nproject = "%s"\n' % self.name
-
         if "version" not in from_conf:
             if kwargs.get("version"):
                 conf += '\nversion = "%s"\n' % kwargs["version"]
-
         if should_use_template and self.template_project:
             if "html_theme_path" not in from_conf:
                 conf += '\nhtml_theme_path = [r"%s"]\n' % self.template_project.themes_path
-
         conf += self.append_doxylink_settings(conf, rel_paths=rel_paths)
         conf += self.append_intersphinx_settings(conf, rel_paths=rel_paths)
         conf += self.append_qiapidoc_settings()
         conf += self.append_breathe_settings()
-
         out_conf_py = os.path.join(self.build_dir, "conf.py")
         qisys.sh.write_file_if_different(conf, out_conf_py)
 
     def append_breathe_settings(self):
+        """ Append Breathe Settings """
         breathe_projects = dict()
         for x in self.doxydeps:
             breathe_projects[x.name] = os.path.join(x.build_dir, 'xml')
-
         return "\nbreathe_projects = %s\n" % breathe_projects
 
     def append_qiapidoc_settings(self):
@@ -99,7 +99,6 @@ class SphinxProject(qidoc.project.DocProject):
     def append_doxylink_settings(self, conf, rel_paths=False):
         """ Return a string representing the doxylink settings """
         res = self.append_extension(conf, "sphinxcontrib.doxylink")
-
         doxylink = dict()
         for doxydep in self.doxydeps:
             if rel_paths:
@@ -108,7 +107,6 @@ class SphinxProject(qidoc.project.DocProject):
             else:
                 dep_path = r"%s" % doxydep.html_dir
             doxylink[doxydep.name] = (doxydep.tagfile, dep_path)
-
         res += "\ndoxylink = %s\n" % str(doxylink)
         return res
 
@@ -120,7 +118,6 @@ class SphinxProject(qidoc.project.DocProject):
             doc_project = self.doc_worktree.get_doc_project(dep_name, raises=False)
             if doc_project and doc_project.doc_type == "sphinx":
                 sphinx_deps.append(doc_project)
-
         intersphinx_mapping = dict()
         for sphinx_dep in sphinx_deps:
             if rel_paths:
@@ -128,54 +125,52 @@ class SphinxProject(qidoc.project.DocProject):
                 dep_path = qisys.sh.to_posix_path(dep_path)
             else:
                 dep_path = sphinx_dep.html_dir
-
             intersphinx_mapping[sphinx_dep.name] = (
                 dep_path,
                 os.path.join(r"%s" % sphinx_dep.html_dir, "objects.inv")
             )
-
         res += "\nintersphinx_mapping= " + str(intersphinx_mapping)
         return res
 
     @staticmethod
     def append_extension(conf, extension_name):
+        """ Append Extension """
         from_conf = dict()
-        exec(conf, from_conf)  # pylint: disable=exec-used
+        exec(conf.encode("utf-8"), from_conf)
         res = ""
         if "extensions" not in from_conf:
             res += "extensions = list()\n"
         res += '\nextensions.append("%s")' % extension_name
         return res
 
-    def build(self, build_type=None, language=None,  # pylint: disable=arguments-differ,too-many-branches
-              spellcheck=False, werror=False, pdb=False):
+    def build(self, **kwargs):
         """ Run sphinx.main() with the correct arguments """
         try:
             import sphinx
-        except ImportError, e:
+        except ImportError as e:
             ui.error(e, "skipping build")
             return
-
+        build_type = kwargs.get("build_type", None)
+        language = kwargs.get("language", None)
+        spellcheck = kwargs.get("spellcheck", False)
+        werror = kwargs.get("werror", False)
+        pdb = kwargs.get("pdb", False)
         if self.prebuild_script:
             ui.info(ui.green, "Running pre-build script:",
                     ui.white, self.prebuild_script)
             cmd = [sys.executable, self.prebuild_script]
             qisys.command.call(cmd, cwd=self.path)
             ui.info()
-
         self.generate_examples_zips()
-
         if self.translated and language and language != "en" \
                 and language not in self.linguas:
             raise UnknownLingua(self, language)
         if self.translated:
             self.intl_build(language)
-
         qisys.sh.mkdir(self.html_dir, recursive=True)
         spell_dir = os.path.join(self.build_dir, "spellcheck")
         qisys.sh.mkdir(spell_dir, recursive=True)
         cmd = [sys.executable, "-c", self.build_dir]
-
         if spellcheck:
             cmd.extend(("-b", "spelling"))
         else:
@@ -186,9 +181,7 @@ class SphinxProject(qidoc.project.DocProject):
             cmd.append("-Dlanguage=%s" % language)
         if pdb:
             cmd.append("-P")
-
         cmd.append(self.source_dir)
-
         if spellcheck:
             cmd.append(spell_dir)
         else:
@@ -209,6 +202,7 @@ class SphinxProject(qidoc.project.DocProject):
             raise SphinxBuildError(self)
 
     def generate_examples_zips(self):
+        """ Generate Exemples ZIPs """
         for example_src in self.examples:
             example_path = os.path.join(self.source_dir, example_src)
             zip_path = os.path.join(self.source_dir, example_src + ".zip")
@@ -217,6 +211,7 @@ class SphinxProject(qidoc.project.DocProject):
                 qisys.archive.compress(example_path, algo="zip", quiet=True)
 
     def intl_update(self):
+        """ Intl Update """
         ui.info(ui.blue, "::", ui.reset, "Generating message catalogs ...")
         import sphinx
         from sphinx_intl.commands import run as sphinx_intl_run
@@ -232,9 +227,7 @@ class SphinxProject(qidoc.project.DocProject):
             rc = e.code
         if rc != 0:
             raise SphinxBuildError(self)
-
         ui.info()
-
         # Second step: run sphinx-intl update -l <lingua> for every lingua
         ui.info(ui.blue, "::", ui.reset, "Updating .po files ...")
         for i, lingua in enumerate(self.linguas):
@@ -247,6 +240,7 @@ class SphinxProject(qidoc.project.DocProject):
             sphinx_intl_run(cmd)
 
     def intl_build(self, language):
+        """ Intl Build """
         from sphinx_intl.commands import run as sphinx_intl_run
         locale_dir = os.path.join(self.source_dir, "locale")
         ui.info(ui.blue, "::", ui.reset, "Building .mo files ...")
@@ -258,6 +252,7 @@ class SphinxProject(qidoc.project.DocProject):
         sphinx_intl_run(cmd)
 
     def install(self, destdir):
+        """ Install """
         for example_src in self.examples:
             example_path = os.path.join(self.source_dir, example_src)
             real_dest = os.path.join(destdir, example_src)
@@ -267,6 +262,7 @@ class SphinxProject(qidoc.project.DocProject):
 
 
 def get_num_spellcheck_errors(build_dir):
+    """ Get Num Spellcheck Errors """
     output_txt = os.path.join(build_dir, "spellcheck", "output.txt")
     res = 0
     if not os.path.exists(output_txt):
@@ -281,17 +277,24 @@ def get_num_spellcheck_errors(build_dir):
 
 
 class SphinxBuildError(Exception):
+    """ SphinxBuildError Exception """
+
     def __str__(self):
+        """ String Representation """
         return "Error occurred when building doc project: %s" % self.args[0].name
 
 
 class UnknownLingua(Exception):
+    """ UnknownLingua Exception """
+
     def __init__(self, project, language):
+        """ UnknownLingua Init """
         super(UnknownLingua, self).__init__()
         self.language = language
         self.project = project
 
     def __str__(self):
+        """ String Representation """
         mess = """ Unknown language '{language}' for {project.name}.
 Please check the `linguas` attribute in the `<translate>` tag
 in {project.qiproject_xml}

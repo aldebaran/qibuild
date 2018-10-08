@@ -1,27 +1,36 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" ConfTest """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
 import py
 
 import qilinguist.worktree
-
-from qisys.test.conftest import *
-from qibuild.test.conftest import *
+from qisys.test.conftest import *  # pylint:disable=W0401,W0614
+from qibuild.test.conftest import *  # pylint:disable=W0401,W0614
 
 
 class QiLinguistAction(TestAction):
+    """ QiLinguistAction Class """
+
     def __init__(self, worktree_root=None):
+        """ QiLinguistAction Init """
         super(QiLinguistAction, self).__init__("qilinguist.actions")
         self.build_worktree = TestBuildWorkTree()
         self.trad = self.build_worktree.add_test_project("translateme/gettext")
 
     def create_po(self, proj):
+        """ Create Po """
         fr_FR_po_file = os.path.join(proj.path, "po", "fr_FR.po")
         en_US_po_file = os.path.join(proj.path, "po", "en_US.po")
         fr_file = open(fr_FR_po_file, 'wb')
         en_file = open(en_US_po_file, 'wb')
-        fr_file.write("""
+        fr_file.write(b"""
     # French translations for qi package
     # Traductions fran\xc3\xa7aises du paquet qi.
     # Copyright (C) 2012 THE qi'S COPYRIGHT HOLDER
@@ -55,7 +64,7 @@ class QiLinguistAction(TestAction):
     msgid "Where is Brian?"
     msgstr "O\xc3\xb9 est Brian ?"
     """)
-        en_file.write("""
+        en_file.write(b"""
     # English translations for qi package.
     # Copyright (C) 2012 THE qi'S COPYRIGHT HOLDER
     # This file is distributed under the same license as the qi package.
@@ -94,13 +103,17 @@ class QiLinguistAction(TestAction):
 
 
 class TestLinguistWorktree(qilinguist.worktree.LinguistWorkTree):
+    """ TestLinguistWorktree Class """
+
     def __init__(self, worktree=None):
+        """ TestLinguistWorktree Init """
         if not worktree:
             worktree = TestWorkTree()
         super(TestLinguistWorktree, self).__init__(worktree)
-        self.tmpdir = py.path.local(self.root)
+        self.tmpdir = py.path.local(self.root)  # pylint:disable=no-member
 
     def create_gettext_project(self, name):
+        """ Create GetText Project """
         proj_path = os.path.join(self.root, name)
         qisys.sh.mkdir(proj_path, recursive=True)
         qiproject_xml = os.path.join(proj_path, "qiproject.xml")
@@ -116,10 +129,11 @@ class TestLinguistWorktree(qilinguist.worktree.LinguistWorkTree):
 
 @pytest.fixture
 def qilinguist_action(cd_to_tmpdir):
-    res = QiLinguistAction()
-    return res
+    """ QiLinguits Action """
+    return QiLinguistAction()
 
 
 @pytest.fixture
 def linguist_worktree(cd_to_tmpdir):
+    """ Linguits Worktree """
     return TestLinguistWorktree()

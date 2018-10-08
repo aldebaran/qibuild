@@ -1,17 +1,26 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiTest Collector """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import json
 import glob
-import qisys.ui as ui
-import qisys.command
+
 import qipy.venv
+import qisys.command
+import qisys.ui as ui
 
 
 class PythonTestCollector(object):
+    """ PythonTestCollector """
+
     def __init__(self, python_worktree):
+        """ PythonTestCollector Init """
         self.python_worktree = python_worktree
         self.root = python_worktree.worktree.root
         self.pytest_path = str()
@@ -28,12 +37,14 @@ class PythonTestCollector(object):
 
     @staticmethod
     def get_list_of_pytest(rep):
+        """ Get List of PyTest """
         pytest_list = list()
-        for root, __dirnames, __filenames in os.walk(rep):  # pylint: disable=unused-variable
+        for root, __dirnames, __filenames in os.walk(rep):
             pytest_list.extend(glob.glob(root + "/test_*.py"))
         return pytest_list
 
     def create_pytest_json(self, json_path, pytest_list, project):
+        """ Create PyTest JSON """
         json_path = os.path.join(json_path, "pytest.json")
         json_data = list()
         for pytest in pytest_list:
@@ -58,6 +69,7 @@ class PythonTestCollector(object):
             o.write(json.dumps(json_data, indent=2))
 
     def get_test_and_write(self, project):
+        """ Get Test and Write """
         test_list = self.get_list_of_pytest(project.path)
         self.tests_path.extend(test_list)
         if test_list:
@@ -67,6 +79,7 @@ class PythonTestCollector(object):
             ui.info(ui.green, " * ", ui.red, project.src, ": (no tests found)")
 
     def collect(self):
+        """ Collect """
         projects = list()
         for project in self.python_worktree.python_projects:
             src = project.src

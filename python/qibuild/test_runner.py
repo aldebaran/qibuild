@@ -1,41 +1,46 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-import datetime
-import multiprocessing
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test Runner """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
 import re
 import sys
+import datetime
+import multiprocessing
 
-import qisys.sh
-from qisys import ui
-from qisys.qixml import etree
-import qisys.command
 import qitest.conf
 import qitest.runner
-
-# pylint: disable=unused-variable
+import qisys.sh
+import qisys.command
+from qisys import ui
+from qisys.qixml import etree
 
 
 class ProjectTestRunner(qitest.runner.TestSuiteRunner):
-    """ Implements :py:class:`.TestSuiteRunner` for a qibuild/cmake project """
+    """ Implements :py:class:`.TestSuiteRunner` for a qibuild/cmake project. """
 
     def __init__(self, project):
+        """ ProjectTestRunner Init """
         super(ProjectTestRunner, self).__init__(project)
         self._coverage = False
         self._valgrind = False
         self.break_on_failure = False
         self._num_cpus = -1
-        tests = project.tests
         self.ignore_timeouts = False
 
     @property
     def launcher(self):
-        """ Implements TestSuiteRunner.launcher """
+        """ Implements TestSuiteRunner.launcher. """
         return ProcessTestLauncher(self)
 
     @property
     def test_results_dir(self):
+        """ Tets Result Dir """
         if self.test_output_dir:
             if self.project.name:
                 base = os.path.join(self.test_output_dir, self.project.name)
@@ -47,6 +52,7 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
 
     @property
     def perf_results_dir(self):
+        """ Perf Result Dir """
         if self.test_output_dir:
             if self.project.name:
                 base = os.path.join(self.test_output_dir, self.project.name)
@@ -58,10 +64,12 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
 
     @property
     def num_cpus(self):
+        """ Number of CPUs """
         return self._num_cpus
 
     @num_cpus.setter
     def num_cpus(self, value):
+        """ Number of CPUs Setter """
         if value == -1:
             return
         if not qisys.command.find_program("taskset"):
@@ -72,10 +80,12 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
 
     @property
     def valgrind(self):
+        """ Valgrind """
         return self._valgrind
 
     @valgrind.setter
     def valgrind(self, value):
+        """ Valgrind Setter """
         if not value:
             return
         if not qisys.command.find_program("valgrind"):
@@ -84,10 +94,12 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
 
     @property
     def coverage(self):
+        """ Coverage """
         return self._coverage
 
     @coverage.setter
     def coverage(self, value):
+        """ Coverage Setter """
         if not value:
             return
         if not qisys.command.find_program("gcovr"):
@@ -96,12 +108,13 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
 
 
 class ProcessTestLauncher(qitest.runner.TestLauncher):
-    """ Implements :py:class:`.TestLauncher` using
-    :py:class:`qisys.command.Process`
-
+    """
+    Implements :py:class:`.TestLauncher` using
+    :py:class:`qisys.command.Process`.
     """
 
     def __init__(self, project_runner):
+        """ ProcessTestLauncher INit """
         super(ProcessTestLauncher, self).__init__()
         self.suite_runner = project_runner
         self.project = self.suite_runner.project
@@ -114,24 +127,26 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             qisys.sh.mkdir(directory, recursive=True)
 
     def valgrind_log(self, test):
+        """ Valgind Log """
         return os.path.join(self.suite_runner.test_results_dir,
                             test["name"] + "_valgrind.log")
 
     def test_out(self, test):
+        """ Test Out """
         return os.path.join(self.suite_runner.test_results_dir,
                             test["name"] + ".xml")
 
     def perf_out(self, test):
+        """ Perf Out """
         return os.path.join(self.suite_runner.perf_results_dir,
                             test["name"] + ".xml")
 
     def launch(self, test):
-        """ Implements :py:func:`qitest.runner.TestLauncher.launch`
-
+        """
+        Implements :py:func:`qitest.runner.TestLauncher.launch`.
         Also make sure a Junit-like XML file is always written, even
         if the test did not produce any XML file on its own or crashed
         before being able to write one.
-
         """
         res = qitest.result.TestResult(test)
         if not test.get("timeout"):
@@ -149,14 +164,12 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             process.run(timeout)
         end = datetime.datetime.now()
         delta = end - start
-
         res.time = float(delta.microseconds) / 10 ** 6 + delta.seconds
         res.out = process.out
         # Sometimes the process did not have any output,
         # but we still want to let the user know it ran
         if not process.out:
             res.out = "<no output>"
-
         message = self.get_message(process, timeout=timeout)
         if process.return_type == qisys.command.Process.OK:
             res.ok = True
@@ -169,13 +182,12 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         else:
             ui.info("\n", process.out)
             message = (ui.red, message)
-
         res.message = message
         self._post_run(process, res, test)
         return res
 
     def _update_test(self, test):
-        """ Update the test given the settings on the test suite """
+        """ Update the test given the settings on the test suite. """
         self._update_test_cmd_for_project(test)
         self._update_test_executable(test)
         self._update_test_env(test)
@@ -191,6 +203,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             self._with_num_cpus(test, num_cpus)
 
     def _update_test_cmd_for_project(self, test):
+        """ Update Test Cmd For Project """
         if not self.project:
             return
         test_out = self.test_out(test)
@@ -206,9 +219,9 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             cmd.extend(["--output", perf_out])
 
     def _update_test_executable(self, test):
-        """ Sometimes the path to the executable to run is a
-        relative path to the suite runner working directory
-
+        """
+        Sometimes the path to the executable to run is a
+        relative path to the suite runner working directory.
         """
         cmd = test["cmd"]
         executable = cmd[0]
@@ -216,6 +229,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         cmd[0] = executable
 
     def _update_test_env(self, test):
+        """ Update Test Env """
         build_env = os.environ.copy()
         if self.suite_runner.env:
             build_env = self.suite_runner.env.copy()
@@ -235,20 +249,20 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             envsetter.prepend_directory_to_variable(sdk_dir, "DYLD_FRAMEWORK_PATH")
         env = envsetter.get_build_env()
         test["env"] = env
-
         # Quick hack:
         gtest_repeat = env.get("GTEST_REPEAT", "1")
         test["timeout"] = test["timeout"] * int(gtest_repeat)
 
     def _update_test_cwd(self, test):
+        """ Update Test Cwd """
         cwd = self.suite_runner.cwd
         if test.get("working_directory") is None:
             test["working_directory"] = cwd
 
     def _with_valgrind(self, test):
+        """ With Valgind """
         if not qisys.command.find_program("valgrind"):
             raise Exception("valgrind was not found on the system")
-        cwd = test["working_directory"]
         valgrind_log = self.valgrind_log(test)
         test["timeout"] = test["timeout"] * 10
         test["cmd"] = ["valgrind", "--track-fds=yes",
@@ -256,6 +270,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
 
     @staticmethod
     def _nightmare_mode(test):
+        """ Nightmare Mode """
         if not test.get("gtest"):
             return
         cmd = test["cmd"]
@@ -263,41 +278,39 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         test["timeout"] = test["timeout"] * 20
 
     def _with_num_cpus(self, test, num_cpus):
+        """ With Num CPUs """
         cpu_list = get_cpu_list(multiprocessing.cpu_count(),
                                 num_cpus, self.worker_index)
         taskset_opts = ["-c", ",".join(str(i) for i in cpu_list)]
         test["cmd"] = ["taskset"] + taskset_opts + test["cmd"]
 
     def _post_run(self, process, res, test):
+        """ Post Run """
         if self.suite_runner.valgrind:
             valgrind_log = self.valgrind_log(test)
             parse_valgrind(valgrind_log, res)
-
         process_crashed = process.return_type not in [qisys.command.Process.OK,
                                                       qisys.command.Process.FAILED]
         process_crashed = process_crashed or process.returncode < 0
-
         test_out = self.test_out(test)
         perf_out = self.perf_out(test)
-
         if process_crashed:
             # do not trust generated files:
             qisys.sh.rm(perf_out)
             qisys.sh.rm(test_out)
-
         if process_crashed or not os.path.exists(test_out):
             self._write_xml(res, test, test_out)
 
     @staticmethod
     def _write_xml(res, test, out_xml):
-        """ Make sure a Junit XML compatible file is written """
+        """ Make sure a Junit XML compatible file is written. """
         # Arbitrary limit output (~700 lines) to prevent from crashing on read
         res.out = res.out[-16384:]
         res.out = re.sub('\x1b[^m]*m', "", res.out)
-
         message_as_string = " ".join(str(x) for x in res.message
-                                     if not isinstance(x, ui._Color))  # pylint: disable=protected-access
+                                     if not isinstance(x, ui._Color))
         # Windows output is most likely code page 850
+        # TODO: I need to check that, at least on Win 10
         if sys.platform.startswith("win"):
             encoding = "ascii"
         else:
@@ -309,12 +322,10 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             pass
         # Make sure there are no invalid data in the XML
         res.out = qisys.qixml.sanitize_xml(res.out)
-
         if res.ok:
             num_failures = "0"
         else:
             num_failures = "1"
-
         root = etree.Element("testsuites")
         root.set("tests", "1")
         root.set("failures", num_failures)
@@ -337,12 +348,11 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             failure = etree.SubElement(test_case, "failure")
             failure.set("message", message_as_string)
             failure.text = res.out
-
         qisys.qixml.write(root, out_xml, encoding=encoding)
 
     @staticmethod
-    def get_message(process, timeout=None):  # pylint: disable=too-many-return-statements
-        """ Human readable string describing the state of the process """
+    def get_message(process, timeout=None):
+        """ Human readable string describing the state of the process. """
         if process.return_type == qisys.command.Process.OK:
             return "[OK]"
         if process.return_type == qisys.command.Process.INTERRUPTED:
@@ -361,9 +371,11 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             if retcode > 0:
                 return "[FAIL] Return code: %i" % retcode
             return qisys.command.str_from_signal(-retcode)
+        return None
 
 
 def get_cpu_list(total_cpus, num_cpus_per_test, worker_index):
+    """ Get CPU List """
     cpu_list = list()
     i = worker_index * num_cpus_per_test
     cpu_list = range(i, i + num_cpus_per_test)
@@ -378,7 +390,6 @@ def parse_valgrind(valgrind_log, res):
     invalid_read_regex = re.compile(r"==\d+== Invalid read of size (\d+)")
     with open(valgrind_log, "r") as f:
         lines = f.readlines()
-
     for l in lines:
         res.out += l
         r = leak_fd_regex.search(l)

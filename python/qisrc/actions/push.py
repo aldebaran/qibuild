@@ -1,22 +1,26 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-""" Push changes for review or to the server (deprecated)
-
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
 """
+Push changes for review or to the server (deprecated)
+"""
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import sys
 
-from qisys import ui
-import qisys
 import qisrc.git
 import qisrc.parsers
 import qisrc.maintainers
 import qisrc.review
+import qisys
+from qisys import ui
 
 
 def configure_parser(parser):
-    """Configure parser for this action """
+    """ Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
     qisys.parsers.project_parser(parser, positional=False)
     parser.add_argument("--no-review", action="store_false", dest="review",

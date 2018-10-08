@@ -1,18 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-"""This module implements the Gentoo binary packages class, which take benefit
-from portage's modules.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+"""
+This module implements the Gentoo binary packages class,
+which take benefit from portage's modules.
 
 This module depends on portage:
 http://www.gentoo.org/proj/en/portage/index.xml
-
 """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import re
-# pylint: disable-msg=F0401
 import portage
 
 import qisys
@@ -29,11 +31,9 @@ _DEPENDENCY = {
 
 
 def _get_pkg_arch(metadata_dir):
-    """Return the tuple architecture/variant for which the package has been
-    built.
-
+    """
+    Return the tuple architecture/variant for which the package has been built.
     :return: the tuple (architecture, variant)
-
     """
     def _parse_march(flags_file):
         value = None
@@ -54,19 +54,16 @@ def _get_pkg_arch(metadata_dir):
 
 
 class GentooPackage(GentooNoPortagePackage):
-    """ Gentoo binary package endpoint using ``portage``.
-
-    """
+    """ Gentoo binary package endpoint using ``portage``. """
 
     def __init__(self, package_path):
+        """ GentooPackage Init """
         GentooNoPortagePackage.__init__(self, package_path)
 
-    def _load(self):  # pylint: disable=too-many-locals
-        """ Read the metadata from the binary package and store them in the
-        instance.
-
+    def _load(self):
+        """
+        Read the metadata from the binary package and store them in the instance.
         :return: the metadata dictionary
-
         """
         with qisys.sh.TempDir() as work_dir:
             pkg = portage.xpak.tbz2(self.path)
@@ -76,7 +73,7 @@ class GentooPackage(GentooNoPortagePackage):
                 pf = fpf.readline().strip()
             name, version, revision = portage.versions.pkgsplit(pf)
             dependency = dict()
-            for dep, dep_filename in _DEPENDENCY.iteritems():
+            for dep, dep_filename in _DEPENDENCY.items():
                 dep_path = os.path.join(work_dir, dep_filename)
                 if not os.path.exists(dep_path):
                     dependency[dep] = list()
@@ -86,7 +83,7 @@ class GentooPackage(GentooNoPortagePackage):
         dependency['all'] = list()
         for dep_list in _DEPENDENCY:
             dependency['all'].extend(dependency[dep_list])
-        for dep, dep_list in dependency.iteritems():
+        for dep, dep_list in dependency.items():
             dependency[dep] = list(set(dep_list))
         metadata = {
             'name': name,

@@ -1,17 +1,24 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import mock
 
 
 def test_simple_build(qidoc_action):
+    """ Test Simple Build """
     qidoc_action.add_test_project("libqi")
     qidoc_action("build", "qi-api")
 
 
 def test_translated_project(qidoc_action):
+    """ Test Translated Project """
     translateme_proj = qidoc_action.add_test_project("translateme")
     # should build the english version without warnings
     qidoc_action("build", "translateme", "--werror")
@@ -19,7 +26,7 @@ def test_translated_project(qidoc_action):
                                        "build-doc", "html", "en", "index.html")
     assert os.path.exists(expected_index_html)
     with open(expected_index_html, "r") as fp:
-        contents = fp.read()
+        contents = fp.read().decode("utf-8")
         assert "This Page" in contents
     # should build the french version
     qidoc_action("build", "translateme", "--language", "fr")
@@ -27,11 +34,12 @@ def test_translated_project(qidoc_action):
                                        "build-doc", "html", "fr", "index.html")
     assert os.path.exists(expected_index_html)
     with open(expected_index_html, "r") as fp:
-        contents = fp.read()
+        contents = fp.read().decode("utf-8")
         assert "Cette page" in contents
 
 
 def write_french_po(proj_path):
+    """ Write French Po """
     po_file = os.path.join(proj_path, "source", "locale",
                            "fr", "LC_MESSAGES", "index.po")
     with open(po_file, "w") as fp:
@@ -64,6 +72,7 @@ msgstr ""
 
 
 def test_full_translation_workflow(qidoc_action):
+    """ Test Full Translation Workflow """
     translateme_proj = qidoc_action.add_test_project("translateme")
     qidoc_action("intl-update", "translateme")
     write_french_po(translateme_proj.path)
@@ -72,17 +81,19 @@ def test_full_translation_workflow(qidoc_action):
                                        "build-doc", "html", "fr", "index.html")
     assert os.path.exists(expected_index_html)
     with open(expected_index_html, "r") as fp:
-        contents = fp.read()
+        contents = fp.read().decode("utf-8")
         assert "Bienvenue" in contents
 
 
 def test_language_not_in_qiproject(qidoc_action):
+    """ Test Language Not In QiProject """
     qidoc_action.add_test_project("translateme")
     error = qidoc_action("build", "translateme", "--language", "de", raises=True)
     assert "Unknown language 'de'" in error
 
 
 def test_forwarding_pdb(qidoc_action):
+    """ Test Forwarding Pdb """
     qidoc_action.add_test_project("world")
     with mock.patch("sphinx.main") as mock_main:
         mock_main.return_value = 0
@@ -92,17 +103,19 @@ def test_forwarding_pdb(qidoc_action):
 
 
 def test_breathe(qidoc_action):
+    """ Test Breathe """
     qidoc_action.add_test_project("libworld")
     qidoc_action.add_test_project("templates")
     world_breathe = qidoc_action.add_test_project("world-breathe")
     qidoc_action("build", "world-breathe")
     index_html = os.path.join(world_breathe.html_dir, "index.html")
     with open(index_html, "r") as fp:
-        contents = fp.read()
+        contents = fp.read().decode("utf-8")
     assert "the answer" in contents
 
 
 def test_missing_deps(qidoc_action):
+    """ Test Missing Deps """
     qidoc_action.add_test_project("hello")
     error = qidoc_action("build", "hello", raises=True)
     assert "world" in error

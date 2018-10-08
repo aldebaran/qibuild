@@ -1,45 +1,30 @@
 #!/usr/bin/env python
-##
-# fix-rpath.py
-##
-# Author(s):
-# - Samuel MARTIN <smartin@aldebaran-robotics.com>
-##
-# Copyright (C) 2012 platform
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 3 of the License, or
-# (at your option) any later version.
-##
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-##
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-##
-
-"""
-usage: fix-rpath.py CROSS_ROOTPATH LIBDIR
-"""
+# -*- coding: utf-8 -*-
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" usage: fix-rpath.py CROSS_ROOTPATH LIBDIR """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import re
-import shutil
-import stat
-import subprocess
 import sys
+import stat
+import shutil
+import subprocess
 
 _dryrun = False
 
 _FILE_EXEC = r'.*?:\s+Mach-O 64-bit (dynamically linked shared library|executable) x86_64'
 re_FILE_EXEC = re.compile(_FILE_EXEC)
+_LIB_OPT = r'\s*(/opt/.*?\.dylib).*'
+re_LIB_OPT = re.compile(_LIB_OPT)
 
 
 def find_exec(root, maxdepth=None):
-    print "Scanning {0} (maxdepth: {1})".format(root, maxdepth)
+    """ Find Exec """
+    print("Scanning {0} (maxdepth: {1})".format(root, maxdepth))
     exec_list = list()
     for root_, _, files in os.walk(root):
         for file_ in files:
@@ -53,11 +38,8 @@ def find_exec(root, maxdepth=None):
     return exec_list
 
 
-_LIB_OPT = r'\s*(/opt/.*?\.dylib).*'
-re_LIB_OPT = re.compile(_LIB_OPT)
-
-
 def get_wrong_rpath(file_path):
+    """ Get Wrong RPath """
     lib_list = list()
     p = subprocess.Popen(["otool", "-L", file_path], stdout=subprocess.PIPE)
     output = p.communicate()[0]
@@ -69,6 +51,7 @@ def get_wrong_rpath(file_path):
 
 
 def fix_rpath(file_path, old_rpath_list, new_libdir):
+    """ Fix RPath """
     to_recheck = 0
     cmd = ["install_name_tool"]
     for old_rpath in old_rpath_list:
@@ -107,6 +90,7 @@ def fix_rpath(file_path, old_rpath_list, new_libdir):
 
 
 def main(root, new_libdir):
+    """ Main Entry Point """
     to_recheck = 0
     exec_list = find_exec(root)
     for exec_ in exec_list:

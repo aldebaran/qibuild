@@ -1,11 +1,16 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiTooChain Parsers """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
+import qitoolchain
 import qisys.worktree
 import qibuild.parsers
-
 import qibuild.config
-import qitoolchain
 
 
 def toolchain_parser(parser):
@@ -17,14 +22,12 @@ def toolchain_parser(parser):
 
 
 def get_toolchain(args):
-    """ Get the toolchain to use.
-    If we are inside a build worktree, return the default
-    toolchain is this worktree
-
+    """
+    Get the toolchain to use.
+    If we are inside a build worktree, return the default toolchain is this worktree.
     """
     if args.toolchain_name:
         return qitoolchain.get_toolchain(args.toolchain_name)
-
     config = args.config
     if not config:
         try:
@@ -36,7 +39,6 @@ def get_toolchain(args):
                 config = None
         except qisys.worktree.NotInWorkTree:
             config = None
-
     if not config:
         mess = "Could not find which config to use.\n"
         mess += "(not in a work tree or no default config in "
@@ -44,7 +46,6 @@ def get_toolchain(args):
         mess += "Please specify a configuration with -c, --config \n"
         mess += "or a toolchain name with -t, --toolchain"
         raise Exception(mess)
-
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read()
     build_config = qibuild_cfg.configs.get(config)

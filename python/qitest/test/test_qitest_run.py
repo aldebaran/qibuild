@@ -1,17 +1,23 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test QiTest Run """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import sys
 import json
 
 import qisys.command
-
-# allow the existing foo/bar/baz names
-# pylint: disable=blacklisted-name
+from qitest.test.conftest import qitest_action
+from qibuild.test.conftest import qibuild_action
+from qibuild.test.conftest import record_messages
 
 
 def test_simple_run(tmpdir, qitest_action):
+    """ Test Simple Run """
     ls = qisys.command.find_program("ls")
     tests = [
         {"name": "ls", "cmd": [ls], "timeout": 1}
@@ -22,13 +28,14 @@ def test_simple_run(tmpdir, qitest_action):
 
 
 def test_repeat_until_fail(tmpdir, qitest_action):
+    """ Test Repeat Until Fail """
     ls = qisys.command.find_program("ls")
     rm = qisys.command.find_program("rm")
-    foo = tmpdir.join("foo")
-    foo.write("this is foo\n")
+    food = tmpdir.join("foo")
+    food.write("this is foo\n")
     tests = [
-        {"name": "ls", "cmd": [ls, foo.strpath], "timeout": 1},
-        {"name": "rm", "cmd": [rm, foo.strpath], "timeout": 1},
+        {"name": "ls", "cmd": [ls, food.strpath], "timeout": 1},
+        {"name": "rm", "cmd": [rm, food.strpath], "timeout": 1},
     ]
     qitest_json = tmpdir.join("qitest.json")
     qitest_json.write(json.dumps(tests))
@@ -38,17 +45,16 @@ def test_repeat_until_fail(tmpdir, qitest_action):
 
 
 def test_no_capture(tmpdir, qitest_action):
+    """ Test No Capture """
     if not sys.stdout.isatty():
         # The test will fail anyway
         return
-
     test_tty = tmpdir.join("test_tty.py")
     test_tty.write("""
 import sys
 if not sys.stdout.isatty():
     sys.exit("sys.stdout is not a tty")
 """)
-
     tests = [
         {"name": "test_tty", "cmd": [sys.executable, test_tty.strpath], "timeout": 1}
     ]
@@ -60,6 +66,7 @@ if not sys.stdout.isatty():
 
 
 def test_run_last_failed(tmpdir, qitest_action, record_messages):
+    """ Test Run Last Failed """
     test_one = tmpdir.join("test_one.py")
     test_one.write("import sys; sys.exit(1)")
     test_two = tmpdir.join("test_two.py")
@@ -84,6 +91,7 @@ def test_run_last_failed(tmpdir, qitest_action, record_messages):
 
 
 def test_exclude(tmpdir, qitest_action):
+    """ Test Exclude """
     tests = [
         {"name": "foo", "cmd": [sys.executable, "--version"]},
         {"name": "bar", "cmd": [sys.executable, "-c", "import sys ; sys.exit(1)"]}
@@ -96,6 +104,7 @@ def test_exclude(tmpdir, qitest_action):
 
 
 def test_ignore_timeouts(qitest_action, tmpdir):
+    """ Test Ignore TimeOuts """
     qitest_json = tmpdir.join("qitest.json")
     sleep_cmd = qisys.command.find_program("sleep")
     qitest_json.write("""
@@ -109,6 +118,7 @@ def test_ignore_timeouts(qitest_action, tmpdir):
 
 
 def test_action_coverage(qibuild_action, qitest_action):
+    """ Test Action Coverage """
     gcovr = qisys.command.find_program("gcovr", raises=False)
     if not gcovr:
         return

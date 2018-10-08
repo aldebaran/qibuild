@@ -43,7 +43,7 @@ to disable the check, using the ``pylint`` error code:
 
 .. code-block:: python
 
-    # pylint: disable-msg=E1101
+    # pylint:disable-msg=E1101
 
 Running the test suite
 ----------------------

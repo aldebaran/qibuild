@@ -1,10 +1,11 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-""" Generate Sphinks documentation from a CMake source files.
-
-"""
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Generate Sphinks documentation from a CMake source files. """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import re
 import os
@@ -31,10 +32,9 @@ DOCUMENTED_FILES = [
 
 
 def clean_comment(line):
-    r""" Clean up a comment, removing
-    # , #! and starting space, and adding
-    missing \n if necessary
-
+    """
+    Clean up a comment, removing # , #! and starting space,
+    and adding missing \n if necessary
     >>> clean_comment("#")
     '\n'
     >>> clean_comment("# This is ...")
@@ -54,8 +54,8 @@ def clean_comment(line):
 
 
 def indent(txt, indent_level):
-    """ Indent a piece of text
-
+    """
+    Indent a piece of text
     >>> indent('foo', 2)
     '    foo'
     """
@@ -64,22 +64,21 @@ def indent(txt, indent_level):
 
 
 def clean_indent(txt):
-    """ Useful because parameters descriptions
-    are not always properly indented at the end of
-    parsing
-
+    """
+    Useful because parameters descriptions are not always
+    properly indented at the end of parsing.
     """
     return "\n".join(x.strip() for x in txt.splitlines())
 
 
 def parse_fun_block(txt):
-    r""" Return a tuple of two elements:
+    """
+    Return a tuple of two elements:
     (fun_desc, params, example)
     where:
         * fun_desc is the general desription of the function
         * params is a list of tuples: (type, name, doc)
         * example is list of examples
-
     """
     desc = ""
     param_txt = ""
@@ -93,17 +92,15 @@ def parse_fun_block(txt):
                 desc += line + "\n"
             else:
                 param_txt += line + "\n"
-
     params = parse_params(param_txt)
     example = parse_example(txt)
     return desc, params, example
 
 
 def parse_params(txt):
-    """Parse a set of parameters doc
-
+    """
+    Parse a set of parameters doc.
     Returns a list of tuples : (type, name, doc)
-
     """
     res = list()
     # First, slipt with stuff looking like \TYPE:
@@ -121,33 +118,32 @@ def parse_params(txt):
             # first word is the name, the rest is the description:
             match = re.match(r'\s*(\w+)\s*(.*)', rest, re.DOTALL)
             if not match:
-                print "warning, failed to parse parameters"
-                print "near", rest
+                print("warning, failed to parse parameters")
+                print("near", rest)
                 break
             (name, desc) = match.groups()
         desc = clean_indent(desc)
         res.append((type, name, desc))
         i += 2
-
     return res
 
 
 def parse_example(txt):
-    """ Parse a block of text linked to a function,
-    looking for an example.
-
+    """
+    Parse a block of text linked to a function, looking for an example.
     Return None if not example was found
     """
     res = re.findall(r'\\example\s*:\s*(\w+)', txt, re.DOTALL)
     if not res:
         return
     if len(res) > 1:
-        print "warning: only zero or one examples authorized for each function"
+        print("warning: only zero or one examples authorized for each function")
     return res[0]
 
 
 def decorate(name, type):
-    """ Decorate a parameter
+    """
+    Decorate a parameter.
     >>> decorate("FOO", "arg")
     'FOO'
     >>> decorate("FOO", "flag")
@@ -176,9 +172,7 @@ def decorate(name, type):
 
 
 def gen_rst_directive(fun_name, params):
-    """ Generate rst directive for a cmake function
-
-    """
+    """ Generate rst directive for a cmake function. """
     res = ".. cmake:function:: %s" % fun_name
     res += "("
     sig_params = [decorate(name, type) for(type, name, doc) in params]
@@ -197,18 +191,13 @@ def gen_rst_directive(fun_name, params):
         to_add = ":arg %s: %s" % (name, doc)
         res += indent(to_add, 2)
         res += "\n"
-
     return res
 
 
 def gen_example_rst(example):
-    r""" Process the \example flag
-    from cmake doc
-
-    """
+    r""" Process the \example flag from cmake doc. """
     if not example:
         return ""
-
     res = """**Example**
 
 .. literalinclude:: /samples/{example}/CMakeLists.txt
@@ -219,10 +208,10 @@ def gen_example_rst(example):
 
 
 def get_title_block(txt):
-    """ Get the general doc of the cmake code.
+    """
+    Get the general doc of the cmake code.
     Should be at the top of the file, from the
     first '#!' to the next text block
-
     """
     res = ""
     in_title = False
@@ -236,13 +225,12 @@ def get_title_block(txt):
                 res += clean_comment(line)
             else:
                 break
-
     return res
 
 
 def get_fun_name(line):
-    """ Get function name from a line
-
+    """
+    Get function name from a line.
     >>> get_fun_name('function(foo)')
     'foo'
     >>> get_fun_name('function(foo BAR BAZ)')
@@ -258,11 +246,10 @@ def get_fun_name(line):
 
 
 def get_fun_blocks(txt):
-    """ Get all the blocks associated to a function,
+    """
+    Get all the blocks associated to a function,
     from '#!' to a line starting with function()
-
     Returns a list (function, txt)
-
     """
     res = list()
     cur_block = ""
@@ -281,35 +268,28 @@ def get_fun_blocks(txt):
                     if name:
                         res.append((name, cur_block))
                     else:
-                        print 'Warning: could not guess function name'
-                        print 'near', line
+                        print('Warning: could not guess function name')
+                        print('near', line)
                     cur_block = ""
                     in_block = False
                 else:
                     cur_block = ""
                     in_block = False
-
     return res
 
 
 def gen_title_rst(txt):
-    """Generate rst title from a cmake comment
-
-    """
+    """ Generate rst title from a cmake comment. """
     # Just add a few useful directives
     txt = ".. highlight:: cmake\n\n" + txt
     return txt
 
 
 def gen_fun_rst(name, txt):
-    """Generate rst documentation for a documentation from
-    a name an a text
-
-    """
+    """ Generate rst documentation for a documentation from a name an a text. """
     (desc, params, example) = parse_fun_block(txt)
     directive = gen_rst_directive(name, params)
     example_rst = gen_example_rst(example)
-
     res = """
 {directive}
 {desc}
@@ -323,32 +303,25 @@ def gen_fun_rst(name, txt):
 
 
 def gen_rst(txt):
-    """ Given a the contents of a cmake file
-    with doxgen like comment, generate a RST
-    formatted string.
-
+    """
+    Given a the contents of a cmake file with doxgen
+    like comment, generate a RST formatted string.
     """
     res = ""
-
     title_block = get_title_block(txt)
     title_rst = gen_title_rst(title_block)
     res += title_rst
     # add a blank line just to be sure
     res += "\n"
-
     fun_blocks = get_fun_blocks(txt)
     for (name, fun_block) in fun_blocks:
         fun_rst = gen_fun_rst(name, fun_block)
         res += fun_rst
-
     return res
 
 
 def gen_cmake_doc(cmake_file, rst_file):
-    """ Creating the rst file matching a cmake
-    file
-
-    """
+    """ Creating the rst file matching a cmake file. """
     should_skip = False
     basedir = os.path.dirname(rst_file)
     if not os.path.exists(basedir):
@@ -362,7 +335,7 @@ def gen_cmake_doc(cmake_file, rst_file):
             should_skip = True
     if should_skip:
         return
-    print "Generating", rst_file
+    print("Generating", rst_file)
     with open(cmake_file, "r") as fp:
         txt = fp.read()
     rst = gen_rst(txt)
@@ -372,9 +345,7 @@ def gen_cmake_doc(cmake_file, rst_file):
 
 
 def main():
-    """ Parses command line arguments
-
-    """
+    """ Parses command line arguments. """
     # We know that qidoc build will set the correct cwd
     qibuild_dir = ".."
     qibuild_dir = os.path.abspath(qibuild_dir)
@@ -385,7 +356,6 @@ def main():
     if not os.path.exists(cmake_api):
         os.makedirs(cmake_api)
     qibuild_cmake = os.path.join(qibuild_dir, "cmake", "qibuild")
-
     for filename in DOCUMENTED_FILES:
         cmake_file = os.path.join(qibuild_cmake, filename + ".cmake")
         rst_file = os.path.join(cmake_api, filename + ".rst")

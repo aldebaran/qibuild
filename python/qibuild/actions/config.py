@@ -1,18 +1,22 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-"""Display the current config """
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Display the current config. """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import subprocess
 
+import qibuild.wizard
+import qibuild.parsers
 import qisys.parsers
 from qisys import ui
-import qibuild.parsers
-import qibuild.wizard
 
 
 def configure_parser(parser):
-    """Configure parser for this action """
+    """ Configure parser for this action. """
     qisys.parsers.worktree_parser(parser)
     parser.add_argument("--edit", action="store_true",
                         help="edit the configuration")
@@ -24,7 +28,7 @@ def configure_parser(parser):
 
 
 def do(args):
-    """Main entry point"""
+    """ Main entry point. """
     worktree = qisys.parsers.get_worktree(args, raises=None)
     if worktree:
         build_worktree = qibuild.worktree.BuildWorkTree(worktree)
@@ -38,21 +42,18 @@ def do(args):
 
 
 def show_config(args, build_worktree):
-
+    """ Show Config """
     is_local = args.is_local
     if is_local and not build_worktree:
         raise Exception("Cannot use --local when not in a worktree")
-
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read(create_if_missing=True)
-
     if args.edit:
         editor = qibuild_cfg.defaults.env.editor
         if not editor:
             editor = qisys.interact.get_editor()
             qibuild_cfg.defaults.env.editor = editor
             qibuild_cfg.write()
-
         full_path = qisys.command.find_program(editor)
         if is_local:
             cfg_path = build_worktree.qibuild_xml
@@ -60,17 +61,14 @@ def show_config(args, build_worktree):
             cfg_path = qibuild.config.get_global_cfg_path()
         subprocess.call([full_path, cfg_path])
         return
-
     if not build_worktree:
-        print qibuild_cfg
+        print(qibuild_cfg)
         return
-
     if not is_local:
-        print "General configuration"
-        print "---------------------"
-        print ui.indent(str(qibuild_cfg))
-        print
-
-    print "Local configuration"
-    print "-------------------"
-    print ui.indent(str(qibuild_cfg.local))
+        print("General configuration")
+        print("---------------------")
+        print(ui.indent(str(qibuild_cfg)))
+        print("")
+    print("Local configuration")
+    print("-------------------")
+    print(ui.indent(str(qibuild_cfg.local)))

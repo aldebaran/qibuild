@@ -17,27 +17,19 @@ PYMODULES =  \
 PYTHON    ?= python
 PIP       ?= pip
 
-all: pycodestyle pylint-full check
+all: pycodestyle pylint check
 
 pycodestyle:
-	@echo ":: Running pycodestyle on root folder"
+	@echo :: Running pycodestyle on root folder
 	@pycodestyle .. 2>&1
 
-pylint-full:
-	@echo ":: Running pylint: $(PYMODULES)"
+pylint:
+	@echo :: Running pylint: $(PYMODULES)
 	@pylint $(PYMODULES) 2>&1
 
-pylint-error:
-	@echo ":: Running pylint --errors-only: $(PYMODULES)"
-	@pylint --errors-only $(PYMODULES) 2>&1
-	@echo " => Checked only for pylint errors"
-	@echo "    Use make pylint-full for running a full pylint check"
-
 check:
-	@echo ":: Running tests:"
-	@$(PYTHON) -m pytest $(PYTEST_ARGS) $(TEST_MODULES) \
-				  --cov=. --cov-report=html \
-				  -n `nproc`
+	@echo :: Running tests:
+	@$(PYTHON) -m pytest $(PYTEST_ARGS) $(TEST_MODULES) --cov=. --cov-report=html -n auto
 
 doc:
 	qidoc build qibuild

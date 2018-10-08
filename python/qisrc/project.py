@@ -1,17 +1,25 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiSrc Project """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import copy
 
-from qisys import ui
-import qisys.qixml
 import qisrc.git_config
+import qisys.qixml
+from qisys import ui
 
 
-class GitProject(object):  # pylint: disable=too-many-instance-attributes
+class GitProject(object):
+    """ GitProject Class """
+
     def __init__(self, git_worktree, worktree_project):
+        """ GitProject Init """
         self.git_worktree = git_worktree
         self.src = worktree_project.src
         self.qiproject_xml = worktree_project.qiproject_xml
@@ -23,14 +31,17 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
         self.switch_ref_to_branch = False
 
     def load_xml(self, xml_elem):
+        """ Load Xml """
         parser = GitProjectParser(self)
         parser.parse(xml_elem)
 
     def dump_xml(self):
+        """ Dump Xml """
         parser = GitProjectParser(self)
         return parser.xml_elem(node_name="project")
 
     def save_config(self):
+        """ Save Config """
         self.apply_config()
         self.git_worktree.save_project_config(self)
 
@@ -40,6 +51,7 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
         for branch in self.branches:
             if branch.default:
                 return branch
+        return None
 
     @property
     def review_remote(self):
@@ -47,6 +59,7 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
         for remote in self.remotes:
             if remote.review:
                 return remote
+        return None
 
     @property
     def default_remote(self):
@@ -54,13 +67,11 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
         for remote in self.remotes:
             if remote.default:
                 return remote
+        return None
 
     @property
     def clone_url(self):
-        """ The url to use when cloning this repository for
-        the first time
-
-        """
+        """ The url to use when cloning this repository for the first time """
         return self.default_remote.url
 
     @property
@@ -70,9 +81,9 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
         return qisys.sh.to_native_path(res)
 
     def configure_remote(self, remote):
-        """ Configure a remote. If a remote with the same name
-        exists, its url will be overwritten
-
+        """
+        Configure a remote. If a remote with the same name
+        exists, its url will be overwritten.
         """
         for previous_remote in self.remotes:
             if previous_remote.name == remote.name:
@@ -96,9 +107,9 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
     def configure_branch(self, name, tracks="origin",
                          remote_branch=None, default=True,
                          quiet=False):
-        """ Configure a branch. If a branch with the same name
+        """
+        Configure a branch. If a branch with the same name
         already exists, update its tracking remote.
-
         """
         previous_default_branch = self.default_branch
         if previous_default_branch and previous_default_branch.name != name:
@@ -126,10 +137,9 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
         return branch
 
     def read_remote_config(self, repo, quiet=False):
-        """ Apply the configuration read from the "repo" setting
-        of a remote manifest.
-        Called by WorkTreeSyncer
-
+        """
+        Apply the configuration read from the "repo" setting of a remote manifest.
+        Called by WorkTreeSyncer.
         """
         previous_default = None
         if self.default_remote:
@@ -158,7 +168,6 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
             # simply set self.review to False so that `qisrc push`
             # does not try to push to gerrit
             self.review = False
-
         if repo.fixed_ref:
             ui.warning("Now using fixed ref:", repo.fixed_ref)
             self.fixed_ref = repo.fixed_ref
@@ -168,47 +177,38 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
                 self.switch_ref_to_branch = True
 
     def sync(self, rebase_devel=False, **kwargs):
-        """ Synchronize remote changes with the underlying git repository
+        """
+        Synchronize remote changes with the underlying git repository
         Calls :py:meth:`qisrc.git.Git.sync_branch`
-
         .. warning::
            this method is called in parallel when calling ``qisrc sync``,
            therefore it must not cause any side-effect on the global state
            outside of this repo.
         """
-        # pylint: disable=too-many-return-statements
-        # pylint: disable=too-many-instance-attributes
-        # pylint: disable=unused-argument
         git = qisrc.git.Git(self.path)
         branch = self.default_branch
         if not branch:
             return None, "No branch given, and no branch configured by default"
-
         rc, out = git.fetch(raises=False)
         if rc != 0:
             return False, "fetch failed\n" + out
-
         if self.fixed_ref:
             return self.safe_reset_to_ref(self.fixed_ref)
-
         current_branch = git.get_current_branch()
         if not current_branch:
             return None, "Not on any branch"
-
         if current_branch != branch.name and not rebase_devel:
             return None, "Not on the correct branch. " + \
                          "On %s but should be on %s" % (current_branch, branch.name)
-
         if current_branch != branch.name and rebase_devel:
             return git.sync_branch_devel(branch, fetch_first=False)
-
         # Here current_branch == branch.name
         return git.sync_branch(branch, fetch_first=False)
 
     def safe_reset_to_ref(self, ref):
-        """ Read a fixed ref from the remote config.
-        Make sure to not discard any local changes
-
+        """
+        Read a fixed ref from the remote config.
+        Make sure to not discard any local changes.
         """
         git = qisrc.git.Git(self.path)
         ok, mess = git.require_clean_worktree()
@@ -218,38 +218,32 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
         return ok, mess
 
     def safe_reset_to_branch(self, branch):
-        """ Switch from a ref to a branch
-        Make sure to not discard any local changes
-
+        """
+        Switch from a ref to a branch.
+        Make sure to not discard any local changes.
         """
         git = qisrc.git.Git(self.path)
-
         rc, out = git.fetch(raises=False)
         if rc != 0:
             return False, "fetch failed\n" + out
-
         ok, mess = git.require_clean_worktree()
         if not ok:
             return None, "Skipped: " + mess
-
         # switch to new branch
         branch_remote = "%s/%s" % (self.default_remote.name, branch)
-
         rc, out = git.call("show-ref", branch_remote, raises=False)
         if rc == 0:
             checkout_args = ["-B", branch, "--track", branch_remote]
         else:
             checkout_args = ["-B", branch]
-
         ok, mess = git.checkout(*checkout_args, raises=False)
         if ok != 0:
             return False, "Checkout failed " + mess
-
         return True, ""
 
     def reset(self):
-        """ Same as sync, but discard any local changes
-
+        """
+        Same as sync, but discard any local changes
         .. warning::
            this method is called in parallel when calling ``qisrc sync``,
            therefore it must not cause any side-effect on the global state
@@ -259,15 +253,12 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
         branch = self.default_branch
         if not branch:
             return None, "No branch given, and no branch configured by default"
-
         rc, out = git.fetch(raises=False)
         if rc != 0:
             return False, "fetch failed\n" + out
-
         rc, out = git.checkout("-B", branch.name, raises=False)
         if rc != 0:
             return False, "checkout failed\n" + out
-
         remote_branch = branch.remote_branch
         if not remote_branch:
             remote_branch = branch.name
@@ -275,14 +266,10 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
         rc, out = git.reset("--hard", remote_ref, raises=False)
         if rc != 0:
             return False, "reset --hard failed\n" + out
-
         return True, "reset to %s\n" % remote_ref + out
 
     def apply_config(self):
-        """ Apply configuration to the underlying git
-        repository
-
-        """
+        """ Apply configuration to the underlying git repository. """
         git = qisrc.git.Git(self.path)
         if git.is_empty():
             ui.error("repo in %s has no commits yet" % self.src)
@@ -299,32 +286,36 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
             else:
                 self.fixed_ref = None
                 self.switch_ref_to_branch = False
-
         if self.fixed_ref:
             ok, mess = self.safe_reset_to_ref(self.fixed_ref)
             if not ok:
                 ui.error("%s\n %s" % (self.name, mess))
 
     def __deepcopy__(self, memo):
+        """ DeepCopy """
         shallow_copy = copy.copy(self)
         shallow_copy.branches = copy.deepcopy(self.branches)
         shallow_copy.remotes = copy.deepcopy(self.remotes)
         return shallow_copy
 
     def __eq__(self, other):
+        """ Return True If other is Equal to self """
         return self.src == other.src
 
     def __ne__(self, other):
+        """ Return True If other is Not Equal to self """
         return not self.__eq__(other)
 
     def __repr__(self):
+        """ Representation """
         return "<GitProject in %s>" % self.src
-##
-# Parsing
 
 
 class GitProjectParser(qisys.qixml.XMLParser):
+    """ GitProjectParser Class """
+
     def __init__(self, target):
+        """ GitProjectParser Init """
         super(GitProjectParser, self).__init__(target)
         self._ignore = ["worktree", "path", "clone_url",
                         "default_branch", "review_url",
@@ -332,24 +323,28 @@ class GitProjectParser(qisys.qixml.XMLParser):
         self._required = ["src"]
 
     def _parse_remote(self, elem):
+        """ Parse Remote """
         remote = qisrc.git_config.Remote()
         parser = qisrc.git_config.RemoteParser(remote)
         parser.parse(elem)
         self.target.remotes.append(remote)
 
     def _parse_branch(self, elem):
+        """ Parse Branch """
         branch = qisrc.git_config.Branch()
         parser = qisrc.git_config.BranchParser(branch)
         parser.parse(elem)
         self.target.branches.append(branch)
 
     def _write_branches(self, elem):
+        """ Write Branches """
         for branch in self.target.branches:
             parser = qisrc.git_config.BranchParser(branch)
             branch_xml = parser.xml_elem()
             elem.append(branch_xml)
 
     def _write_remotes(self, elem):
+        """ Write Remotes """
         for remote in self.target.remotes:
             parser = qisrc.git_config.RemoteParser(remote)
             remote_xml = parser.xml_elem()

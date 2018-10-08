@@ -1,8 +1,14 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-import collections
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
+import collections
 
 import qisys.command
 import qidoc.doxygen
@@ -14,35 +20,37 @@ class DoxygenProject(qidoc.project.DocProject):
 
     def __init__(self, doc_worktree, project, name,
                  depends=None, dest=None):
+        """ DoxygenProject Init """
         self.doc_type = "doxygen"
         super(DoxygenProject, self).__init__(doc_worktree, project, name,
                                              depends=depends, dest=dest)
 
     @property
     def in_doxyfile(self):
+        """ In DoxyFile """
         return os.path.join(self.path, "Doxyfile")
 
     @property
     def out_doxyfile(self):
+        """ Out DoxyFile """
         return os.path.join(self.build_dir, "Doxyfile")
 
     @property
     def tagfile(self):
+        """ TagFile """
         return os.path.join(self.build_dir, self.name + ".tag")
 
     def configure(self, **kwargs):
-        """ Create a correct Doxyfile in self.build_dir.
-
+        """
+        Create a correct Doxyfile in self.build_dir.
         * Force OUTPUT_DIRECTORY
         * Rewrite INPUT, EXAMPLE_PATH and IMAGE_PATH
         * Add @INCLUDE_PATH and @INCLUDE statements if we
           have a template
-
         """
         template_conf = collections.OrderedDict()
         if self.template_project:
             template_conf = self.template_project.doxy_conf.copy()
-
         version = kwargs.get("version")
         rel_paths = kwargs.get("rel_paths", False)
         in_conf = qidoc.doxygen.read_doxyfile(self.in_doxyfile)
@@ -71,17 +79,14 @@ class DoxygenProject(qidoc.project.DocProject):
                 else:
                     dep_path = doxydep.html_dir
                 out_conf["TAGFILES"] += doxydep.tagfile + "=" + dep_path + " "
-
         if version:
             out_conf["PROJECT_NUMBER"] = version
-
         for path_key in ["INPUT", "EXAMPLE_PATH", "IMAGE_PATH"]:
             in_value = in_conf.get(path_key)
             if not in_value:
                 continue
             out_value = self.make_rel_paths(in_value)
             out_conf[path_key] = out_value
-
         qidoc.doxygen.write_doxyfile(out_conf, self.out_doxyfile)
 
     def build(self, **kwargs):
@@ -90,12 +95,13 @@ class DoxygenProject(qidoc.project.DocProject):
         qisys.command.call(cmd, cwd=self.build_dir)
 
     def install(self, destdir):
+        """ Install """
         qisys.sh.install(self.html_dir, destdir)
 
     def make_rel_paths(self, value):
-        """ Transform a relative path to the source into an
-        absolute path (usable from a build directory)
-
+        """
+        Transform a relative path to the source into an
+        absolute path (usable from a build directory).
         """
         res = list()
         for path in value.split():

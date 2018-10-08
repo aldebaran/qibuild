@@ -1,18 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-"""" Computing diffs between manifest branches """
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Computing diffs between manifest branches """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import sys
 
-from qisys import ui
 import qisrc.git
+from qisys import ui
 
 
-def diff_worktree(git_worktree, git_projects, branch, cmd=None):  # pylint: disable=too-many-locals
-    """ Run  `git <cmd> local_branch..remote_branch` for every project
-
-    """
+def diff_worktree(git_worktree, git_projects, branch, cmd=None):
+    """ Run  `git <cmd> local_branch..remote_branch` for every project """
     if not cmd:
         cmd = ["log"]
     remote_projects = git_worktree.get_projects_on_branch(branch)
@@ -33,7 +35,6 @@ def diff_worktree(git_worktree, git_projects, branch, cmd=None):  # pylint: disa
             else:
                 merge_base = out.strip()
                 full_cmd = cmd + ["%s..%s" % (merge_base, local_branch)]
-
                 color = ui.config_color(sys.stdout)
                 if color:
                     full_cmd.append("--color=always")

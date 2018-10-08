@@ -1,27 +1,33 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiSrc Worktree """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
 import copy
 import operator
 
-from qisys import ui
-import qisys.worktree
 import qisrc.git
-import qisrc.snapshot
 import qisrc.sync
+import qisrc.snapshot
 import qisrc.project
+import qisys.worktree
+from qisys import ui
 
 
 class NotInAGitRepo(Exception):
-    """ Custom exception when user did not
-    specify any git repo ond the command line
-    and we did not manage to guess one from the
-    working dir
-
+    """
+    Custom exception when user did not specify any
+    git repo ond the command line and we did not
+    manage to guess one from the working dir.
     """
 
     def __str__(self):
+        """ String Representation """
         return """ Could not guess git repository from current working directory
   Here is what you can do :
      - try from a valid git repository
@@ -33,6 +39,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
     """ Stores a list of git projects and a list of manifests """
 
     def __init__(self, worktree):
+        """ GitWorkTree Init """
         self.worktree = worktree
         self.root = worktree.root
         self._root_xml = qisys.qixml.read(self.git_xml).getroot()
@@ -49,6 +56,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
                                               force=force, all_repos=all_repos)
 
     def configure_projects(self, projects):
+        """ Configure Projects """
         self.syncer.configure_projects(projects)
 
     def check_manifest(self, xml_path):
@@ -60,10 +68,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         return self.syncer.sync()
 
     def load_git_projects(self):
-        """ Build a list of git projects using the
-        xml configuration
-
-        """
+        """ Build a list of git projects using the xml configuration """
         self.git_projects = list()
         for worktree_project in self.worktree.projects:
             project_src = worktree_project.src
@@ -86,6 +91,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             return self.get_git_project(path)
         if raises:
             raise NoSuchGitProject(src)
+        return None
 
     def get_git_projects(self, groups=None):
         """ Get the git projects matching a given group """
@@ -96,7 +102,6 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         group_names = groups
         for git_project in self.git_projects:
             git_project_names[git_project.name] = git_project
-
         groups = qisrc.groups.get_groups(self.worktree)
         for group_name in group_names:
             warn_for_group = True
@@ -110,10 +115,8 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
                         ui.warning("Group", group_name, "is not currently in use\n",
                                    "Please use `qisrc add-group %s`" % group_name)
                         warn_for_group = False
-
         res = list(res)
-        res.sort(key=operator.attrgetter("src"))
-        return res
+        return sorted(res, key=operator.attrgetter("src"))
 
     def find_repo(self, repo):
         """ Look for a project configured with the given repo """
@@ -122,9 +125,11 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
                 for remote in git_project.remotes:
                     if url == remote.url:
                         return git_project
+        return None
 
     @property
     def git_xml(self):
+        """ Git Xml """
         git_xml_path = os.path.join(self.worktree.dot_qi, "git.xml")
         if not os.path.exists(git_xml_path):
             with open(git_xml_path, "w") as fp:
@@ -133,12 +138,11 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
 
     @property
     def manifest(self):
+        """ Manifest """
         return self.syncer.manifest
 
     def snapshot(self):
-        """ Return a :py:class`.Snapshot` of the current worktree state
-
-        """
+        """ Return a :py:class`.Snapshot` of the current worktree state """
         snapshot = qisrc.snapshot.Snapshot()
         snapshot.manifest = self.manifest
         git = qisrc.git.Git(self.syncer.manifest_repo)
@@ -166,12 +170,12 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         return new_proj
 
     def reload(self):
+        """ Reload """
         self.load_git_projects()
 
     def clone_missing(self, repo):
         """ Add a new project.
         :returns: a boolean telling if the clone succeeded
-
         """
         worktree_project = self.worktree.add_project(repo.src)
         git_project = qisrc.project.GitProject(self, worktree_project)
@@ -191,6 +195,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         return self._clone_missing(git_project, repo)
 
     def _clone_missing(self, git_project, repo):
+        """ Clone Missing """
         branch = repo.default_branch
         fixed_ref = repo.fixed_ref
         clone_url = repo.clone_url
@@ -216,13 +221,10 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         return True
 
     def move_repo(self, repo, new_src, force=False):
-        """ Move a project in the worktree (same remote url, different
-        src)
-
-        """
+        """ Move a project in the worktree (same remote url, different src) """
         project = self.get_git_project(repo.src)
         if not project:
-            return
+            return False
         ui.info("* moving", ui.blue, project.src,
                 ui.reset, "to", ui.blue, new_src)
         new_path = os.path.join(self.worktree.root, new_src)
@@ -234,7 +236,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
                 ui.error(new_path, "already exists")
                 ui.error("If you are sure there is nothing valuable here, "
                          "remove this directory and try again")
-                return
+                return False
         new_base_dir = os.path.dirname(new_path)
         try:
             qisys.sh.mkdir(new_base_dir, recursive=True)
@@ -243,23 +245,21 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             ui.error("Error when moving", project.src, "to", new_path,
                      "\n", e, "\n",
                      "Repository left in", project.src)
-            return
+            return False
         self.worktree.move_project(project.src, new_src)
         project.src = new_src
         self.save_project_config(project)
         return True
 
-    def checkout(self, branch, force=False):  # pylint: disable=too-many-locals,unused-argument
-        """ Called by ``qisrc checkout``
-
+    def checkout(self, branch, force=False):
+        """
+        Called by ``qisrc checkout``
         For each project, checkout the branch if it is different than
         the default branch of the manifest.
-
         """
+        # FIXME: Why is there a branch parameter if not used
         ui.info(ui.green, ":: Checkout projects ...")
         errors = list()
-        manifest_xml = os.path.join(self.syncer.manifest_repo, "manifest.xml")
-        manifest = qisrc.manifest.Manifest(manifest_xml)  # pylint: disable=unused-variable
         to_checkout = list()
         for project in self.git_projects:
             if project.default_branch is None:
@@ -270,12 +270,10 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             git = qisrc.git.Git(project.path)
             if git.get_current_branch() != branch_name:
                 to_checkout.append(project)
-
         n = len(to_checkout)
         if n == 0:
             ui.info(ui.green, "Nothing to checkout")
             return True
-
         max_src = max([len(x.src) for x in to_checkout])
         for i, project in enumerate(to_checkout):
             ui.info_count(i, n, ui.bold, "Checkout",
@@ -296,9 +294,9 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         return False
 
     def get_projects_on_branch(self, branch):
-        """ Return a dict (src, project) for every project as configured
+        """
+        Return a dict (src, project) for every project as configured
         on the given branch of the manifest.
-
         """
         res = dict()
         ref = "origin/" + branch
@@ -324,11 +322,14 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             self.worktree.remove_project(project.src)
 
     def _get_elem(self, src):
+        """ Get Elem """
         for xml_elem in self._root_xml.findall("project"):
             if xml_elem.get("src") == src:
                 return xml_elem
+        return None
 
     def _set_elem(self, src, new_elem):
+        """ Set Elem """
         # remove it first if it exits
         for xml_elem in self._root_xml.findall("project"):
             if xml_elem.get("src") == src:
@@ -349,6 +350,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         qisys.qixml.write(self._root_xml, self.git_xml)
 
     def __repr__(self):
+        """ Representation """
         return "<GitWorkTree in %s>" % self.root
 
 
@@ -371,4 +373,5 @@ Tips:
 
 
 class NoSuchGitProject(Exception):
+    """ NoSuchGitProject Exception """
     pass

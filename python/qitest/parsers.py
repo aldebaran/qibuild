@@ -1,18 +1,21 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-""" Collection of parser fonctions for qitests actions
-"""
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Collection of parser fonctions for qitests actions """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 
 import qisys.parsers
-import qibuild.parsers
 import qitest.project
+import qibuild.parsers
 
 
 def test_parser(parser, with_num_jobs=True):
+    """ Test Parser """
     qisys.parsers.worktree_parser(parser)
     group = parser.add_argument_group("test options")
     group.add_argument("--perf", dest="perf", action="store_true",
@@ -46,7 +49,6 @@ def test_parser(parser, with_num_jobs=True):
                        "directory (instead of build-<platform>/sdk/coverage-results)")
     group.add_argument("--root-output-dir", dest="test_output_dir", metavar="ROOT_OUTPUT_DIR",
                        help="same as --test-output-dir (deprecated)")
-
     group.add_argument("--no-capture", dest="capture", action="store_false")
     group.add_argument("--ignore-timeouts", dest="ignore_timeouts", action="store_true",
                        help="Ignore timeouts when running tests")
@@ -56,11 +58,11 @@ def test_parser(parser, with_num_jobs=True):
                         ignore_timeouts=False)
     if with_num_jobs:
         qisys.parsers.parallel_parser(group, default=1)
-
     return group
 
 
 def get_test_runner(args, build_project=None, qitest_json=None):
+    """ Get Test Runner """
     test_project = None
     if not qitest_json:
         qitest_json = vars(args).get("qitest_json")
@@ -74,15 +76,13 @@ def get_test_runner(args, build_project=None, qitest_json=None):
         if build_project:
             test_project = build_project.to_test_project()
         else:
-            return
-
+            return None
     test_runner = qibuild.test_runner.ProjectTestRunner(test_project)
     if build_project:
         test_runner.cwd = build_project.sdk_directory
         test_runner.env = build_project.build_worktree.get_env()
     else:
         test_runner.cwd = qisys.sh.to_native_path(os.path.dirname(qitest_json))
-
     test_runner.patterns = args.patterns
     test_runner.excludes = args.excludes
     test_runner.perf = args.perf
@@ -99,11 +99,11 @@ def get_test_runner(args, build_project=None, qitest_json=None):
     test_runner.capture = args.capture
     test_runner.last_failed = args.last_failed
     test_runner.ignore_timeouts = args.ignore_timeouts
-
     return test_runner
 
 
 def parse_build_projects(args):
+    """ Parse Build Projects """
     res = list()
     try:
         build_worktree = qibuild.parsers.get_build_worktree(args)
@@ -127,19 +127,17 @@ def parse_build_projects(args):
 
 
 def get_test_runners(args):
+    """ Get Test Runners """
     res = list()
     qitest_jsons = args.qitest_jsons or list()
-
     # first case: qitest.json in current working directory
     test_runner = get_test_runner(args)
     if test_runner:
         res.append(test_runner)
-
     # second case: qitest.json specified with --qitest-json
     for qitest_json in qitest_jsons:
         test_runner = get_test_runner(args, qitest_json=qitest_json)
         res.append(test_runner)
-
     # third case: parsing build projects
     build_projects_runners = parse_build_projects(args)
     # avoid appending a test_runner guessed from a build project
@@ -149,14 +147,10 @@ def get_test_runners(args):
     for test_runner in build_projects_runners:
         if test_runner.cwd not in known_cwds:
             res.append(test_runner)
-
     if args.coverage and not build_projects_runners:
-        raise Exception("""\
---coverage can only be used from a qibuild CMake project
-""")
+        raise Exception("""--coverage can only be used from a qibuild CMake project\n""")
     elif args.coverage:
         return build_projects_runners
-
     if not res:
         raise Exception("Nothing found to test")
     return res

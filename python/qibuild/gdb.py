@@ -1,23 +1,23 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-""" Tools for the GNU debugger
-
-"""
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Tools for the GNU debugger """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
+import sys
 import subprocess
 
-from qisys import ui
 import qisys.sh
 import qisys.command
+from qisys import ui
 
 
 def contains_debug_info(filename, objdump=None):
-    """ Check that an elf contains debug info
-
-    """
+    """ Check that an elf contains debug info. """
     if not objdump:
         objdump = "objdump"
     retcode = subprocess.call([objdump, "-j", ".debug_info", "-h", filename],
@@ -26,16 +26,13 @@ def contains_debug_info(filename, objdump=None):
 
 
 def split_debug(src, objcopy=None, objdump=None):
-    """ Split the debug information in the `src` binary.
-
+    """
+    Split the debug information in the `src` binary.
     The debug information will be put in a .debug directory next
     to the executable
-
     <base_dir>/bin/foo
     <base_dir>/bin/.debug/foo
-
-    Also uses objcopy so that the binaries and libraries still remain
-    usable with gdb
+    Also uses objcopy so that the binaries and libraries still remain usable with gdb
     """
     if objcopy is None:
         objcopy = "objcopy"
@@ -70,5 +67,4 @@ def split_debug(src, objcopy=None, objdump=None):
 
 
 if __name__ == "__main__":
-    import sys
     split_debug(sys.argv[1])

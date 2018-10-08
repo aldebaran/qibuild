@@ -1,17 +1,21 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-import os
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test Parser """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
+import os
 import pytest
 
 import qisys.sh
 import qibuild.parsers
 
-# pylint: disable=unused-variable
-
 
 def test_parse_one_arg(build_worktree, args):
+    """ Test Parse One Arg """
     world = build_worktree.create_project("world")
     args.projects = ["world"]
     args.dep_types = "default"
@@ -20,6 +24,7 @@ def test_parse_one_arg(build_worktree, args):
 
 
 def test_finds_parent_qibuild_project(build_worktree, args):
+    """ Test Find Parent QiBuild Project """
     args.dep_types = "default"
     a_proj = build_worktree.create_project("a")
     worktree = build_worktree.worktree
@@ -33,12 +38,14 @@ def test_finds_parent_qibuild_project(build_worktree, args):
 
 
 def test_set_generator(build_worktree, args):
+    """ Test Set Generator """
     args.cmake_generator = "Ninja"
     build_config = qibuild.parsers.get_build_config(build_worktree, args)
     assert build_config.cmake_generator == "Ninja"
 
 
 def test_get_one_project(build_worktree, args):
+    """ Test Get One Project """
     build_worktree.create_project("hello")
     world = build_worktree.create_project("world")
     args.projects = ["world"]
@@ -46,7 +53,6 @@ def test_get_one_project(build_worktree, args):
     with qisys.sh.change_cwd(world.path):
         args.projects = None
         assert qibuild.parsers.get_one_build_project(build_worktree, args) == world
-    # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         args.all = True
         qibuild.parsers.get_one_build_project(build_worktree, args)
@@ -54,6 +60,7 @@ def test_get_one_project(build_worktree, args):
 
 
 def test_default_all(build_worktree, args):
+    """ Test Default All """
     args.dep_types = "default"
     world_proj = build_worktree.create_project("world")
     foo_proj = build_worktree.create_project("foo")
@@ -72,8 +79,9 @@ def test_default_all(build_worktree, args):
 
 
 def test_using_dash_s(build_worktree, args):
+    """ Test Using Dash s """
     args.dep_types = []
-    world_proj = build_worktree.create_project("world")
+    _world_proj = build_worktree.create_project("world")
     hello_proj = build_worktree.create_project("hello", build_depends=["world"])
     with qisys.sh.change_cwd(hello_proj.path):
         assert qibuild.parsers.get_build_projects(build_worktree, args) == [hello_proj]

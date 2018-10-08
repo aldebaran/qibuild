@@ -1,25 +1,26 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" This package contains the WorkTree object. """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-"""This package contains the WorkTree object.
-
-"""
-
-import abc
-import locale
 import os
+import abc
 import ntpath
-import posixpath
+import locale
 import operator
-
-import qisys.project
-import qisys.command
-import qisys.sh
-import qisys.qixml
-from qisys import ui
+import posixpath
+import six
 
 import qibuild.config
+import qisys.sh
+import qisys.qixml
+import qisys.project
+import qisys.command
+from qisys import ui
 
 
 class WorkTree(object):
@@ -28,17 +29,16 @@ class WorkTree(object):
     def __init__(self, root, sanity_check=True):
         """
         Construct a new worktree
-
         :param root: The root directory of the worktree.
         :param allow_nested: Allow nested worktrees.
-
         """
+        if isinstance(root, str):
+            root = root.decode("utf-8")
         if not os.path.exists(root):
             raise Exception(""" \
 Could not open WorkTree in {0}.
 This path does not exist
 """.format(root))
-
         self._observers = list()
         self.root = root
         self.cache = self.load_cache()
@@ -52,21 +52,15 @@ This path does not exist
     def register_self(self):
         """ Register to the global list of all worktrees  in
         ~/.config/qi/qibuild.xml
-
         """
         qibuild_cfg = qibuild.config.QiBuildConfig()
         to_read = qibuild.config.get_global_cfg_path()
         qibuild_cfg.read(to_read, create_if_missing=True)
-        encoding = locale.getpreferredencoding()
-        as_unicode = self.root.decode(encoding)
-        if qibuild_cfg.add_worktree(as_unicode):
+        if qibuild_cfg.add_worktree(self.root):
             qibuild_cfg.write()
 
     def register(self, observer):
-        """ Called when an observer wants to be notified
-        about project changes
-
-        """
+        """ Called when an observer wants to be notified about project changes """
         self._observers.append(observer)
 
     def load_cache(self):
@@ -84,10 +78,9 @@ This path does not exist
         return cache
 
     def reload(self):
-        """ Re-read every qiproject.xml.
-        Useful when projects are added or removed, or when
-        qiproject.xml change
-
+        """
+        Re-read every qiproject.xml.
+        Useful when projects are added or removed, or when qiproject.xml change
         """
         self.cache = self.load_cache()
         self.load_projects()
@@ -106,14 +99,14 @@ This path does not exist
 
     @property
     def dot_qi(self):
-        """Get the dot_qi directory."""
+        """ Get the dot_qi directory. """
         res = os.path.join(self.root, ".qi")
         qisys.sh.mkdir(res)
         return res
 
     @property
     def worktree_xml(self):
-        """Get the path to .qi/worktree.xml """
+        """ Get the path to .qi/worktree.xml """
         worktree_xml = os.path.join(self.dot_qi, "worktree.xml")
         if not os.path.exists(worktree_xml):
             with open(worktree_xml, "w") as fp:
@@ -121,32 +114,26 @@ This path does not exist
         return worktree_xml
 
     def has_project(self, path):
+        """ Return True if the Path is a Projet """
         src = self.normalize_path(path)
         srcs = (self.normalize_path(p.src) for p in self.projects)
         return src in srcs
 
     def load_projects(self):
-        """ For every project in cache, re-read the subprojects and
-        and them to the list
-
-        """
+        """ For every project in cache, re-read the subprojects and and them to the list """
         self.projects = list()
         srcs = self.cache.get_srcs()
         for src in srcs:
             project = qisys.project.WorkTreeProject(self, src)
             project.parse_qiproject_xml()
             self.projects.append(project)
-
         res = set(self.projects)
         for project in self.projects:
             self._rec_parse_sub_projects(project, res)
         self.projects = sorted(res, key=operator.attrgetter("src"))
 
     def _rec_parse_sub_projects(self, project, res):
-        """ Recursively parse every project and subproject,
-        filling up the res list.
-
-        """
+        """ Recursively parse every project and subproject, filling up the res list. """
         for sub_project_src in project.subprojects:
             src = os.path.join(project.src, sub_project_src)
             src = qisys.sh.to_posix_path(src)
@@ -156,13 +143,12 @@ This path does not exist
             self._rec_parse_sub_projects(sub_project, res)
 
     def get_project(self, src, raises=False):
-        """ Get a project
-
+        """
+        Get a project
         :param src: a absolute path, or a path relative to the worktree
         :param raises: Raises if project is not found
         :returns:  a :py:class:`.WorkTreeProject` instance or None if raises is
             False and project is not found
-
         """
         src = self.normalize_path(src)
         if not self.has_project(src):
@@ -172,14 +158,15 @@ This path does not exist
                                    src, [self.normalize_path(x.src) for x in self.projects])
             raise WorkTreeError(mess)
         match = (p for p in self.projects if self.normalize_path(p.src) == src)
+        if six.PY3:
+            return match.__next__()
         return match.next()
 
     def add_project(self, path):
-        """ Add a project to a worktree
-
+        """
+        Add a project to a worktree
         :param path: path to the project, can be absolute,
                     or relative to the worktree root
-
         """
         src = self.normalize_path(path)
         if self.has_project(src):
@@ -195,12 +182,11 @@ This path does not exist
         return project
 
     def remove_project(self, path, from_disk=False):
-        """ Remove a project from a worktree
-
+        """
+        Remove a project from a worktree
         :param path: path to the project, can be absolute,
                     or relative to the worktree root
         :param from_disk: also erase project files from disk
-
         """
         src = self.normalize_path(path)
         project = self.get_project(src, raises=True)
@@ -215,9 +201,7 @@ This path does not exist
         """ Move a project from a worktree """
         src = self.normalize_path(path)
         new_src = self.normalize_path(new_path)
-
-        __project = self.get_project(src, raises=True)  # pylint: disable=unused-variable
-
+        __project = self.get_project(src, raises=True)
         if self.has_project(new_src):
             mess = "Could not move project\n"
             mess += "Path %s is already registered\n" % src
@@ -230,10 +214,7 @@ This path does not exist
             observer.reload()
 
     def normalize_path(self, path):
-        """ Make sure the path is a POSIX path, relative to
-        the worktree root
-
-        """
+        """ Make sure the path is a POSIX path, relative to the worktree root """
         if os.path.isabs(path):
             path = os.path.relpath(path, start=self.root)
         path = path.replace(ntpath.sep, posixpath.sep)
@@ -242,6 +223,7 @@ This path does not exist
         return path
 
     def __repr__(self):
+        """ String Representation """
         res = "<WorkTree in %s\n" % self.root
         res += repr_list_projects(self.projects)
         res += ">\n"
@@ -249,6 +231,7 @@ This path does not exist
 
 
 def repr_list_projects(projects, name="projects"):
+    """ String Representation os a Project List """
     res = ""
     if projects:
         res += name
@@ -259,12 +242,12 @@ def repr_list_projects(projects, name="projects"):
 
 
 def is_worktree(path):
-    path = os.path.join(path, ".qi")
-    return os.path.isdir(path)
+    """ Return True if the Path is a WorkTree """
+    return os.path.isdir(os.path.join(path, ".qi"))
 
 
 def guess_worktree(cwd=None, raises=False):
-    """Look for parent directories until a .qi dir is found somewhere."""
+    """ Look for parent directories until a .qi dir is found somewhere. """
     if cwd is None:
         cwd = os.getcwd()
     cwd = qisys.sh.to_native_path(cwd)
@@ -281,25 +264,24 @@ def guess_worktree(cwd=None, raises=False):
 
 
 class WorkTreeObserver(object):
-    """ To be subclasses for objects willing to be
-    notified when a project is added or removed from
-    the worktree
-
     """
+    To be subclasses for objects willing to be notified
+    when a project is added or removed from the worktree
+    """
+
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def reload(self):
+        """ Reload """
         pass
 
 
 class WorkTreeCache(object):
-    """ Cache the paths to all the projects registered
-    in a worktree
-
-    """
+    """ Cache the paths to all the projects registered in a worktree """
 
     def __init__(self, xml_path):
+        """ WorkTreeCache Init """
         self.xml_path = xml_path
         self.xml_root = qisys.qixml.read(xml_path).getroot()
 
@@ -335,6 +317,7 @@ class NotInWorkTree(Exception):
     """ Just a custom exception. """
 
     def __str__(self):
+        """ String Representation """
         return """ Could not guess worktree from current working directory
   Here is what you can do :
      - try from a valid work tree
@@ -344,10 +327,14 @@ class NotInWorkTree(Exception):
 
 
 class NoSuchProject(Exception):
+    """ NoSuchProject Custom Exception """
+
     def __init__(self, name, message):
+        """ NoSuchProject Init """
         super(NoSuchProject, self).__init__()
         self.name = name
         self.message = message
 
     def __str__(self):
+        """ String Representation """
         return self.message

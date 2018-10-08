@@ -1,26 +1,27 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-"""Run git grep on every project
-
-Options are the same as in git grep, e.g.:
-
-  qisrc grep -- -niC2 foo
-
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
 """
+Run git grep on every project
+Options are the same as in git grep, e.g.:
+  qisrc grep -- -niC2 foo
+"""
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import sys
 
-from qisys import ui
 import qisrc.git
 import qisrc.parsers
 import qibuild.parsers
+from qisys import ui
 
 
 def configure_parser(parser):
-    """Configure parser for this action."""
+    """ Configure parser for this action. """
     qisrc.parsers.worktree_parser(parser)
     qibuild.parsers.project_parser(parser, positional=False)
     parser.add_argument("--path", help="type of patch to print",
@@ -29,8 +30,8 @@ def configure_parser(parser):
                         help="git grep options preceded with -- to escape the leading '-'")
 
 
-def do(args):  # pylint: disable=too-many-locals
-    """Main entry point."""
+def do(args):
+    """ Main entry point. """
     git_worktree = qisrc.parsers.get_git_worktree(args)
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args, default_all=True,
                                                   use_build_deps=args.use_deps)
@@ -44,11 +45,9 @@ def do(args):  # pylint: disable=too-many-locals
             git_grep_opts.insert(0, "--null")
     if ui.config_color(sys.stdout):
         git_grep_opts.insert(0, "--color=always")
-
     if not git_projects:
         qisrc.worktree.on_no_matching_projects(git_worktree, groups=args.groups)
         sys.exit(0)
-
     max_src = max(len(x.src) for x in git_projects)
     retcode = 1
     for i, project in enumerate(git_projects):

@@ -1,28 +1,26 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-"""Automatic testing for handling archives
-
-"""
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Automatic testing for handling archives """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import zipfile
-
 import pytest
 
 import qisys
-
-from qisys.archive import extract, guess_algo  # pylint: disable=unused-import
+from qisys.archive import extract, guess_algo
 
 # We don't use the stdlib for tar: it does not have
 # all the features `tar` has and is slower, so all tar tests
 # are disabled on Windows
 
-# pylint: disable=unused-variable
-
 
 def test_create_extract_zip_simple(tmpdir):
+    """ Test Create Extract ZIP Simple """
     tmpdir.ensure("foo/a/b.txt", file=True)
     tmpdir.ensure("foo/c.txt", file=True)
     foo_zip = qisys.archive.compress(tmpdir.join("foo").strpath)
@@ -34,6 +32,7 @@ def test_create_extract_zip_simple(tmpdir):
 
 
 def test_create_extract_tar_simple(tmpdir):
+    """ Test Create Extract TAR Simple """
     if os.name == 'nt':
         return
     tmpdir.ensure("foo/a/b.txt", file=True)
@@ -48,6 +47,7 @@ def test_create_extract_tar_simple(tmpdir):
 
 
 def test_rewrite_top_dir_bz2(tmpdir):
+    """ Test Rewrite Top Dir BZ2 """
     if os.name == 'nt':
         return
     # We need that when converting gentoo binary packages
@@ -64,28 +64,30 @@ def test_rewrite_top_dir_bz2(tmpdir):
 
 
 def test_compress_broken_symlink(tmpdir):
+    """ Test Compare Broken SymLink """
     # Windows doesn't support symlink
     if os.name == 'nt':
         return
     src = tmpdir.mkdir("src")
-    broken_symlink = os.symlink("/does/not/exist", src.join("broken").strpath)
-    res = qisys.archive.compress(src.strpath, algo="zip")
+    _broken_symlink = os.symlink("/does/not/exist", src.join("broken").strpath)  # pylint:disable=no-member
+    _res = qisys.archive.compress(src.strpath, algo="zip")
 
 
 def test_extract_invalid_empty(tmpdir):
+    """ Test Extract Invalid Empty """
     if os.name == 'nt':
         return
     srcdir = tmpdir.mkdir("src")
     destdir = tmpdir.mkdir("dest")
     archive = srcdir.join("empty.tar.gz")
     archive.write("")
-    # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         qisys.archive.extract(archive.strpath, destdir.strpath)
     assert "tar failed" in e.value.message
 
 
 def test_extract_invalid_no_topdir(tmpdir):
+    """ Test Extract Invalid No Top Dir """
     src = tmpdir.mkdir("src")
     src.ensure("superfluous.txt", file=True)
     src.ensure("foo/a.txt", file=True)
@@ -96,15 +98,14 @@ def test_extract_invalid_no_topdir(tmpdir):
             archive.write("superfluous.txt")
             archive.write("foo/a.txt")
             archive.write("foo/b.txt")
-
     dest = tmpdir.join("dest")
-    # pylint: disable-msg=E1101
     with pytest.raises(qisys.archive.InvalidArchive) as e:
         qisys.archive.extract(buggy_zip_path, dest.strpath)
     assert "same top dir" in str(e.value)
 
 
 def test_flat(tmpdir):
+    """ Test Flat """
     src = tmpdir.mkdir("src")
     src.ensure("lib", "libfoo.so", file=True)
     src.ensure("include", "foo.h", file=True)
@@ -117,6 +118,7 @@ def test_flat(tmpdir):
 
 
 def test_symlinks(tmpdir):
+    """ Test Simlinks """
     src = tmpdir.mkdir("src")
     src.ensure("lib", "libfoo.so.42", file=True)
     src.join("lib", "libfoo.so").mksymlinkto("libfoo.so.42")
@@ -128,6 +130,7 @@ def test_symlinks(tmpdir):
 
 
 def test_returned_value_when_extracting_flat_package(tmpdir):
+    """ Test Returned Value When Extracting Flat Package """
     src = tmpdir.mkdir("src")
     src.ensure("a", file=True)
     src.ensure("b", file=True)
