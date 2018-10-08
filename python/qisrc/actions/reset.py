@@ -1,28 +1,30 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-"""Reset repositories to a clean state
-
-By default, make sure the repository is on the correct branch
-
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
 """
+Reset repositories to a clean state.
+By default, make sure the repository is on the correct branch
+"""
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import sys
 
-from qisys import ui
+import qisrc.git
+import qisrc.reset
+import qisrc.status
+import qisrc.parsers
+import qisrc.snapshot
 import qisys.parsers
 import qisys.worktree
 import qisys.interact
-import qisrc.git
-import qisrc.snapshot
-import qisrc.status
-import qisrc.parsers
-import qisrc.reset
+from qisys import ui
 
 
 def configure_parser(parser):
-    """Configure parser for this action."""
+    """ Configure parser for this action. """
     qisys.parsers.worktree_parser(parser)
     qisys.parsers.project_parser(parser)
     parser.add_argument("-f", "--force", action="store_true",
@@ -35,19 +37,16 @@ def configure_parser(parser):
     parser.set_defaults(ignore_groups=False)
 
 
-def do(args):  # pylint: disable=too-many-branches
-    """Main entry points."""
-
+def do(args):
+    """ Main entry points. """
     git_worktree = qisrc.parsers.get_git_worktree(args)
     snapshot = None
     if args.snapshot:
         snapshot = qisrc.snapshot.Snapshot()
         snapshot.load(args.snapshot)
-
     if snapshot and snapshot.format_version and snapshot.format_version >= 1:
         reset_manifest(git_worktree, snapshot,
                        ignore_groups=args.ignore_groups)
-
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args,
                                                   default_all=True,
                                                   use_build_deps=True)
@@ -61,19 +60,15 @@ def do(args):  # pylint: disable=too-many-branches
             ui.warning(message)
             errors.append(src)
             continue
-
         if not git_project.default_branch:
             if git_project.fixed_ref:
                 qisrc.reset.clever_reset_ref(git_project, git_project.fixed_ref)
                 continue
-
             ui.warning(git_project.src, "not in manifest, skipping")
             continue
-
         branch = git_project.default_branch.name
         remote = git_project.default_remote.name
         git.safe_checkout(branch, remote, force=True)
-
         to_reset = None
         if args.snapshot:
             to_reset = snapshot.refs.get(src)
@@ -88,7 +83,6 @@ def do(args):  # pylint: disable=too-many-branches
             qisrc.reset.clever_reset_ref(git_project, to_reset)
         except Exception:
             errors.append(src)
-
     if not errors:
         return
     ui.error("Failed to reset some projects")
@@ -98,6 +92,7 @@ def do(args):  # pylint: disable=too-many-branches
 
 
 def reset_manifest(git_worktree, snapshot, ignore_groups=False):
+    """ Reset Manifest """
     manifest = snapshot.manifest
     if ignore_groups:
         groups = git_worktree.manifest.groups

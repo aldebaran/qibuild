@@ -1,13 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-import qisrc.snapshot
-from qisrc.test.conftest import TestGitWorkTree  # pylint: disable=unused-import
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test Snapshot """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-# pylint: disable=unused-variable
+import qisrc.snapshot
+from qisrc.test.conftest import TestGitWorkTree
 
 
 def test_dump_load(tmpdir):
+    """ Test Dump Load """
     snapshot = qisrc.snapshot.Snapshot()
     snapshot.refs["foo"] = "a42fb"
     snapshot.refs["bar"] = "bccad"
@@ -19,6 +24,7 @@ def test_dump_load(tmpdir):
 
 
 def test_generate_load(git_worktree, tmpdir):
+    """ Test Generate Load """
     foo_proj = git_worktree.create_git_project("foo")
     foo_git = qisrc.git.Git(foo_proj.path)
     _, foo_ref_expected = foo_git.call("rev-parse", "HEAD", raises=False)
@@ -26,18 +32,16 @@ def test_generate_load(git_worktree, tmpdir):
     qisrc.snapshot.generate_snapshot(git_worktree, snapshot_txt)
     snapshot = qisrc.snapshot.Snapshot()
     snapshot.load(snapshot_txt)
-    foo_ref = snapshot.refs["foo"]
-
+    _foo_ref = snapshot.refs["foo"]
     # Make a commit and an other diff
     foo_git.commit("--message", "empty", "--allow-empty")
-
     qisrc.snapshot.load_snapshot(git_worktree, snapshot_txt)
     _, foo_ref_actual = foo_git.call("rev-parse", "HEAD", raises=False)
-
     assert foo_ref_actual == foo_ref_expected
 
 
 def test_always_fetch(git_worktree, git_server, tmpdir):
+    """ Test Always Fetch """
     foo_repo = git_server.create_repo("foo.git")
     git_worktree.clone_missing(foo_repo)
     foo_proj = git_worktree.get_git_project("foo")
@@ -47,18 +51,17 @@ def test_always_fetch(git_worktree, git_server, tmpdir):
                                    raises=False)
     assert rc == 0
     remote_sha1 = remote_sha1.split()[0]
-
     snapshot = qisrc.snapshot.Snapshot()
     snapshot.refs["foo"] = remote_sha1
     snapshot_txt = tmpdir.join("snapshot.txt").strpath
     snapshot.dump(snapshot_txt)
-
     qisrc.snapshot.load_snapshot(git_worktree, snapshot_txt)
     _, local_sha1 = foo_git.call("rev-parse", "HEAD", raises=False)
     assert local_sha1 == remote_sha1
 
 
 def test_load_file_object(tmpdir):
+    """ Test Load File Object """
     snapshot = qisrc.snapshot.Snapshot()
     snapshot.refs["foo"] = "d34db33f"
     snapshot_txt = tmpdir.join("snap.txt").strpath
@@ -70,6 +73,7 @@ def test_load_file_object(tmpdir):
 
 
 def test_load_file_path(tmpdir):
+    """ Test Load File Path """
     snapshot = qisrc.snapshot.Snapshot()
     snapshot.refs["foo"] = "d34db33f"
     snapshot_txt = tmpdir.join("snap.txt").strpath
@@ -80,6 +84,7 @@ def test_load_file_path(tmpdir):
 
 
 def test_stores_manifest_in_snapshot(git_server, git_worktree):
+    """ Test Stores Manifest In Snapshot """
     git_server.create_repo("foo")
     manifest_url = git_server.manifest_url
     git_worktree.configure_manifest(manifest_url)
@@ -88,7 +93,8 @@ def test_stores_manifest_in_snapshot(git_server, git_worktree):
     assert manifest.url == manifest_url
 
 
-def test_generate_load_json(tmpdir, git_server, git_worktree):  # pylint: disable=unused-argument
+def test_generate_load_json(tmpdir, git_server, git_worktree):
+    """ Test Loca JSON """
     snapshot1 = qisrc.snapshot.Snapshot()
     snapshot1.manifest = qisrc.sync.LocalManifest()
     snapshot1.manifest.ref = "refs/heads/master"

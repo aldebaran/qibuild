@@ -1,14 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Fake Interact """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 
 class FakeInteract(object):
-    """ A class to tests code depending on qisys.interact
-
-    """
+    """ A class to tests code depending on qisys.interact """
 
     def __init__(self):
+        """ FakeInteract Init """
         self.answers_type = None
         self.answer_index = -1
         self._answers = None
@@ -17,14 +21,14 @@ class FakeInteract(object):
 
     @property
     def answers(self):
+        """ Answers Getter """
         if self._answers is None:
             raise Exception("FakeInteract not initialized")
         return self._answers
 
-    # pylint: disable-msg=E1101
     @answers.setter
-    # pylint: disable-msg=E0102
     def answers(self, value):
+        """ Answers Setter """
         if isinstance(value, dict):
             self.answers_type = "dict"
         elif isinstance(value, list):
@@ -34,6 +38,7 @@ class FakeInteract(object):
         self._answers = value
 
     def find_answer(self, message, choices=None, default=None):
+        """ Find Answer """
         keys = self.answers.keys()
         for key in keys:
             if key in message.lower():
@@ -52,46 +57,53 @@ class FakeInteract(object):
         mess += "Known keys are: %s" % ", ".join(keys)
         raise Exception(mess)
 
-    def ask_choice(self, choices, message, **unused):  # pylint: disable=unused-argument
-        print "::", message
+    def ask_choice(self, choices, message, **_unused):
+        """ Ask Choice """
+        print("::", message)
         for choice in choices:
-            print "* ", choice
+            print("* ", choice)
         answer = self._get_answer(message, choices)
-        print ">", answer
+        print(">", answer)
         return answer
 
     def ask_yes_no(self, message, default=False):
-        print "::", message,
+        """ Ask Yes / No """
+        print("::", message,)
         if default:
-            print "(Y/n)"
+            print("(Y/n)")
         else:
-            print "(y/N)"
+            print("(y/N)")
         answer = self._get_answer(message, default=default)
-        print ">", answer
+        print(">", answer)
         return answer
 
     def ask_path(self, message):
-        print "::", message
+        """ Ask Path """
+        print("::", message)
         answer = self._get_answer(message)
-        print ">", answer
+        print(">", answer)
         return answer
 
     def ask_string(self, message):
-        print "::", message
+        """ Ask String """
+        print("::", message)
         answer = self._get_answer(message)
-        print ">", answer
+        print(">", answer)
         return answer
 
     def ask_program(self, message):
-        print "::", message
+        """ Ask Program """
+        print("::", message)
         answer = self._get_answer(message)
-        print ">", answer
+        print(">", answer)
         return answer
 
     def get_editor(self):
+        """ Return the Editor """
         return self.editor
 
     def _get_answer(self, message, choices=None, default=None):
+        """ Get an Answer """
         question = dict()
         question['message'] = message
         question['choices'] = choices
@@ -99,6 +111,5 @@ class FakeInteract(object):
         self.questions.append(question)
         if self.answers_type == "dict":
             return self.find_answer(message, choices=choices, default=default)
-
         self.answer_index += 1
         return self.answers[self.answer_index]

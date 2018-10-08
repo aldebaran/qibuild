@@ -1,27 +1,33 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
 import sys
 import re
-import zipfile
 import shlex
+import zipfile
 
-from qisys.qixml import etree
-import qisys.version
 import qisrc.license
 import qibuild.deps
+import qisys.version
+from qisys.qixml import etree
 
 
-class QiPackage(object):  # pylint: disable=too-many-instance-attributes
-    """ Binary package for use with qibuild.
-
+class QiPackage(object):
+    """
+    Binary package for use with qibuild.
     Package names are unique in a given toolchain.
-    path is None until the package is added to a database
-
+    path is None until the package is added to a database.
     """
 
     def __init__(self, name, version=None, path=None):
+        """ QiPackage Init """
         self.name = name
         self.version = version
         self.target = None
@@ -46,6 +52,7 @@ class QiPackage(object):  # pylint: disable=too-many-instance-attributes
 
     @license.setter
     def license(self, value):
+        """ Write the Package Licence """
         package_xml = os.path.join(self.path, "package.xml")
         qisrc.license.write_license(package_xml, value)
 
@@ -57,7 +64,7 @@ class QiPackage(object):  # pylint: disable=too-many-instance-attributes
             qibuild.deps.read_deps_from_xml(self, xml_root)
 
     def to_xml(self):
-        """ Return an ``etree.Element`` representing this package """
+        """ Return an etree.Element representing this package """
         element = etree.Element("package")
         element.set("name", self.name)
         if self.path:
@@ -77,18 +84,15 @@ class QiPackage(object):  # pylint: disable=too-many-instance-attributes
         return element
 
     def install(self, destdir, components=None, release=True):
-        """ Install the given components of the package to the given destination
-
-        Will read
-
+        """
+        Install the given components of the package to the given destination.
+        Will read:
         * ``install_manifest_<component>.txt`` for each component if the file exists
         * ``<component>.mask`` to exclude files matching some regex if the mask exists
         * if none exits, will apply the ``qisys.sh.is_runtime`` filter when
           installing *runtime* component
-
         Note that when installing 'test' component, only the
-        install_manifest_test.txt manifest file will be read
-
+        install_manifest_test.txt manifest file will be read.
         """
         if self.subpkg:
             return list()
@@ -102,11 +106,14 @@ class QiPackage(object):  # pylint: disable=too-many-instance-attributes
         return installed_files
 
     def _install_all(self, destdir):
+        """ Install All """
         def filter_fun(x):
+            """ Filter package.xml """
             return x != "package.xml"
         return qisys.sh.install(self.path, destdir, filter_fun=filter_fun)
 
     def _install_component(self, component, destdir, release=True):
+        """ Install Component """
         installed_files = list()
         manifest_name = "install_manifest_%s.txt" % component
         if not release and sys.platform.startswith("win"):
@@ -122,9 +129,9 @@ class QiPackage(object):  # pylint: disable=too-many-instance-attributes
             if not mask and component == "runtime":
                 # retro-compat
                 def filter_fun(x):
+                    """ Filter Function """
                     return qisys.sh.is_runtime(x) and x != "package.xml"
                 return qisys.sh.install(self.path, destdir, filter_fun=filter_fun)
-
             # avoid install masks and package.xml
             mask.append(r"exclude .*\.mask")
             mask.append(r"exclude package\.xml")
@@ -141,6 +148,7 @@ class QiPackage(object):  # pylint: disable=too-many-instance-attributes
             return installed_files
 
     def _read_install_mask(self, mask_name):
+        """ Read Install Mask """
         mask_path = os.path.join(self.path, mask_name + ".mask")
         if not os.path.exists(mask_path):
             return list()
@@ -159,12 +167,16 @@ class QiPackage(object):  # pylint: disable=too-many-instance-attributes
             return mask
 
     def _install_with_mask(self, destdir, mask):
+        """ Install With Mask """
+
         def get_match(line, src):
+            """ Get Match """
             words = line.split()
             regex = " ".join(words[1:])
             return re.match(regex, src)
 
         def filter_fun(src):
+            """ Filter Function """
             src = qisys.sh.to_posix_path(src)
             positive_regexps = [x for x in mask if x.startswith("include")]
             negative_regexps = [x for x in mask if x.startswith("exclude")]
@@ -177,15 +189,13 @@ class QiPackage(object):  # pylint: disable=too-many-instance-attributes
                 if match:
                     return False
             return True
-
         return qisys.sh.install(self.path, destdir, filter_fun=filter_fun)
 
     def load_package_xml(self):
-        """ Load metadata from package.xml
-
+        """
+        Load metadata from package.xml.
         Assume self.path is set: must be called after
         the package has been added to a toolchain
-
         """
         package_xml = os.path.join(self.path, "package.xml")
         if not os.path.exists(package_xml):
@@ -197,10 +207,10 @@ class QiPackage(object):  # pylint: disable=too-many-instance-attributes
         self._post_add = root.get("post-add")
 
     def reroot_paths(self):
-        """ Make sure all the paths are absolute.
+        """
+        Make sure all the paths are absolute.
         Assume self.path is set: must be called after
-        the package has been added to a toolchain
-
+        the package has been added to a toolchain.
         """
         if self.toolchain_file:
             self.toolchain_file = os.path.join(self.path, self.toolchain_file)
@@ -210,15 +220,13 @@ class QiPackage(object):  # pylint: disable=too-many-instance-attributes
             self.cross_gdb = os.path.join(self.path, self.cross_gdb)
 
     def post_add(self):
-        """ Run the post-add script if it exists.
-
+        """
+        Run the post-add script if it exists.
         Raises:
             * CommandFailedException if the post-add script fails
         """
-
         if not self._post_add:
             return
-
         # Make sure the script is found in the package directory
         post_add_cmd = shlex.split(self._post_add)
         post_add_cmd[0] = os.path.join(self.path, post_add_cmd[0])
@@ -226,9 +234,11 @@ class QiPackage(object):  # pylint: disable=too-many-instance-attributes
         qisys.command.call(post_add_cmd, cwd=self.path)
 
     def __repr__(self):
+        """ QiPackage Representation """
         return "<Package %s %s>" % (self.name, self.version)
 
     def __str__(self):
+        """ QiPackage String Representation """
         if self.version:
             res = "%s-%s" % (self.name, self.version)
         else:
@@ -238,6 +248,11 @@ class QiPackage(object):  # pylint: disable=too-many-instance-attributes
         return res
 
     def __cmp__(self, other):
+        """
+        QiPackage Comarison
+        TODO: Update for Pyhon 3
+        https://portingguide.readthedocs.io/en/latest/comparisons.html#rich-comparisons
+        """
         if self.name == other.name:
             if self.version is None and other.version is not None:
                 return -1
@@ -251,6 +266,7 @@ class QiPackage(object):  # pylint: disable=too-many-instance-attributes
 
 
 def from_xml(element):
+    """ Load a Package From an XML File """
     name = element.get("name")
     if not name:
         raise Exception("missing 'name' attribute")
@@ -265,13 +281,10 @@ def from_xml(element):
     res.version = element.get("version")
     res.path = element.get("path")
     res.directory = element.get("directory")
-    res._post_add = element.get("post-add")  # pylint: disable=protected-access
+    res._post_add = element.get("post-add")
     res.subpkg = element.get("subpkg")
     if res.url and res.directory:
-        mess = """\
-Bad configuration for package %s. 'directory' and 'url' are
-mutually exclusive
-"""
+        mess = """\nBad configuration for package %s. 'directory' and 'url' are mutually exclusive"""
         raise Exception(mess % name)
     res.toolchain_file = element.get("toolchain_file")
     res.sysroot = element.get("sysroot")
@@ -283,6 +296,7 @@ mutually exclusive
 
 
 def from_archive(archive_path):
+    """ Load a Package from an Archive """
     archive = zipfile.ZipFile(archive_path)
     xml_data = archive.read("package.xml")
     element = etree.fromstring(xml_data)
@@ -290,20 +304,24 @@ def from_archive(archive_path):
 
 
 def extract(archive_path, dest):
+    """ Extract an Archive """
     if archive_path.endswith((".tar.gz", ".tbz2")):
         return _extract_legacy(archive_path, dest)
     with zipfile.ZipFile(archive_path) as archive:
-        if "package.xml" in archive.namelist():
-            return _extract_modern(archive_path, dest)
-
-        return _extract_legacy(archive_path, dest)
+        names = archive.namelist()
+    archive.close()
+    if "package.xml" in names:
+        return _extract_modern(archive_path, dest)
+    return _extract_legacy(archive_path, dest)
 
 
 def _extract_modern(archive_path, dest):
+    """ Extract the Modern Type Archives (ZIP) """
     return qisys.archive.extract(archive_path, dest, strict_mode=False)
 
 
 def _extract_legacy(archive_path, dest):
+    """ Extract the Legacy Types Archives (TAR.BZ and TBZ2) """
     dest = qisys.sh.to_native_path(dest)
     algo = qisys.archive.guess_algo(archive_path)
     extract_dest = os.path.dirname(dest)
@@ -315,5 +333,4 @@ def _extract_legacy(archive_path, dest):
         qisys.sh.mv(extract_path, dest)
         qisys.sh.rm(extract_path)
         return dest
-
     return extract_path

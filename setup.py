@@ -1,19 +1,21 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild Setup """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
-import sys
 from setuptools import setup, find_packages
-
-if (sys.version_info.major, sys.version_info.minor) != (2, 7):
-    sys.exit("Error: qibuild only works with Python2.7")
 
 
 def get_qibuild_cmake_files():
+    """ Get QiBuild CMake Files """
     res = list()
     cmake_dest = 'share/cmake'
-    for (root, directories, filenames) in os.walk('cmake'):
+    for (root, _dirs, filenames) in os.walk('cmake'):
         rel_root = os.path.relpath(root, 'cmake')
         if rel_root == ".":
             rel_root = ""
@@ -23,31 +25,37 @@ def get_qibuild_cmake_files():
     return res
 
 
-data_files = get_qibuild_cmake_files()
-
-setup(name="qibuild",
-      version="3.11.18",
-      description="The meta build framework",
-      url="http://doc.aldebaran.com/qibuild",
-      author="Aldebaran Robotics",
-      author_email="qibuild-dev@aldebaran-robotics.com",
-      py_modules=['qicd'],
-      packages=find_packages("python"),
-      package_dir={"": "python"},
-      include_package_data=True,
-      install_requires=["virtualenv"],
-      data_files=data_files,
-      license="BSD",
-      entry_points={
-          "console_scripts": [
-              "qidoc        = qisys.main:main",
-              "qilinguist   = qisys.main:main",
-              "qisrc        = qisys.main:main",
-              "qibuild      = qisys.main:main",
-              "qipkg        = qisys.main:main",
-              "qipy         = qisys.main:main",
-              "qitest       = qisys.main:main",
-              "qitoolchain  = qisys.main:main",
-          ]
-      }
-      )
+setup(
+    name="qibuild",
+    version="3.12",
+    description="The Meta Build Framework",
+    url="http://doc.aldebaran.com/qibuild",
+    author="SoftBank Robotics",
+    author_email="qibuild-dev@aldebaran-robotics.com",
+    py_modules=["qicd"],
+    packages=find_packages("python"),
+    package_dir={"": "python".encode("utf-8")},
+    include_package_data=True,
+    install_requires=[
+        "qi>=1.5",
+        "six>=1.11",
+        "sphinx<=1.3.1",
+        "sphinx_intl<=0.9.5",
+        "tabulate>=0.8",
+        "virtualenv>=16",
+    ],
+    data_files=get_qibuild_cmake_files(),
+    license="BSD",
+    entry_points={
+        "console_scripts": [
+            "qidoc        = qisys.main:main",
+            "qilinguist   = qisys.main:main",
+            "qisrc        = qisys.main:main",
+            "qibuild      = qisys.main:main",
+            "qipkg        = qisys.main:main",
+            "qipy         = qisys.main:main",
+            "qitest       = qisys.main:main",
+            "qitoolchain  = qisys.main:main",
+        ]
+    }
+)

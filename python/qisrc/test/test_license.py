@@ -1,11 +1,17 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import qisrc.license
 
 
 def test_reads_license_from_qiproject(tmpdir):
+    """ Test Read Licence """
     qiproject_xml = tmpdir.join("qiproject.xml")
     qiproject_xml.write("""
 <project version="3">
@@ -18,6 +24,7 @@ def test_reads_license_from_qiproject(tmpdir):
 
 
 def test_warns_when_no_license(tmpdir, record_messages):
+    """ Test Warn When No Licence """
     qiproject_xml = tmpdir.join("qiproject.xml")
     qiproject_xml.write("""
 <project version="3">
@@ -30,6 +37,7 @@ def test_warns_when_no_license(tmpdir, record_messages):
 
 
 def test_reads_license_from_package(tmpdir):
+    """ Test Read Licence From Package """
     package_xml = tmpdir.join("package.xml")
     package_xml.write("""
 <package name="foo" version="0.1">
@@ -41,6 +49,7 @@ def test_reads_license_from_package(tmpdir):
 
 
 def write_license(tmpdir):
+    """ Write Licence """
     qiproject_xml = tmpdir.join("qiproject.xml")
     qiproject_xml.write("<project>")
     qisrc.license.write_license(qiproject_xml.strpath, "BSD")

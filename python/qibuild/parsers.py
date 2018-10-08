@@ -1,18 +1,21 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Collection of parser fonctions for qibuild actions. """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-""" Collection of parser fonctions for qibuild actions
-"""
-
-from qisys import ui
-import qisys.parsers
+import qibuild.deps
 import qibuild.worktree
 import qibuild.cmake_builder
-import qibuild.deps
+import qisys.parsers
+from qisys import ui
 
 
 def cmake_build_parser(parser, group=None, with_build_parser=True):
+    """ CMake Build Parser """
     if with_build_parser:
         qisys.parsers.build_parser(parser, group=None)
     if not group:
@@ -23,6 +26,7 @@ def cmake_build_parser(parser, group=None, with_build_parser=True):
 
 
 def cmake_configure_parser(parser):
+    """ CMAke Configure Parser """
     group = parser.add_argument_group("configure options")
     group.add_argument("-G", "--cmake-generator", action="store",
                        help="Specify the CMake generator")
@@ -75,9 +79,7 @@ def cmake_configure_parser(parser):
 
 
 def convert_cmake_args_to_flags(args):
-    """ Convert 'helper' options into cmake flags
-
-    """
+    """ Convert 'helper' options into cmake flags. """
     if not args.cmake_flags:
         args.cmake_flags = list()
     if args.effective_cplusplus:
@@ -96,7 +98,7 @@ def convert_cmake_args_to_flags(args):
 
 
 def project_parser(parser, positional=True):
-    """Parser settings for every action using several build projects."""
+    """ Parser settings for every action using several build projects. """
     group = qisys.parsers.project_parser(parser, positional=positional)
     # --use-deps is only useful when it would make more sense to
     # NOT solve the deps by default (for instance for `qibuild test`)
@@ -110,10 +112,7 @@ def project_parser(parser, positional=True):
 
 
 def get_build_worktree(args, verbose=True):
-    """ Get a build worktree to use from a argparse.Namespace
-    object
-
-    """
+    """ Get a build worktree to use from a argparse.Namespace object. """
     worktree = qisys.parsers.get_worktree(args)
     build_worktree = qibuild.worktree.BuildWorkTree(worktree)
     if verbose:
@@ -121,7 +120,6 @@ def get_build_worktree(args, verbose=True):
                 build_worktree.root)
     build_config = get_build_config(build_worktree, args)
     build_worktree.build_config = build_config
-
     if verbose:
         if build_config.local_cmake:
             ui.info(ui.green, "Using additional cmake file", ui.blue,
@@ -131,15 +129,14 @@ def get_build_worktree(args, verbose=True):
                     build_config.toolchain.name)
         for profile in build_config.profiles:
             ui.info(ui.green, "Using profile:", ui.blue, profile)
-
     return build_worktree
 
 
 def get_build_projects(build_worktree, args, solve_deps=True, default_all=False):
-    """ Get a list of build projects to use from an argparse.Namespace
+    """
+    Get a list of build projects to use from an argparse.Namespace
     object. Useful when you do not need a CMakeBuilder.
-    You can choose whether or not to solve the dependencies
-
+    You can choose whether or not to solve the dependencies.
     """
     parser = BuildProjectParser(build_worktree)
     projects = parser.parse_args(args, default_all=default_all)
@@ -151,9 +148,9 @@ def get_build_projects(build_worktree, args, solve_deps=True, default_all=False)
 
 
 def get_one_build_project(build_worktree, args):
-    """ Get one build project from the command line.
-    (zero or one project name may be specified)
-
+    """
+    Get one build project from the command line.
+    (zero or one project name may be specified).
     """
     parser = BuildProjectParser(build_worktree)
     projects = parser.parse_args(args)
@@ -163,7 +160,7 @@ def get_one_build_project(build_worktree, args):
 
 
 def get_dep_types(args, default=None):
-    """ Get a list of dep types from the command line """
+    """ Get a list of dep types from the command line. """
     if not default:
         default = ["build", "runtime", "test"]
     if args.single:
@@ -174,9 +171,7 @@ def get_dep_types(args, default=None):
 
 
 def get_cmake_builder(args, default_dep_types=None):
-    """ Get a :py:class:`.CMakeBuilder` object from the command line
-
-    """
+    """ Get a :py:class:`.CMakeBuilder` object from the command line. """
     build_worktree = get_build_worktree(args)
     # dep solving will be made later by the CMakeBuilder
     build_projects = get_build_projects(build_worktree, args, solve_deps=False)
@@ -186,9 +181,9 @@ def get_cmake_builder(args, default_dep_types=None):
 
 
 def get_host_tools_builder(args):
-    """ Get a :py:class:`.CMakeBuilder  object from the command line
-    suitable to build host dependencies
-
+    """
+    Get a :py:class:`.CMakeBuilder  object from the
+    command line suitable to build host dependencies.
     """
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read(create_if_missing=True)
@@ -208,6 +203,7 @@ marked as a host config\
 
 
 def get_host_projects(build_worktree, args):
+    """ Get Host Projects """
     projects = list()
     if args.all:
         projects = build_worktree.build_projects
@@ -223,9 +219,7 @@ def get_host_projects(build_worktree, args):
 
 
 def get_build_config(build_worktree, args):
-    """ Get a CMakeBuildConfig object from an argparse.Namespace object
-
-    """
+    """ Get a CMakeBuildConfig object from an argparse.Namespace object """
     build_config = build_worktree.build_config
     if hasattr(args, "config"):
         if args.config:
@@ -252,31 +246,26 @@ def get_build_config(build_worktree, args):
             build_config.build_prefix = args.build_prefix
     return build_config
 
-##
-# Implementation details
-
 
 class BuildProjectParser(qisys.parsers.AbstractProjectParser):
     """ Implements AbstractProjectParser for a BuildWorkTree """
 
     def __init__(self, build_worktree):
+        """ BuildProjectParser Init """
         super(BuildProjectParser, self).__init__()
         self.build_worktree = build_worktree
 
     def all_projects(self, args):
+        """ Return All Projects """
         return self.build_worktree.build_projects
 
     def parse_no_project(self, args):
-        """ Try to find the closest worktree project that
-        mathes the current directory
-
-        """
+        """ Try to find the closest worktree project that mathes the current directory. """
         # step 1: find the closest buildable project
         parser = qisys.parsers.WorkTreeProjectParser(self.build_worktree.worktree)
         worktree_projects = parser.parse_no_project(args)
         if not worktree_projects:
             raise CouldNotGuessProjectName()
-
         # WorkTreeProjectParser returns None or a list of one element
         worktree_proj = worktree_projects[0]
         build_proj = qisys.parsers.find_parent_project(self.build_worktree.build_projects,
@@ -289,20 +278,19 @@ class BuildProjectParser(qisys.parsers.AbstractProjectParser):
         if not build_proj:
             # give up:
             raise CouldNotGuessProjectName()
-
         return self.parse_one_project(args, build_proj.name)
 
     def parse_one_project(self, args, project_arg):
-        """ Accept both an absolute path matching a worktree project,
-        or a project src
-
-        """
+        """ Accept both an absolute path matching a worktree project, or a project src. """
         project = self.build_worktree.get_build_project(project_arg, raises=True)
         return [project]
 
 
 class CouldNotGuessProjectName(Exception):
+    """ CouldNotGuessProjectName Exception """
+
     def __str__(self):
+        """ String Representation """
         return """
 Could not guess qibuild project name from current working directory
 Please go inside a project, or specify the project name

@@ -1,17 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Manage the list of maintainers. """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-"""Manage the list of maintainers."""
-
-from qisys import ui
-import qisys.parsers
 import qisrc.git
 import qisrc.maintainers
+import qisys.parsers
+from qisys import ui
 
 
 def configure_parser(parser):
-    """Configure parser for this action."""
+    """ Configure parser for this action. """
     qisys.parsers.worktree_parser(parser)
     qisys.parsers.project_parser(parser, positional=False)
     group = parser.add_argument_group("qisrc maintainers options")
@@ -35,14 +38,11 @@ def configure_parser(parser):
 
 
 def do(args):
-    """Main entry point."""
-
+    """ Main entry point. """
     worktree = qisys.parsers.get_worktree(args)
     projects = qisys.parsers.get_projects(worktree, args)
-
     if not projects:
         raise Exception("Please specify at least one project")
-
     if args.maintainers_action == "add":
         to_call = add_maintainer
     if args.maintainers_action == "list":
@@ -51,12 +51,12 @@ def do(args):
         to_call = remove_maintainer
     elif args.maintainers_action == "clear":
         to_call = clear_maintainers
-
     for project in projects:
         to_call(project, args)
 
 
 def add_maintainer(project, args):
+    """ Add Maintainer """
     name = args.name
     if not name:
         name = qisys.interact.ask_string("name: ")
@@ -70,7 +70,8 @@ def add_maintainer(project, args):
     qisrc.maintainers.add(project, name=name, email=email)
 
 
-def remove_maintainer(project, args):  # pylint: disable=unused-argument
+def remove_maintainer(project, *unused_args):
+    """ Remove Maintainer """
     maintainers = qisrc.maintainers.get(project)
     if not maintainers:
         ui.info("No maintainer configured for this project")
@@ -89,16 +90,17 @@ def remove_maintainer(project, args):  # pylint: disable=unused-argument
             ui.reset, "removed from maintainers")
 
 
-def clear_maintainers(project, *unused_args):  # pylint: disable=unused-argument
+def clear_maintainers(project, *unused_args):
+    """ Clear Maintainers """
     if qisrc.maintainers.clear(project):
         ui.info("All maintainers removed")
     else:
         ui.info("No maintainer configured for this project")
 
 
-def list_maintainers(project, *unused_args):  # pylint: disable=unused-argument
+def list_maintainers(project, *unused_args):
+    """ List Maintainers """
     maintainers = qisrc.maintainers.get(project)
-
     if maintainers:
         ui.info("Maintainers of", ui.green, project.src)
     else:

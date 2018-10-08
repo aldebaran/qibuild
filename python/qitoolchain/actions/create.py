@@ -1,19 +1,21 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-""" Configure a worktree to use a toolchain.
-
-Toolchain packages and known configurations will be fetched from an URL.
-
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
 """
+Configure a worktree to use a toolchain.
+Toolchain packages and known configurations will be fetched from an URL.
+"""
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import sys
 
-from qisys import ui
-import qisys.parsers
 import qitoolchain
+import qisys.parsers
+from qisys import ui
 
 
 def configure_parser(parser):
@@ -35,9 +37,7 @@ def configure_parser(parser):
 
 
 def do(args):
-    """Main entry point
-
-    """
+    """ Main entry point """
     if "--name" in sys.argv:
         ui.warning("--name is deprecated, use --feed-name instead")
     feed = args.feed
@@ -45,7 +45,6 @@ def do(args):
     if feed and os.path.exists(feed):
         feed = qisys.sh.to_native_path(feed)
     tc_name = args.name
-
     # Validate the name: must be a valid filename:
     bad_chars = r'<>:"/\|?*'
     for bad_char in bad_chars:
@@ -55,14 +54,10 @@ def do(args):
             mess += "of the following chars:\n"
             mess += " ".join(bad_chars)
             raise Exception(mess)
-
     if tc_name in qitoolchain.get_tc_names():
-        toolchain = qitoolchain.Toolchain(tc_name)  # pylint: disable=unused-variable
-        ui.info(tc_name, "already exists,",
-                "updating without removing")
-
+        toolchain = qitoolchain.Toolchain(tc_name)
+        ui.info(tc_name, "already exists,", "updating without removing")
     toolchain = qitoolchain.Toolchain(tc_name)
     if feed:
         toolchain.update(feed, branch=args.branch, name=args.feed_name)
-
     return toolchain

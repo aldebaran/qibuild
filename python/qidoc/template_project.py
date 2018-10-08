@@ -1,13 +1,22 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
 
 import qidoc.doxygen
 
 
 class TemplateProject(object):
+    """ TemplateProject Class """
+
     def __init__(self, doc_worktree, worktree_project):
+        """ TemplateProject Init """
         self.doc_type = "template"
         self.name = "template"
         self.depends = list()
@@ -17,6 +26,7 @@ class TemplateProject(object):
 
     @property
     def sphinx_conf(self):
+        """ Sphinx Conf """
         in_path = os.path.join(self.path,
                                "sphinx", "conf.in.py")
         if not os.path.exists(in_path):
@@ -26,6 +36,7 @@ class TemplateProject(object):
 
     @property
     def doxy_conf(self):
+        """ Doxy Conf """
         in_path = os.path.join(self.path,
                                "doxygen", "Doxyfile.in")
         conf = qidoc.doxygen.read_doxyfile(in_path)
@@ -44,7 +55,9 @@ class TemplateProject(object):
 
     @property
     def themes_path(self):
+        """ Themes Path """
         return os.path.join(self.path, "sphinx", "_themes")
 
     def __repr__(self):
+        """ Representation """
         return "<TemplateProject in %s>" % self.src

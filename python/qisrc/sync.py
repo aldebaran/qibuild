@@ -1,30 +1,31 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-""" Handling synchronization of a worktree with some manifests
-
-"""
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Handling synchronization of a worktree with some manifests """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 
-from qisys.qixml import etree
-from qisys import ui
-import qisys.qixml
 import qisrc.git
 import qisrc.manifest
+import qisys.qixml
+from qisys import ui
+from qisys.qixml import etree
 
 
 class WorkTreeSyncer(object):
-    """ Handle the manifests of a worktree
-
+    """
+    Handle the manifests of a worktree
     Stores the git url of the manifests and the groups that
     should be used, synchronizes the local manifests with the git
     worktree
-
     """
 
     def __init__(self, git_worktree):
+        """ WorkTreeSyncer Init """
         self.git_worktree = git_worktree
         # Read manifest configuration now, before any
         self.manifest = LocalManifest()
@@ -33,13 +34,13 @@ class WorkTreeSyncer(object):
         self.new_repos = list()
 
     def sync(self):
-        """" Synchronize with a remote manifest:
+        """
+        Synchronize with a remote manifest:
         * clone missing repos
         * move repos that needs to be moved
         * reconfigure remotes and default branches
         * synchronizes build profiles
         :returns: True in case of success, False otherwise
-
         """
         # backup old repos configuration now, so that
         # we know what to sync
@@ -48,6 +49,7 @@ class WorkTreeSyncer(object):
 
     @property
     def manifest_xml(self):
+        """ Manifest Xml """
         # it's manifests (plural) for backward-compatible reasons
         manifest_xml_path = os.path.join(self.git_worktree.root, ".qi", "manifests.xml")
         if not os.path.exists(manifest_xml_path):
@@ -57,6 +59,7 @@ class WorkTreeSyncer(object):
 
     @property
     def manifest_repo(self):
+        """ Manifest Repo """
         # the repo is always in manifests/default for backward-compatible reasons
         res = os.path.join(self.git_worktree.root, ".qi", "manifests", "default")
         if not os.path.exists(res):
@@ -71,9 +74,8 @@ class WorkTreeSyncer(object):
         return res
 
     def sync_repos(self, force=False):
-        """ Update the manifest, inspect changes, and updates the
-        git worktree accordingly
-
+        """ Update the manifest, inspect changes,
+        and updates the git worktree accordingly.
         """
         res = True
         ui.info(ui.green, ":: Updating manifest ...")
@@ -94,9 +96,9 @@ class WorkTreeSyncer(object):
         return res
 
     def configure_projects(self, projects=None):
-        """ Configure the given projects so that the actual git config matches
-        the one coming from the manifest :
-
+        """
+        Configure the given projects so that the actual git config
+        matches the one coming from the manifest :
         Configure default remotes, default branches and code review, then save config
         To be called _after_ sync()
         """
@@ -123,6 +125,7 @@ class WorkTreeSyncer(object):
         self.git_worktree.save_git_config()
 
     def read_manifest_config(self):
+        """ Read Manifest Config """
         tree = qisys.qixml.read(self.manifest_xml)
         root = tree.getroot()
         manifest_elem = root.find("manifest")
@@ -156,10 +159,7 @@ class WorkTreeSyncer(object):
 
     def configure_manifest(self, url, branch="master", groups=None, all_repos=False,
                            ref=None, review=None, force=False):
-        """ Add a manifest to the list. Will be stored in
-        .qi/manifests/<name>
-
-        """
+        """ Add a manifest to the list. Will be stored in .qi/manifests/<name> """
         if review is None:
             # not set explicitely by the user,
             # (i.e not from qisrc init --no-review)
@@ -191,17 +191,15 @@ class WorkTreeSyncer(object):
             parent_manifest.groups.groups.update(import_manifest.groups.groups)
 
     def read_remote_manifest(self, manifest_xml=None, warn_if_missing_group=True):
-        """ Read the manifest file in .qi/manifests/<name>/manifest.xml
-        using the settings in .qi/manifest.xml (to know the name and the groups
-        to use)
+        """
+        Read the manifest file in .qi/manifests/<name>/manifest.xml using the
+        settings in .qi/manifest.xml (to know the name and the groups to use).
         """
         if not manifest_xml:
             manifest_xml = os.path.join(self.manifest_repo, "manifest.xml")
         remote_manifest = qisrc.manifest.Manifest(manifest_xml, review=self.manifest.review)
-
         # parse imported manifest recursively if any
         self._read_import_manifest(remote_manifest)
-
         groups = self.manifest.groups
         # if self.manifest.groups is empty but there is a default
         # group in the manifest, we need to set self.manifest.groups
@@ -227,9 +225,9 @@ class WorkTreeSyncer(object):
         return repos
 
     def get_old_repos(self, warn_if_missing_group=True):
-        """ Backup all repos configuration before any synchronisation
-        for compute_repo_diff to have the correct value
-
+        """
+        Backup all repos configuration before any synchronisation
+        for compute_repo_diff to have the correct value.
         """
         old_repos = list()
         old_repos_expected = self.read_remote_manifest(
@@ -246,6 +244,7 @@ class WorkTreeSyncer(object):
         return old_repos
 
     def _import_manifest(self, import_manifest=None):
+        """ Import Manifest """
         if import_manifest.project is None:
             return
         repo_name = os.path.split(import_manifest.project)[1].replace(".git", "")
@@ -278,6 +277,7 @@ Please run `qisrc init MANIFEST_URL`
 
     @staticmethod
     def _sync_git(repo, url, branch, ref):
+        """ Sync Git """
         git = qisrc.git.Git(repo)
         git.set_remote("origin", url)
         if git.get_current_branch() != branch:
@@ -292,31 +292,25 @@ Please run `qisrc init MANIFEST_URL`
         if not transaction.ok:
             raise Exception("Update failed\n" + transaction.output)
 
-    def _sync_repos(self, old_repos, new_repos, force=False):  # pylint: disable=too-many-branches
+    def _sync_repos(self, old_repos, new_repos, force=False):
         """ Sync the remote repo configurations with the git worktree """
         res = True
-        ##
         # 1/ create, remove or move the git projects:
-
         # Compute the work that needs to be done:
         (to_add, to_move, to_rm, to_update) = \
             compute_repo_diff(old_repos, new_repos)
-
         if to_rm or to_add or to_move or to_update:
             ui.info(ui.green, ":: Computing diff ...")
-
         if to_rm:
             for repo in to_rm:
                 ui.info(ui.red, "* ", ui.reset, "removing", ui.blue, repo.src)
         if to_add:
             for repo in to_add:
                 ui.info(ui.green, "* ", ui.reset, "adding", ui.blue, repo.src)
-
         if to_move:
             for (repo, new_src) in to_move:
                 ui.info(ui.brown, "* ", ui.reset, "moving", ui.blue, repo.src,
                         ui.reset, " to ", ui.blue, new_src)
-
         if to_update:
             for (old_repo, new_repo) in to_update:
                 ui.info(ui.green, "* ",
@@ -326,13 +320,10 @@ Please run `qisrc init MANIFEST_URL`
                 project = self.git_worktree.get_git_project(new_repo.src)
                 project.read_remote_config(new_repo)
                 project.save_config()
-
         for repo in to_rm:
             self.git_worktree.remove_repo(repo)
-
         if to_add:
             ui.info(ui.green, ":: Cloning new repositories ...")
-
         for i, repo in enumerate(to_add):
             ui.info_count(i, len(to_add),
                           ui.blue, repo.project,
@@ -350,7 +341,6 @@ Please run `qisrc init MANIFEST_URL`
                 project = self.git_worktree.get_git_project(repo.src)
                 project.read_remote_config(repo)
                 project.save_config()
-
         if to_move:
             ui.info(ui.green, ":: Moving repositories ...")
         for (repo, new_src) in to_move:
@@ -360,13 +350,12 @@ Please run `qisrc init MANIFEST_URL`
                 project.save_config()
             else:
                 res = False
-
         return res
 
     def sync_from_manifest_file(self, xml_path):
-        """ Just synchronize the manifest coming from one xml file.
-        Used by ``qisrc check-manifest``
-
+        """
+        Just synchronize the manifest coming from one xml file.
+        Used by ``qisrc check-manifest``.
         """
         # don't use self.old_repos and self.new_repos here,
         # because we are only using one manifest
@@ -376,16 +365,15 @@ Please run `qisrc init MANIFEST_URL`
         return self._sync_repos(old_repos, new_repos)
 
     def __repr__(self):
+        """ Representation """
         return "<WorkTreeSyncer in %s>" % self.git_worktree.root
 
 
 class LocalManifest(object):
-    """ Settings for a local manifest
-
-
-    """
+    """ Settings for a local manifest """
 
     def __init__(self):
+        """ LocalManifest Init """
         self.url = None
         self.branch = "master"
         self._groups = None
@@ -396,16 +384,19 @@ class LocalManifest(object):
 
     @property
     def groups(self):
+        """ Groups Getter """
         return self._groups
 
     @groups.setter
     def groups(self, groups):
+        """ Groups Setter """
         if groups is None:
             self._groups = None
         else:
             self._groups = sorted(groups)
 
     def __eq__(self, other):
+        """ Retrun True if other is equal to self """
         if not isinstance(other, LocalManifest):
             return False
         return self.url == other.url and \
@@ -415,21 +406,15 @@ class LocalManifest(object):
             self.all_repos == other.all_repos
 
 
-###
-# Compute updates
-
-
-def compute_repo_diff(old_repos, new_repos):  # pylint: disable=too-many-branches
-    """ Compute the work that needs to be done
-
+def compute_repo_diff(old_repos, new_repos):
+    """
+    Compute the work that needs to be done.
     :returns: a tuple (to_add, to_move, to_rm, to_update)
-
     """
     to_add = list()
     to_move = list()
     to_rm = list()
     to_update = list()
-
     for new_repo in new_repos:
         for old_repo in old_repos:
             common_url = find_common_url(old_repo, new_repo)
@@ -443,50 +428,45 @@ def compute_repo_diff(old_repos, new_repos):  # pylint: disable=too-many-branche
             # only changed remotes, because we did not
             # commpute to_update yet
             to_add.append(new_repo)
-
     for old_repo in old_repos:
         for new_repo in new_repos:
             if old_repo.src != new_repo.src:
                 continue
-
             if new_repo.remotes != old_repo.remotes\
                     or new_repo.default_branch != old_repo.default_branch\
                     or new_repo.fixed_ref != old_repo.fixed_ref:
                 to_update.append((old_repo, new_repo))
-
             break
         else:
             if old_repo not in [x[0] for x in to_move]:
                 to_rm.append(old_repo)
-
     really_to_add = list()
     for repo in to_add:
         if repo.src not in [x[0].src for x in to_update]:
             really_to_add.append(repo)
     to_add = really_to_add
-
     # sort everything by 'src':
-    for repo_list in [to_add, to_rm]:
-        repo_list.sort(key=lambda x: x.src)
-    for repo_list in [to_move, to_update]:
-        repo_list.sort(key=lambda x: x[0].src)
-
+    to_add = sorted(to_add, key=lambda x: x.src)
+    to_rm = sorted(to_rm, key=lambda x: x.src)
+    to_move = sorted(to_move, key=lambda x: x[0].src)
+    to_update = sorted(to_update, key=lambda x: x[0].src)
     return to_add, to_move, to_rm, to_update
 
 
 def find_common_url(repo_a, repo_b):
+    """ Find Common Url """
     for url_a in repo_a.urls:
         for url_b in repo_b.urls:
             if url_a == url_b:
                 return url_b
+    return None
 
 
 def compute_profile_updates(local_profiles, remote_profiles):
-    """ Compare a local set of profiles with a remote set.
-
+    """
+    Compare a local set of profiles with a remote set.
     Return a list of profiles to add, and a list of profiles
     that have been updated.
-
     """
     # Note: no profile will ever be removed, I guess we don't care
     new = list()

@@ -1,18 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test Profile """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import qibuild.config
 import qibuild.profile
 from qibuild.test.conftest import TestBuildWorkTree
-
-from qisrc.test.conftest import qisrc_action, git_server  # pylint: disable=unused-import
-
-# pylint: disable=redefined-outer-name
+from qisrc.test.conftest import qisrc_action, git_server
 
 
 def test_read_build_profiles(tmpdir):
+    """ Test Read Build Profile """
     qibuild_xml = tmpdir.join("qibuild.xml")
     qibuild_xml.write("""
 <qibuild version="1">
@@ -41,6 +43,7 @@ def test_read_build_profiles(tmpdir):
 
 
 def test_profiles_are_persistent(tmpdir):
+    """ Test Profiles Are Persistent """
     qibuild_xml = tmpdir.join("qibuild.xml")
     qibuild_xml.write("<qibuild />")
     qibuild.profile.configure_build_profile(qibuild_xml.strpath, "foo", [("WITH_FOO", "ON")])
@@ -50,8 +53,8 @@ def test_profiles_are_persistent(tmpdir):
     assert "foo" not in qibuild.profile.parse_profiles(qibuild_xml.strpath)
 
 
-def test_using_custom_profile(qibuild_action, qisrc_action, git_server,
-                              record_messages):
+def test_using_custom_profile(qibuild_action, qisrc_action, git_server, record_messages):
+    """ Test Using Custom Profile """
     git_server.add_build_profile("foo", [("WITH_FOO", "ON")])
     qisrc_action("init", git_server.manifest_url)
     build_worktree = TestBuildWorkTree()
@@ -67,8 +70,8 @@ def test_using_custom_profile(qibuild_action, qisrc_action, git_server,
     assert record_messages.find(r"WITH_BAR\s+: ON")
 
 
-def test_warns_on_conflict(qibuild_action, qisrc_action, git_server,
-                           record_messages):
+def test_warns_on_conflict(qibuild_action, qisrc_action, git_server, record_messages):
+    """ Test Warns On Conflict """
     git_server.add_build_profile("foo", [("WITH_FOO", "ON")])
     qisrc_action("init", git_server.manifest_url)
     build_worktree = TestBuildWorkTree()

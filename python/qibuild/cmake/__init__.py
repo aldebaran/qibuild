@@ -1,27 +1,29 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" This module contains function to handle CMake managed project. """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-"""This module contains function to handle CMake managed project.
-
-"""
-
-import sys
 import os
 import re
+import sys
 import subprocess
+import six
 
-from qisys import ui
-import qisys.command
-import qisys.sh
 import qibuild.cmake.profiling
+import qisys.sh
+import qisys.command
+from qisys import ui
 
 
 def get_known_cmake_generators():
-    """ Get the list of known cmake generators.
+    """
+    Get the list of known cmake generators.
     Assume cmake is in PATH, or path to cmake is correctly
     configured in ~/.config/qi/qibuild.xml
-
     """
     build_env = qibuild.config.get_build_env()
     cmake_ = qisys.command.find_program("cmake", env=build_env)
@@ -36,11 +38,12 @@ Please install it if necessary and re-run `qibuild config --wizard`\
     intersting = False
     intersting_lines = list()
     magic_line = "The following generators are available on this platform:"
-    # pylint: disable-msg=E1103
     for line in out.splitlines():
         # handle lines like that:
         # Generator = "blalblalba"
         #       files.
+        if six.PY3:
+            line = line.decode()
         if len(line) >= 3:
             if line[2] == ' ' and "=" not in line:
                 continue
@@ -74,14 +77,12 @@ Please install it if necessary and re-run `qibuild config --wizard`\
 
 
 def get_cached_var(build_dir, var, default=None):
-    """Get a variable from cmake cache
-
+    """
+    Get a variable from cmake cache
     :param build_dir: CMakeCache.txt file directory
     :param var:       Requested variable
     :param default:   Default value if not found (default: None)
-
     :return: the variable value
-
     """
     cmakecache = os.path.join(build_dir, "CMakeCache.txt")
     if not os.path.exists(cmakecache):
@@ -91,55 +92,45 @@ def get_cached_var(build_dir, var, default=None):
     return res.get(var, default)
 
 
-def cmake(source_dir, build_dir, cmake_args, env=None,  # pylint: disable=too-many-branches,too-many-locals
+def cmake(source_dir, build_dir, cmake_args, env=None,
           clean_first=True, profiling=False, debug_trycompile=False,
           trace_cmake=False, summarize_options=False):
-    """Call cmake with from a build dir for a source dir.
+    """
+    Call cmake with from a build dir for a source dir.
     cmake_args are added on the command line.
-
     :param env: defines the environment used when calling ``cmake``
                 ``os.environ`` will remain unchanged
     :param clean_first: Clean the cmake cache
     :param summarize_options: Whether to call :py:func:`display_options` at the end
-
     For qibuild/CMake hackers:
-
     :param profiling: Profile CMake executions
     :param debug_trycompile: Call ``cmake`` with ``--debug-trycompile``
     :param trace_cmake: Call ``cmake`` with ``--trace`` The results
                         will be written in <build>/cmake.log
-
     """
     if not os.path.exists(source_dir):
         raise Exception("source dir: %s does not exist, aborting")
-
     if not os.path.exists(build_dir):
         mess = "Could not find build directory: %s \n" % build_dir
         raise Exception(mess)
-
     # Always remove CMakeCache
     if clean_first:
         cache = os.path.join(build_dir, "CMakeCache.txt")
         qisys.sh.rm(cache)
-
     if debug_trycompile:
         cmake_args.append("--debug-trycompile")
     if profiling or trace_cmake:
         cmake_args.append("--trace")
-
     # Check that no one has made an in-source build
     in_source_cache = os.path.join(source_dir, "CMakeCache.txt")
     if os.path.exists(in_source_cache):
-        # FIXME: better wording
         mess = "You have run CMake from your sources\n"
         mess += "CMakeCache.txt found here: %s\n" % in_source_cache
         mess += "Please clean your sources and try again\n"
         raise Exception(mess)
-
     # Check that the root CMakeLists file is correct
     root_cmake = os.path.join(source_dir, "CMakeLists.txt")
     check_root_cmake_list(root_cmake)
-
     # Add path to source to the list of args, and set buildir for
     # the current working dir.
     cmake_args += [source_dir]
@@ -175,29 +166,25 @@ def cmake(source_dir, build_dir, cmake_args, env=None,  # pylint: disable=too-ma
 
 
 def display_options(build_dir):
-    """ Display the options by looking in the CMake cache
-
-    """
+    """ Display the options by looking in the CMake cache. """
     cache_path = os.path.join(build_dir, "CMakeCache.txt")
-    print "-- Build options: "
+    print("-- Build options: ")
     cache = read_cmake_cache(cache_path)
     opt_keys = [x for x in cache if x.startswith(("WITH_", "ENABLE_"))]
     if not opt_keys:
-        print "  <no options found>"
+        print("  <no options found>")
         return
-    opt_keys.sort()
+    opt_keys = sorted(opt_keys)
     padding = max(len(x) for x in opt_keys) + 3
     for key in opt_keys:
         ui.info("  %s : %s" % (key.ljust(padding), cache[key]))
 
 
 def read_cmake_cache(cache_path):
-    """ Read a CMakeCache.txt file, returning a dict
-    name -> value
-
-    """
+    """ Read a CMakeCache.txt file, returning a dict name -> value. """
     with open(cache_path, "r") as fp:
         lines = fp.readlines()
+    fp.close()
     res = dict()
     for line in lines:
         if line.startswith("//"):
@@ -216,8 +203,8 @@ def read_cmake_cache(cache_path):
 
 
 def get_cmake_qibuild_dir():
-    """Get the path to cmake modules.
-
+    """
+    Get the path to cmake modules.
     First, look for a project named `qibuild` in the worktree, (if
     a ``worktree`` was passed,
     then, assume we are using qibuild from sources,
@@ -232,6 +219,7 @@ def get_cmake_qibuild_dir():
 
 
 def find_installed_cmake_qibuild_dir(python_dir):
+    """ Find CMake QiBuild Dir """
     ui.debug("looking for cmake code from", python_dir)
     candidates = [
         # python in qibuild/python, cmake in qibuild/cmake
@@ -256,7 +244,6 @@ def find_installed_cmake_qibuild_dir(python_dir):
         (sys.prefix, "share", "cmake")
     ]
     for candidate in candidates:
-
         rel_path = os.path.join(*candidate)
         res = os.path.join(python_dir, rel_path)
         res = qisys.sh.to_native_path(res)
@@ -264,17 +251,16 @@ def find_installed_cmake_qibuild_dir(python_dir):
         ui.debug("trying", qibuild_config)
         if os.path.exists(qibuild_config):
             return res
+    return None
 
 
 def get_binutil(name, cmake_var=None, build_dir=None, env=None):
-    """ Get a tool from the binutils package.
-    First, look for it in the CMake cache, else look for it in the
-    system.
-
+    """
+    Get a tool from the binutils package.
+    First, look for it in the CMake cache, else look for it in the system.
     Note that after a call to CMAKE_FORCE_C_COMPILER() in a CMake
     toolchain file, CMAKE_AR, CMAKE_OBJDUMP et al. should be correctly
     set in cache.
-
     """
     res = None
     if not cmake_var:
@@ -287,13 +273,12 @@ def get_binutil(name, cmake_var=None, build_dir=None, env=None):
 
 
 def check_root_cmake_list(cmake_list_file):
-    """ Check that the root CMakeLists is correct.
-
+    """
+    Check that the root CMakeLists is correct.
     * It should contain a cmake_minimum_required() line
     * It should contain a call to project()
     * If find_package(qibuild) is called, it should be
       called after project()
-
     """
     dirname = os.path.dirname(cmake_list_file)
     suggested_project_name = os.path.basename(dirname)
@@ -301,7 +286,7 @@ def check_root_cmake_list(cmake_list_file):
     lines = list()
     with open(cmake_list_file, "r") as fp:
         lines = fp.readlines()
-
+    fp.close()
     project_line_number = None
     find_qibuild_line_number = None
     minimum_required_found = False
@@ -314,7 +299,6 @@ def check_root_cmake_list(cmake_list_file):
         if re.match(r'^\s*cmake_minimum_required\(', line,
                     re.IGNORECASE):
             minimum_required_found = True
-
     if not minimum_required_found:
         message += """
 * Missing call to cmake_minimum_required()
@@ -324,7 +308,6 @@ cmake_minimum_required(VERSION 2.8)
 
 At the top of the CMakeLists.txt file
 """
-
     if project_line_number is None:
         message += """
 * Missing call to project().
@@ -335,7 +318,6 @@ project({project_name})
 find_package(qibuild)
 
 """.format(project_name=suggested_project_name)
-
     if find_qibuild_line_number is not None and \
             project_line_number is not None and \
             project_line_number > find_qibuild_line_number:
@@ -347,12 +329,16 @@ find_package(qibuild)
 
 
 class IncorrectCMakeLists(Exception):
+    """ IncorrectCMakeLists Exception """
+
     def __init__(self, cmake_list_file, message):
+        """ IncorrectCMakeLists Init """
         super(IncorrectCMakeLists, self).__init__()
         self.cmake_list_file = cmake_list_file
         self.message = message
 
     def __str__(self):
+        """ String Representation """
         message = "Invalid CMakeLists.txt file detected\n"
         message += "(in %s)\n" % self.cmake_list_file
         message += self.message

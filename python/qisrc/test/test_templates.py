@@ -1,7 +1,17 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test Templates """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import qisrc.templates
 
 
 def test_process_templates(tmpdir):
+    """ Test Process Templates """
     tmpl = tmpdir.mkdir("tmpl")
     tmpl_cmake_list = tmpl.ensure("CMakeLists.txt", file=True)
     tmpl_cmake_list.write("""\
@@ -24,10 +34,8 @@ class @ProjectName@ {
 
 #endif
 """)
-
     dest = tmpdir.mkdir("dest")
     qisrc.templates.process(tmpl.strpath, dest.strpath, project_name="monthyPython")
-
     dest_cmake = dest.join("CMakeLists.txt")
     assert dest_cmake.read() == """\
 cmake_minimum_required(VERSION 3.0)
@@ -35,7 +43,6 @@ project(MonthyPython)
 
 add_executable(monthy_python "monthy_python/monthy_python.cpp")
 """
-
     dest_hpp = dest.join("monthy_python", "monthy_python.hpp")
     assert dest_hpp.read() == """\
 #ifndef MONTHY_PYTHON_HPP
@@ -53,16 +60,13 @@ class MonthyPython {
 
 
 def test_process_string():
+    """ Test Process String """
     res = qisrc.templates.process_string("@project_name@.cpp",
                                          project_name="monthy_python")
     assert res == "monthy_python.cpp"
-
     res = qisrc.templates.process_string("#define @PROJECT_NAME@_HPP",
                                          project_name="Foo")
-
     assert res == "#define FOO_HPP"
-
     res = qisrc.templates.process_string("#define @PROJECT_NAME@_HPP",
                                          project_name="MonthyPython")
-
     assert res == "#define MONTHY_PYTHON_HPP"

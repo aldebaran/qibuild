@@ -1,29 +1,35 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-"""Small set of tools to interact with the user
-
-"""
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Small set of tools to interact with the user """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
+import six
 
 import qisys
 from qisys import ui
 
 
 def read_input():
-    """ Read input from the user
-
-    """
+    """ Read input from the user """
     ui.info(ui.green, "> ", end="")
-    return raw_input()
+    try:
+        if six.PY2:
+            return raw_input()
+        return input()
+    except SyntaxError as exc:
+        if exc.msg == "unexpected EOF while parsing":
+            return ""
+        raise exc
 
 
 def ask_choice(choices, input_text, return_int=False):
-    """Ask the user to choose from a list of choices
-
-    """
+    """ Ask the user to choose from a list of choices """
+    choices = list(choices)
     ui.info(ui.green, "::", ui.reset, input_text)
     for i, choice in enumerate(choices, start=1):
         if i == 1:
@@ -41,22 +47,20 @@ def ask_choice(choices, input_text, return_int=False):
         try:
             index = int(answer)
         except ValueError:
-            print "Please enter number"
+            print("Please enter number")
             continue
         if index not in range(1, len(choices)+1):
-            print "%i is out of range" % index
+            print("%i is out of range" % index)
             continue
         res = choices[index-1]
         keep_asking = False
-
     if return_int:
         return index-1
-
     return res
 
 
 def ask_yes_no(question, default=False):
-    """Ask the user to answer by yes or no"""
+    """ Ask the user to answer by yes or no """
     while True:
         if default:
             ui.info(ui.green, "::", ui.reset, question, "(Y/n)")
@@ -73,8 +77,8 @@ def ask_yes_no(question, default=False):
 
 
 def ask_string(question, default=None):
-    """Ask the user to enter something.
-
+    """
+    Ask the user to enter something.
     Returns what the user entered
     """
     if default:
@@ -90,12 +94,10 @@ def ask_string(question, default=None):
 
 
 def ask_program(message):
-    """Ask the user to enter a path
-    to a program.
-
+    """
+    Ask the user to enter a path to a program.
     Look for it in PATH. If not found,
     ask the user to enter the full path.
-
     If still not found, give up ...
     """
     keep_going = True
@@ -133,8 +135,8 @@ def ask_app(message):
 
 
 def get_editor():
-    """Find the editor searching the environment, lastly ask the user.
-
+    """
+    Find the editor searching the environment, lastly ask the user.
     Returns the editor.
     """
     editor = os.environ.get("VISUAL")

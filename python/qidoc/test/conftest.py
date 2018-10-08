@@ -1,15 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
+import os
+import py
 import bs4
-
-from qisys.test.conftest import *  # pylint: disable=wildcard-import,unused-wildcard-import
-import qisys.qixml
+import pytest
 
 import qidoc.worktree
-
-# pylint: disable=redefined-outer-name
+import qisys.qixml
+from qisys.test.conftest import *  # pylint:disable=W0401,W0614
 
 
 class TestDocWorkTree(qidoc.worktree.DocWorkTree):
@@ -18,21 +23,22 @@ class TestDocWorkTree(qidoc.worktree.DocWorkTree):
     __test__ = False  # Tell PyTest to ignore this Test* named class: This is as test to collect
 
     def __init__(self, worktree=None):
+        """ TestDocWorkTree Init """
         if not worktree:
             worktree = TestWorkTree()
         super(TestDocWorkTree, self).__init__(worktree)
 
     def add_templates(self):
+        """ Add Templates """
         self.add_test_project("templates")
 
     @property
     def tmpdir(self):
-        # pylint: disable-msg=E1101
-        return py.path.local(self.root)
+        """ Tmp Dir """
+        return py.path.local(self.root)  # pylint:disable=no-member
 
-    def create_doc_project(self, name, src=None,
-                           depends=None, doc_type="sphinx",
-                           dest=None):
+    def create_doc_project(self, name, src=None, depends=None, doc_type="sphinx", dest=None):
+        """ Create Doc Project """
         if not depends:
             depends = list()
         if not src:
@@ -57,17 +63,19 @@ class TestDocWorkTree(qidoc.worktree.DocWorkTree):
         return self.get_doc_project(name)
 
     def create_sphinx_project(self, name, src=None, depends=None):
+        """ Create Sphinx Project """
         return self.create_doc_project(name, src=src, depends=depends,
                                        doc_type="sphinx")
 
     def create_doxygen_project(self, name, src=None, depends=None):
+        """ Create Doxygen Project """
         return self.create_doc_project(name, src=src, depends=depends,
                                        doc_type="doxygen")
 
     def add_test_project(self, src):
-        """ Copy a project, reading sources from qidoc/test/projects
-
-        Can return None when testing qidoc2 retro-compat
+        """
+        Copy a project, reading sources from qidoc/test/projects.
+        Can return None when testing qidoc2 retro-compat.
         """
         this_dir = os.path.dirname(__file__)
         src_path = os.path.join(this_dir, "projects", src)
@@ -80,21 +88,28 @@ class TestDocWorkTree(qidoc.worktree.DocWorkTree):
 
 
 class QiDocAction(TestAction):
+    """ QiDocAction Class """
+
     def __init__(self):
+        """ QiDocAction Init """
         super(QiDocAction, self).__init__("qidoc.actions")
         self.doc_worktree = TestDocWorkTree()
 
     def add_test_project(self, *args, **kwargs):
+        """ Add Test Project """
         return self.doc_worktree.add_test_project(*args, **kwargs)
 
     def create_sphinx_project(self, *args, **kwargs):
+        """ Create Sphinx Project """
         return self.doc_worktree.create_sphinx_project(*args, **kwargs)
 
     def create_doxygen_project(self, *args, **kwargs):
+        """ Create Docygen Project """
         return self.doc_worktree.create_doxygen_project(*args, **kwargs)
 
 
 def find_link(html_path, text):
+    """ Find Link """
     with open(html_path, "r") as fp:
         data = fp.read()
     soup = bs4.BeautifulSoup(data, "html.parser")
@@ -104,15 +119,13 @@ def find_link(html_path, text):
     return target_path
 
 
-# pylint: disable-msg=E1101
 @pytest.fixture
-def doc_worktree(cd_to_tmpdir):  # pylint: disable=unused-argument
+def doc_worktree(cd_to_tmpdir):
+    """ Doc WorkTree """
     return TestDocWorkTree()
 
-# pylint: disable-msg=E1103
-
 
 @pytest.fixture
-def qidoc_action(cd_to_tmpdir):  # pylint: disable=unused-argument
-    res = QiDocAction()
-    return res
+def qidoc_action(cd_to_tmpdir):
+    """ QiDoc Action """
+    return QiDocAction()

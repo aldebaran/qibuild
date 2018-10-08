@@ -1,19 +1,23 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test QiSrc Push """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import mock
 
-import qisys.command
 import qisys.sh
+import qisys.command
 import qisrc.git
-
 from qisrc.test.conftest import TestGitWorkTree, TestGit
-
-# pylint: disable=unused-variable
 
 
 def test_not_under_code_review_ask_user(qisrc_action, git_server, interact):
-    foo_repo = git_server.create_repo("foo.git")
+    """ Test Not Under Code Review Ask User """
+    _foo_repo = git_server.create_repo("foo.git")
     qisrc_action("init", git_server.manifest_url)
     git_worktree = TestGitWorkTree()
     foo_proj = git_worktree.get_git_project("foo")
@@ -30,7 +34,8 @@ def test_not_under_code_review_ask_user(qisrc_action, git_server, interact):
 
 
 def test_not_under_code_review_with_no_review(qisrc_action, git_server):
-    foo_repo = git_server.create_repo("foo.git")
+    """ Test Not Under Code Review With No Review """
+    _foo_repo = git_server.create_repo("foo.git")
     qisrc_action("init", git_server.manifest_url)
     git_worktree = TestGitWorkTree()
     foo_proj = git_worktree.get_git_project("foo")
@@ -43,7 +48,8 @@ def test_not_under_code_review_with_no_review(qisrc_action, git_server):
 
 
 def test_using_dash_y(qisrc_action, git_server):
-    foo_repo = git_server.create_repo("foo.git")
+    """ Test Using Dash Y """
+    _foo_repo = git_server.create_repo("foo.git")
     qisrc_action("init", git_server.manifest_url)
     git_worktree = TestGitWorkTree()
     foo_proj = git_worktree.get_git_project("foo")
@@ -56,7 +62,8 @@ def test_using_dash_y(qisrc_action, git_server):
 
 
 def test_publish_changes(qisrc_action, git_server):
-    foo_repo = git_server.create_repo("foo.git", review=True)
+    """ Test Publish Changes """
+    _foo_repo = git_server.create_repo("foo.git", review=True)
     qisrc_action("init", git_server.manifest_url)
     git_worktree = TestGitWorkTree()
     foo_proj = git_worktree.get_git_project("foo")
@@ -69,7 +76,8 @@ def test_publish_changes(qisrc_action, git_server):
 
 
 def test_using_carbon_copy(qisrc_action, git_server):
-    foo_repo = git_server.create_repo("foo.git", review=True)
+    """ Test Using Carbon Copy """
+    _foo_repo = git_server.create_repo("foo.git", review=True)
     qisrc_action("init", git_server.manifest_url)
     git_worktree = TestGitWorkTree()
     foo_proj = git_worktree.get_git_project("foo")
@@ -84,7 +92,8 @@ def test_using_carbon_copy(qisrc_action, git_server):
 
 
 def test_alert_maintainers(qisrc_action, git_server):
-    foo_repo = git_server.create_repo("foo.git", review=True)
+    """ Test Alert Maintainers """
+    _foo_repo = git_server.create_repo("foo.git", review=True)
     qiproject_xml = """\
 <project version="3">
   <maintainer email="jdoe@company.com">John Doe</maintainer>
@@ -105,6 +114,7 @@ def test_alert_maintainers(qisrc_action, git_server):
 
 
 def test_on_new_project(qisrc_action, git_server, tmpdir, interact):
+    """ Test On New Projet """
     foo_repo = git_server.create_repo("foo.git")
     foo_path = tmpdir.join("work").join("foo")
     foo_path.ensure(dir=True)

@@ -1,25 +1,28 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-""" List every all the binaries in the given worktree.
-
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
 """
-# Mainly useful to auto-complete ``qibuild run``
+List every binaries in the given worktree.
+Mainly useful to auto-complete ``qibuild run``.
+"""
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 
-from qisys import ui
 import qibuild.parsers
+from qisys import ui
 
 
 def configure_parser(parser):
-    """ Configure parser for this action """
+    """ Configure parser for this action. """
     qibuild.parsers.cmake_build_parser(parser)
 
 
 def do(args):
-    """ Main entry point """
+    """ Main entry point. """
     build_worktree = qibuild.parsers.get_build_worktree(args)
     sdk_dirs = [x.sdk_directory for x in build_worktree.build_projects]
     bin_dirs = [os.path.join(x, "bin") for x in sdk_dirs]
@@ -34,7 +37,5 @@ def do(args):
             binaries = [x.replace("_d.exe", "") for x in binaries]
             binaries = [x.replace(".exe", "") for x in binaries]
         res.extend(binaries)
-
-    res.sort()
-    for binary in res:
+    for binary in sorted(res):
         ui.info(binary)

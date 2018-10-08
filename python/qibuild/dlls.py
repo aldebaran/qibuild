@@ -1,21 +1,22 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Set of tools to handle DLLs on Windows. """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-""" Set of tools to handle DLLs on Windows.
-
-"""
 import os
 
-from qisys import ui
 import qisys.sh
+from qisys import ui
 
 
-def fix_dlls(sdk_dir, env=None, paths=None, mingw=False):  # pylint: disable=too-many-locals
-    """ Copy the dlls fron the toolchains and the other build dirs
-    into a sdk directory, so that running the executable
-    just works
-
+def fix_dlls(sdk_dir, env=None, paths=None, mingw=False):
+    """
+    Copy the dlls fron the toolchains and the other build dirs
+    into a sdk directory, so that running the executable just works.
     """
     if not paths:
         return
@@ -45,11 +46,10 @@ def fix_dlls(sdk_dir, env=None, paths=None, mingw=False):  # pylint: disable=too
                                  if x.startswith("libgcc")])
             dlls_to_copy.extend([os.path.join(candidate, x) for x in dlls
                                  if x.startswith("mingw")])
-
     for dll_to_copy in dlls_to_copy:
         try:
             qisys.sh.safe_copy(dll_to_copy, dest)
-        except Exception, e:
+        except Exception as e:
             mess = "Could not copy %s to %s\n" % (dll_to_copy, dest)
             mess += "Error was: %s\n" % e
             ui.warning(mess)

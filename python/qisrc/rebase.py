@@ -1,14 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-from qisys import ui
-import qisys.interact
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiSrc Rebase """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import qisrc.manifest
+import qisys.interact
+from qisys import ui
 
 
 def rebase_worktree(git_worktree, git_projects, branch=None,
                     push=False, dry_run=False):
+    """ Rebase WorkTree """
     if not git_projects:
         return
     upstream_projects = git_worktree.get_projects_on_branch(branch)
@@ -19,12 +25,12 @@ def rebase_worktree(git_worktree, git_projects, branch=None,
             mess += " * " + git_project.src
             mess += "\n"
         raise Exception(mess)
-
     if push:
         push_projects(rebased_projects, dry_run=dry_run)
 
 
 def push_projects(git_projects, dry_run=False):
+    """ Push Projects """
     if not git_projects:
         return
     ui.info(ui.green, "Pushing ", len(git_projects), "projects")
@@ -55,6 +61,7 @@ def push_projects(git_projects, dry_run=False):
 
 
 def rebase_projects(git_projects, upstream_projects, branch):
+    """ Rebase Projects """
     ui.info(ui.green, "Computing list of forked projects ...")
     rebased_projects = list()
     errors = list()
@@ -77,6 +84,7 @@ def rebase_projects(git_projects, upstream_projects, branch):
 
 
 def get_forked_projects(git_projects, upstream_projects, branch):
+    """ Get Forked Project """
     res = list()
     for git_project in git_projects:
         if not git_project.default_remote:
@@ -99,11 +107,11 @@ def get_forked_projects(git_projects, upstream_projects, branch):
     return res
 
 
-def rebase_project(git_project, upstream_project):  # pylint: disable=too-many-return-statements
+def rebase_project(git_project, upstream_project):
+    """ Rebase Project """
     ok = check_local_branch(git_project)
     if not ok:
         return False
-
     git = qisrc.git.Git(git_project.path)
     local_branch = git_project.default_branch.name
     upstream_branch = upstream_project.default_branch.name
@@ -123,13 +131,11 @@ def rebase_project(git_project, upstream_project):  # pylint: disable=too-many-r
             return False
         ui.info(ui.green, "[OK]", ui.reset, "fast-forwarded")
         return True
-
     git.call("tag", "-f", "before-rebase", raises=False)  # suppress output
     rc, out = git.call("rebase", upstream_ref, raises=False)
     if rc == 0:
         ui.info(ui.green, "[OK]", ui.reset, "rebased")
         return True
-
     ui.info(ui.red, "[FAILED]", ui.reset, "there was some conflicts")
     git.call("rebase", "--abort", raises=False)
     git.call("tag", "-d", "before-rebase", raises=False)  # suppress output
@@ -137,6 +143,7 @@ def rebase_project(git_project, upstream_project):  # pylint: disable=too-many-r
 
 
 def check_local_branch(git_project):
+    """ Check Local Branch """
     git = qisrc.git.Git(git_project.path)
     rc, out = git.fetch(raises=False)
     if rc != 0:
@@ -166,7 +173,8 @@ def check_local_branch(git_project):
 
 
 def display_changes(git, remote_ref, branch_name):
-    __rc, out = git.call("log", "--color", "--graph", "--abbrev-commit",  # pylint: disable=unused-variable
+    """ Display Changes """
+    __rc, out = git.call("log", "--color", "--graph", "--abbrev-commit",
                          "--pretty=format:%Cred%h%Creset " +
                          "-%C(yellow)%d%Creset " +
                          "%s %Cgreen(%cr) %C(bold blue) " +

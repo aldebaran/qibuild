@@ -1,30 +1,32 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Open a project with an IDE. """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-"""Open a project with an IDE
-
-"""
 import os
 import sys
 import glob
 import subprocess
 
-from qisys import ui
-import qisys
 import qibuild.parsers
+import qisys
+from qisys import ui
 
 SUPPORTED_IDES = ["QtCreator", "Visual Studio", "Xcode"]
 
 
 def configure_parser(parser):
-    """Configure parser for this action """
+    """ Configure parser for this action. """
     qibuild.parsers.cmake_build_parser(parser)
     qibuild.parsers.project_parser(parser)
 
 
 def do(args):
-    """Main entry point."""
+    """ Main entry point. """
     cmake_builder = qibuild.parsers.get_cmake_builder(args)
     if len(cmake_builder.projects) != 1:
         raise Exception("This action can only work on one project")
@@ -40,11 +42,9 @@ def do(args):
             sys.exit(2)
         else:
             cmake_builder.configure()
-
     ide = get_ide(cmake_builder.build_config.qibuild_cfg)
     if not ide:
         return
-
     if ide.name == "Visual Studio":
         open_visual(project)
     elif ide.name == "Xcode":
@@ -59,29 +59,24 @@ def do(args):
 
 
 def get_ide(qibuild_cfg):
-    """Return an IDE to use."""
+    """ Return an IDE to use. """
     known_ides = qibuild_cfg.ides.values()
     ide_names = qibuild_cfg.ides.keys()
     if not known_ides:
         ui.warning("No IDE configured yet")
         ui.info("Tips: use `qibuild config --wizard` to configure an IDE")
         return None
-
     # Remove the one that are not supported:
     supported_ides = [x for x in known_ides if x.name in SUPPORTED_IDES]
-
     if len(supported_ides) == 1:
         return supported_ides[0]
-
     if not supported_ides:
         mess = "Found those IDEs in configuration: %s\n" % ", ".join(ide_names)
         mess += "But `qibuild open` only supports: %s\n" % ", ".join(SUPPORTED_IDES)
         raise Exception(mess)
-
     #  User chose a specific config and an IDE matches this config
     if qibuild_cfg.ide:
         return qibuild_cfg.ide
-
     supported_names = [x.name for x in supported_ides]
     # Several IDEs, ask the user to choose
     ide_name = qisys.interact.ask_choice(supported_names,
@@ -92,6 +87,7 @@ def get_ide(qibuild_cfg):
 
 
 def open_visual(project):
+    """ Open Visual """
     sln_files = glob.glob(project.build_directory + "/*.sln")
     if not sln_files:
         raise OpenError(project, "No .sln file found\n"
@@ -99,24 +95,26 @@ def open_visual(project):
     elif len(sln_files) > 1:
         raise OpenError(project, "Expecting only one sln, got %s" % sln_files)
 
-    print "starting VisualStudio:"
-    print "%s %s" % ("start", sln_files[0])
+    print("starting VisualStudio:")
+    print("%s %s" % ("start", sln_files[0]))
     subprocess.Popen(["start", sln_files[0]], shell=True)
 
 
 def open_xcode(project):
+    """ Open XCode """
     projs = glob.glob(project.build_directory + "/*.xcodeproj")
     if not projs:
         raise OpenError(project, "No .xcodeproj directory found\n")
     elif len(projs) > 1:
         raise OpenError(project, "Expecting only one xcode project file, "
                                  "got %s" % projs)
-    print "starting Xcode:"
-    print "%s %s" % ("open", projs[0])
+    print("starting Xcode:")
+    print("%s %s" % ("open", projs[0]))
     subprocess.Popen(["open", projs[0]])
 
 
 def open_qtcreator(project, qtcreator_path=None):
+    """ Opne QtCreator """
     if not qtcreator_path:
         qtcreator_path = qisys.command.find_program("qtcreator")
     cmake_list = os.path.join(project.path, "CMakeLists.txt")
@@ -124,22 +122,26 @@ def open_qtcreator(project, qtcreator_path=None):
         raise OpenError(project,
                         "QtCreator path not configured properly\n"
                         "Please run `qibuild config --wizard")
-    print "starting QtCreator:"
+    print("starting QtCreator:")
     if qtcreator_path.endswith((".app", ".app/")):
         cmd = ["open", "-a", qtcreator_path, cmake_list]
     else:
         cmd = [qtcreator_path, cmake_list]
-    print " ".join(cmd)
+    print(" ".join(cmd))
     subprocess.Popen(cmd)
 
 
 class OpenError(Exception):
+    """ OpenError Exception """
+
     def __init__(self, project, reason):
+        """ OpenError Init """
         super(OpenError, self).__init__()
         self.project = project
         self.reason = reason
 
     def __str__(self):
+        """ String Representation """
         res = """ \
 Could not open {project.name}
 {reason}

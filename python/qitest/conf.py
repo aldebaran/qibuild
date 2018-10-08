@@ -1,11 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiTest Conf """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
 import json
 
 
 def add_test(output, **kwargs):
+    """ Ad Tests """
     if "name" not in kwargs:
         raise Exception("Should provide a test name")
     if "cmd" not in kwargs:
@@ -15,23 +22,21 @@ def add_test(output, **kwargs):
         with open(output, "r") as fp:
             tests = json.load(fp)
     name = kwargs["name"]
-
     test_names = dict((x["name"], x) for x in tests)
     matching_test = test_names.get(name)
     if matching_test:
         mess = "A test named '%s' already exists. (cmd=%s)" % (
             matching_test["name"], matching_test["cmd"])
         raise Exception(mess)
-
     tests.append(kwargs)
     with open(output, "w") as fp:
         json.dump(tests, fp, indent=2)
 
 
 def parse_tests(conf_path):
-    """ Parse the tests described in a qitest.json file.
+    """
+    Parse the tests described in a qitest.json file.
     Returns a list of dictionaries
-
     """
     res = list()
     with open(conf_path, "r") as fp:
@@ -40,15 +45,14 @@ def parse_tests(conf_path):
     for test in res:
         test_env = test.get("environment")
         if test_env:
-            for key, value in test_env.iteritems():
+            for key, value in test_env.items():
                 del test_env[key]
                 test_env[key.encode("UTF-8")] = value.encode("UTF-8")
     return res
 
 
 def write_tests(tests, conf_path, append=False):
-    """ Write a list of tests to a config file
-    """
+    """ Write a list of tests to a config file """
     if append:
         if os.path.exists(conf_path):
             previous_tests = parse_tests(conf_path)

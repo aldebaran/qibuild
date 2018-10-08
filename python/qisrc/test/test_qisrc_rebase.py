@@ -1,15 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test Git Rebase """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import pytest
 
-from qisrc.test.conftest import TestGitWorkTree
 from qisrc.test.conftest import TestGit
-
-# pylint: disable=unused-variable
+from qisrc.test.conftest import TestGitWorkTree
 
 
 def test_happy_rebase(git_server, qisrc_action):
+    """ Test Happy Rebase """
     git_server.create_repo("foo")
     git_server.switch_manifest_branch("devel")
     git_server.change_branch("foo", "devel")
@@ -22,11 +27,12 @@ def test_happy_rebase(git_server, qisrc_action):
     git.push()
     git.fetch()
     qisrc_action("rebase", "--branch", "master", "--all")
-    rc, out = git.log("--pretty=oneline", raises=False)
+    _rc, out = git.log("--pretty=oneline", raises=False)
     assert len(out.splitlines()) == 3
 
 
 def test_rebase_conflict(git_server, qisrc_action):
+    """ Test Rebase Conflict """
     git_server.create_repo("foo")
     git_server.switch_manifest_branch("devel")
     git_server.change_branch("foo", "devel")
@@ -39,7 +45,6 @@ def test_rebase_conflict(git_server, qisrc_action):
     git.push()
     _, before = git.call("show", raises=False)
     git.fetch()
-    # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         qisrc_action("rebase", "--branch", "master", "--all")
     assert " * foo" in e.value.message
@@ -48,6 +53,7 @@ def test_rebase_conflict(git_server, qisrc_action):
 
 
 def test_raises_when_not_on_correct_branch(git_server, qisrc_action, record_messages):
+    """ Test Raises When Not On Correct Branch """
     git_server.create_repo("foo")
     git_server.switch_manifest_branch("devel")
     git_server.change_branch("foo", "devel")
@@ -61,7 +67,8 @@ def test_raises_when_not_on_correct_branch(git_server, qisrc_action, record_mess
     assert record_messages.find("skipped")
 
 
-def test_when_moved(git_server, qisrc_action, record_messages):  # pylint: disable=unused-argument
+def test_when_moved(git_server, qisrc_action, record_messages):
+    """ Test When Moved """
     git_server.create_repo("foo")
     git_server.switch_manifest_branch("devel")
     git_server.change_branch("foo", "devel")
@@ -74,11 +81,12 @@ def test_when_moved(git_server, qisrc_action, record_messages):  # pylint: disab
     git.commit_file("devel.txt", "devel")
     git.push()
     qisrc_action("rebase", "--branch", "master", "--all")
-    rc, out = git.log("--pretty=oneline", raises=False)
+    _rc, out = git.log("--pretty=oneline", raises=False)
     assert len(out.splitlines()) == 3
 
 
 def test_when_not_up_to_date(git_server, qisrc_action):
+    """ Test When Not Up To Date """
     git_server.create_repo("foo")
     git_server.switch_manifest_branch("devel")
     git_server.change_branch("foo", "devel")
@@ -89,6 +97,7 @@ def test_when_not_up_to_date(git_server, qisrc_action):
 
 
 def test_when_ahead(git_server, qisrc_action):
+    """ Test When Ahead """
     git_server.create_repo("foo")
     git_server.switch_manifest_branch("devel")
     git_server.change_branch("foo", "devel")
@@ -101,7 +110,8 @@ def test_when_ahead(git_server, qisrc_action):
     qisrc_action("rebase", "--all")
 
 
-def test_push_after_rebase(git_server, git_worktree, qisrc_action, interact):  # pylint: disable=unused-argument
+def test_push_after_rebase(git_server, git_worktree, qisrc_action, interact):
+    """ Test Push After Rebase """
     git_server.create_repo("foo")
     git_server.switch_manifest_branch("devel")
     git_server.change_branch("foo", "devel")
@@ -122,7 +132,7 @@ def test_push_after_rebase(git_server, git_worktree, qisrc_action, interact):  #
 
 
 def test_only_rebase_forked_projects(git_server, git_worktree, qisrc_action, record_messages):
-    # pylint: disable=unused-argument
+    """ Test Only Rabase Forked Projects """
     git_server.create_repo("foo")
     git_server.create_repo("bar")
     git_server.switch_manifest_branch("devel")

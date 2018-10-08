@@ -1,30 +1,41 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
-import collections
-import datetime
-import json
-import signal
-import traceback
-import time
-import StringIO
+import io
 import sys
+import json
+import time
+import signal
+import datetime
+import traceback
 import threading
-import Queue
+import collections
+import six
 
-from qisys import ui
-import qisys.command
 import qitest.result
+import qisys.command
+from qisys import ui
+
+if six.PY3:
+    import queue as Queue
+else:
+    import Queue
 
 
-class TestQueue(object):  # pylint: disable=too-many-instance-attributes
+class TestQueue(object):
     """ A class able to run tests in parallel """
 
     __test__ = False  # Tell PyTest to ignore this Test* named class: This is as test to collect
 
     def __init__(self, tests):
+        """ TestQueue Init """
         self.tests = tests
         self.test_logger = TestLogger(tests)
         self.task_queue = Queue.Queue()
@@ -40,7 +51,6 @@ class TestQueue(object):  # pylint: disable=too-many-instance-attributes
         if repeat_until_fail == 0:
             self._run_once(num_jobs)
             return self.ok
-
         ui.info(ui.blue, "::", ui.reset, "Running tests until they fail")
         num_runs = 0
         while num_runs < repeat_until_fail:
@@ -51,7 +61,6 @@ class TestQueue(object):  # pylint: disable=too-many-instance-attributes
                 num_runs += 1
             else:
                 break
-
         return self.ok
 
     def _run_once(self, num_jobs):
@@ -75,10 +84,8 @@ class TestQueue(object):  # pylint: disable=too-many-instance-attributes
             return
         for i, test in enumerate(self.tests):
             self.task_queue.put((test, i))
-
         if num_jobs == 1:
             self.test_logger.single_job = True
-
         for i in range(0, num_jobs):
             worker = TestWorker(self.task_queue, i)
             worker.launcher = self.launcher
@@ -87,20 +94,17 @@ class TestQueue(object):  # pylint: disable=too-many-instance-attributes
             worker.results = self.results
             self._workers.append(worker)
             worker.start()
-
         while not self.task_queue.empty() and \
                 not self._interrupted:
             time.sleep(0.1)
-
         for worker_thread in self._workers:
             worker_thread.join()
 
     def summary(self):
-        """ Display the tests results.
-
+        """
+        Display the tests results.
         Called at the end of self.run()
         Sets ``self.ok``
-
         """
         if not self.tests:
             self.ok = False
@@ -124,18 +128,17 @@ class TestQueue(object):  # pylint: disable=too-many-instance-attributes
                                   ui.reset, *failure.message)
         self.write_failures(failures)
 
-    def sigint_handler(self, *args):  # pylint: disable=unused-argument
-        """ Called when user press ctr+c during the test suite
-
+    def sigint_handler(self, *_args):
+        """
+        Called when user press ctr+c during the test suite
         * Tell qisys.command to kill every process still running
         * Tell the tests_queue that is has been interrupted, and
           stop all the test workers
         * Setup a second sigint for when killing process failed
-
         """
-        def double_sigint(signum, frame):  # pylint: disable=unused-argument
-            sys.exit("Exiting main program \n",
-                     "This may leave orphan processes")
+        def double_sigint(_signum, _frame):
+            """ Double SigInt """
+            sys.exit("Exiting main program \n", "This may leave orphan processes")
         qisys.command.SIGINT_EVENT.set()
         ui.warning("\n!!!",
                    "Interrupted by user, stopping every process.\n"
@@ -146,6 +149,7 @@ class TestQueue(object):  # pylint: disable=too-many-instance-attributes
         signal.signal(signal.SIGINT, double_sigint)
 
     def write_failures(self, failures):
+        """ Write Failures """
         path = self.launcher.project.sdk_directory
         fail_json = os.path.join(path, ".failed.json")
         fail_names = [x.test["name"] for x in failures]
@@ -154,14 +158,15 @@ class TestQueue(object):  # pylint: disable=too-many-instance-attributes
 
 
 class TestWorker(threading.Thread):
-    """ Implementation of a 'worker' thread. It will consume
+    """
+    Implementation of a 'worker' thread. It will consume
     the test queue, running the tests and logging the results
-
     """
 
     __test__ = False  # Tell PyTest to ignore this Test* named class: This is as test to collect
 
     def __init__(self, queue, worker_index):
+        """ TestWorker Init """
         super(TestWorker, self).__init__(name="TestWorker#%i" % worker_index)
         self.index = worker_index
         self.queue = queue
@@ -175,6 +180,7 @@ class TestWorker(threading.Thread):
         self._should_stop = True
 
     def run(self):
+        """ Run """
         while not self._should_stop:
             try:
                 test, index = self.queue.get_nowait()
@@ -184,7 +190,7 @@ class TestWorker(threading.Thread):
             result = None
             try:
                 result = self.launcher.launch(test)
-            except Exception, e:
+            except Exception as e:
                 result = qitest.result.TestResult(test)
                 result.ok = False
                 result.message = self.message_for_exception(e)
@@ -195,25 +201,27 @@ class TestWorker(threading.Thread):
 
     @staticmethod
     def message_for_exception(exception):
+        """ Message For Exception """
         tb = sys.exc_info()[2]
-        io = StringIO.StringIO()
-        traceback.print_tb(tb, file=io)
+        iostr = io.BytesIO()
+        traceback.print_tb(tb, file=iostr)
         return (ui.red, "Python exception during tests:\n",
                 exception.__class__.__name__,
                 str(exception), "\n",
                 ui.reset,
-                io.getvalue())
+                iostr.getvalue())
 
 
 class TestLogger(object):
-    """ Small class used to print what is going on during
+    """
+    Small class used to print what is going on during
     tests, using a mutex so that outputs are not mixed up
-
     """
 
     __test__ = False  # Tell PyTest to ignore this Test* named class: This is as test to collect
 
     def __init__(self, tests):
+        """ TestLogger Init """
         self.mutex = threading.Lock()
         self.tests = tests
         try:

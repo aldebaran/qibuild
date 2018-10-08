@@ -1,28 +1,31 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-""" Tools to handle build profiles
-
-
-"""
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Tools to handle build profiles. """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
+
 import qisys.qixml
 
 
 class Profile(object):
-    """ A profile is just a set of CMake flags for now.
+    """
+    A profile is just a set of CMake flags for now.
     If has a name you can specify when building using
-    ``qibuild configure --profile <name>``
-
+    ``qibuild configure --profile <name>``.
     """
 
     def __init__(self, name):
+        """ Profile Init """
         self.name = name
         self.cmake_flags = list()
 
     def elem(self):
+        """ Elem """
         elem = qisys.qixml.etree.Element("profile")
         elem.set("name", self.name)
         if self.cmake_flags:
@@ -38,19 +41,20 @@ class Profile(object):
         return elem
 
     def __eq__(self, other):
+        """ Return True if other is equal to self """
         return self.cmake_flags == other.cmake_flags
 
     def __ne__(self, other):
+        """ Return True if other is not equal to self """
         return not self.__eq__(other)
 
 
-def parse_profiles(xml_path):  # pylint: disable=too-many-locals
-    """ Parse .qi/qibuild.xml. Return a dict
-    name -> Profile
-    """
+def parse_profiles(xml_path):
+    """ Parse .qi/qibuild.xml. Return a dict name -> Profile """
     if not os.path.exists(xml_path):
         with open(xml_path, "w") as fp:
             fp.write("<qibuild />")
+        fp.close()
     res = dict()
     tree = qisys.qixml.read(xml_path)
     root = tree.getroot()
@@ -75,7 +79,7 @@ def parse_profiles(xml_path):  # pylint: disable=too-many-locals
 
 
 def configure_build_profile(xml_path, name, flags):
-    """ Add a new profile to an XML file """
+    """ Add a new profile to an XML file. """
     profile = Profile(name)
     profile.cmake_flags = flags
     tree = qisys.qixml.read(xml_path)
@@ -92,7 +96,7 @@ def configure_build_profile(xml_path, name, flags):
 
 
 def remove_build_profile(xml_path, name):
-    """ Remove a build profile from XML file """
+    """ Remove a build profile from XML file. """
     tree = qisys.qixml.read(xml_path)
     root = tree.getroot()
     profiles = root.find("profiles")

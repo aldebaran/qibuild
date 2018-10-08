@@ -1,20 +1,21 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
 """ Extract a binary toolchain package """
-
-# FIXME: deal with the cyclic-import in a dedicated issue
-# pylint: disable=cyclic-import
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 
-from qisys import ui
-import qisys.parsers
 import qitoolchain.qipackage
+import qisys.parsers
+from qisys import ui
 
 
 def configure_parser(parser):
+    """ Configure Parser """
     qisys.parsers.default_parser(parser)
     parser.add_argument("package_path",
                         help="Path to the package to extract")
@@ -23,6 +24,7 @@ def configure_parser(parser):
 
 
 def do(args):
+    """ Main Entry Point """
     package_path = args.package_path
     output = args.output or os.getcwd()
     qipackage = None

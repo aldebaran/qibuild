@@ -1,17 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import pytest
 
-import qisrc.manifest
 import qisrc.review
-
-# allow the existing foo/bar/baz names
-# pylint: disable=blacklisted-name
-# pylint: disable=unused-variable
+import qisrc.manifest
 
 
 def test_simple_read(tmpdir):
+    """ Test Simple Read """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -22,13 +25,14 @@ def test_simple_read(tmpdir):
 """)
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     assert len(manifest.repos) == 1
-    bar = manifest.repos[0]
-    assert bar.src == "lib/bar"
-    assert bar.clone_url == "git@example.com:foo/bar.git"
-    assert bar.default_branch == "next"
+    bar1 = manifest.repos[0]
+    assert bar1.src == "lib/bar"
+    assert bar1.clone_url == "git@example.com:foo/bar.git"
+    assert bar1.default_branch == "next"
 
 
 def test_src_are_unique(tmpdir):
+    """ Test Src Are Unique """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -39,13 +43,13 @@ def test_src_are_unique(tmpdir):
         remotes="origin" />
 </manifest>
 """)
-    # pylint: disable-msg=E1101
     with pytest.raises(qisrc.manifest.ManifestError) as e:
         qisrc.manifest.Manifest(manifest_xml.strpath)
     assert "Found two projects sharing the same sources" in str(e.value)
 
 
 def test_projects_are_unique(tmpdir):
+    """ Test Projects Are Unique """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -54,13 +58,13 @@ def test_projects_are_unique(tmpdir):
   <repo project="foo/bar.git" src="bar2" remotes="origin" />
 </manifest>
 """)
-    # pylint: disable-msg=E1101
     with pytest.raises(qisrc.manifest.ManifestError) as e:
         qisrc.manifest.Manifest(manifest_xml.strpath)
     assert "foo/bar.git found twice" in str(e.value)
 
 
 def test_empty_src(tmpdir):
+    """ Test Empty Src """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -69,11 +73,12 @@ def test_empty_src(tmpdir):
 </manifest>
 """)
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
-    bar = manifest.repos[0]
-    assert bar.src == "foo/bar"
+    bar1 = manifest.repos[0]
+    assert bar1.src == "foo/bar"
 
 
 def test_no_remotes_attr(tmpdir):
+    """ Test No Remote Attr """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -81,13 +86,13 @@ def test_no_remotes_attr(tmpdir):
   <repo project="foo/bar.git" src="lib/bar"/>
 </manifest>
 """)
-    # pylint: disable-msg=E1101
     with pytest.raises(qisrc.manifest.ManifestError) as e:
         qisrc.manifest.Manifest(manifest_xml.strpath)
     assert e.value.message == "Missing 'remotes' attribute"
 
 
 def test_several_reviews(tmpdir):
+    """ Test Several Reviews """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -95,13 +100,13 @@ def test_several_reviews(tmpdir):
   <remote name="review2" url="git@example.com" review="true" />
 </manifest>
 """)
-    # pylint: disable-msg=E1101
     with pytest.raises(qisrc.manifest.ManifestError) as e:
         qisrc.manifest.Manifest(manifest_xml.strpath)
     assert "Only one" in str(e.value)
 
 
 def test_no_matching_remote(tmpdir):
+    """ Test No Matching Remote """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -109,13 +114,13 @@ def test_no_matching_remote(tmpdir):
   <repo project="foo/bar.git" src="lib/bar" remotes="invalid" />
 </manifest>
 """)
-    # pylint: disable-msg=E1101
     with pytest.raises(qisrc.manifest.ManifestError) as e:
         qisrc.manifest.Manifest(manifest_xml.strpath)
     assert e.value.message == "No matching remote: invalid for repo foo/bar.git"
 
 
 def test_repo_branch(tmpdir):
+    """ Test Repo Branch """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -125,13 +130,14 @@ def test_repo_branch(tmpdir):
 </manifest>
 """)
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
-    bar = manifest.repos[0]
-    foo = manifest.repos[1]
-    assert bar.default_branch == "master"
-    assert foo.default_branch == "devel"
+    bar1 = manifest.repos[0]
+    foo1 = manifest.repos[1]
+    assert bar1.default_branch == "master"
+    assert foo1.default_branch == "devel"
 
 
 def test_remote_branch(tmpdir):
+    """ Test Remote Branch """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -140,11 +146,12 @@ def test_remote_branch(tmpdir):
 </manifest>
 """)
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
-    bar = manifest.repos[0]
-    assert bar.default_branch == "release"
+    bar1 = manifest.repos[0]
+    assert bar1.default_branch == "release"
 
 
 def test_invalid_group(tmpdir):
+    """ Test Invalid Group """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -159,7 +166,6 @@ def test_invalid_group(tmpdir):
 
 </manifest>
 """)
-    # pylint: disable-msg=E1101
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     with pytest.raises(qisrc.manifest.ManifestError) as e:
         manifest.get_repos(groups=["foo-group"])
@@ -171,6 +177,7 @@ def test_invalid_group(tmpdir):
 
 
 def test_review_projects(tmpdir):
+    """ Test Review Project """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -181,13 +188,14 @@ def test_review_projects(tmpdir):
 """)
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     assert len(manifest.repos) == 1
-    bar = manifest.repos[0]
-    assert bar.src == "lib/bar"
-    assert bar.clone_url == "http://gerrit:8080/foo/bar.git"
-    assert bar.review is True
+    bar1 = manifest.repos[0]
+    assert bar1.src == "lib/bar"
+    assert bar1.clone_url == "http://gerrit:8080/foo/bar.git"
+    assert bar1.review is True
 
 
 def test_review_projects_with_two_remotes(tmpdir):
+    """ Test Review Projects With Two Remotes """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -198,20 +206,21 @@ def test_review_projects_with_two_remotes(tmpdir):
 """)
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     assert len(manifest.repos) == 1
-    bar = manifest.repos[0]
-    assert bar.src == "lib/bar"
-    assert len(bar.remotes) == 2
-    origin_remote = bar.remotes[0]
-    gerrit_remote = bar.remotes[1]
+    bar1 = manifest.repos[0]
+    assert bar1.src == "lib/bar"
+    assert len(bar1.remotes) == 2
+    origin_remote = bar1.remotes[0]
+    gerrit_remote = bar1.remotes[1]
     assert origin_remote.name == "origin"
     assert gerrit_remote.name == "gerrit"
     assert gerrit_remote.review is True
-    assert bar.review_remote == gerrit_remote
-    assert bar.review is True
-    assert bar.default_remote.name == "origin"
+    assert bar1.review_remote == gerrit_remote
+    assert bar1.review is True
+    assert bar1.default_remote.name == "origin"
 
 
 def test_no_review(tmpdir):
+    """ Test No Review """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -221,12 +230,10 @@ def test_no_review(tmpdir):
 </manifest>
 """)
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath, review=False)
-
     assert len(manifest.repos) == 1
     [repo] = manifest.repos
     assert repo.review is False
     assert repo.default_remote.name == "origin"
-
     assert len(repo.remotes) == 1
     [remote] = repo.remotes
     assert remote.name == "origin"
@@ -234,6 +241,7 @@ def test_no_review(tmpdir):
 
 
 def test_default_remote(tmpdir):
+    """ Test Default Remote """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -252,6 +260,7 @@ def test_default_remote(tmpdir):
 
 
 def test_groups(tmpdir):
+    """ Test Groups """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -276,6 +285,7 @@ def test_groups(tmpdir):
 
 
 def test_default_group(tmpdir):
+    """ Test Default Group """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -298,6 +308,7 @@ def test_default_group(tmpdir):
 
 
 def test_default_branch(tmpdir):
+    """ Test Default Branch """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -310,13 +321,14 @@ def test_default_branch(tmpdir):
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     assert len(manifest.repos) == 2
     assert manifest.default_branch == "devel"
-    bar = manifest.repos[0]
-    assert bar.default_branch == "devel"
-    foo = manifest.repos[1]
-    assert foo.default_branch == "tutu"
+    bar1 = manifest.repos[0]
+    assert bar1.default_branch == "devel"
+    foo1 = manifest.repos[1]
+    assert foo1.default_branch == "tutu"
 
 
 def test_multiple_remotes(tmpdir):
+    """ Test Multiple Remotes """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -328,11 +340,12 @@ def test_multiple_remotes(tmpdir):
 """)
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     assert len(manifest.repos) == 1
-    foo = manifest.repos[0]
-    assert len(foo.remotes) == 2
+    foo1 = manifest.repos[0]
+    assert len(foo1.remotes) == 2
 
 
 def test_fixed_ref(tmpdir):
+    """ Test Fixed Ref """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -344,12 +357,13 @@ def test_fixed_ref(tmpdir):
 </manifest>
 """)
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
-    foo = manifest.repos[0]
-    assert foo.default_branch is None
-    assert foo.fixed_ref == "v0.1"
+    foo1 = manifest.repos[0]
+    assert foo1.default_branch is None
+    assert foo1.fixed_ref == "v0.1"
 
 
 def test_fixed_ref_and_branch_are_exclusive(tmpdir):
+    """ Test Fixed Ref And Branch are Exclusive """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -361,13 +375,13 @@ def test_fixed_ref_and_branch_are_exclusive(tmpdir):
         branch="master" />
 </manifest>
 """)
-    # pylint: disable-msg=E1101
     with pytest.raises(Exception)as e:
         qisrc.manifest.Manifest(manifest_xml.strpath)
     assert "'branch' and 'ref' are mutually exclusive" in e.value.args[0]
 
 
 def test_from_git_repo(git_server):
+    """ Test From Git Repo """
     git_server.create_repo("foo")
     git_server.switch_manifest_branch("devel")
     git_server.create_repo("bar")
@@ -379,6 +393,7 @@ def test_from_git_repo(git_server):
 
 
 def test_all_repos(tmpdir):
+    """ Test All Repo """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -401,6 +416,7 @@ def test_all_repos(tmpdir):
 
 
 def test_import_parser(tmpdir):
+    """ Test Import Parser """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
     <manifest>
@@ -418,6 +434,7 @@ def test_import_parser(tmpdir):
 
 
 def test_import_parser_error_manifest(tmpdir):
+    """ Test Import Parser Error Manifest """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
     <manifest>
@@ -425,13 +442,13 @@ def test_import_parser_error_manifest(tmpdir):
       <import remotes="origin" />
     </manifest>
     """)
-    # pylint: disable-msg=E1101
     with pytest.raises(Exception)as e:
-        manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+        _manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     assert "Missing 'manifest' attribute" in e.value.args[0]
 
 
 def test_import_parser_error_remote_empty(tmpdir):
+    """ Test Import Parser Error Remote Empty """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
     <manifest>
@@ -439,13 +456,13 @@ def test_import_parser_error_remote_empty(tmpdir):
       <import manifest="a.git" remotes="" />
     </manifest>
     """)
-    # pylint: disable-msg=E1101
     with pytest.raises(Exception)as e:
-        manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+        _manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     assert "Empty 'remotes' attribute" in e.value.args[0]
 
 
 def test_import_parser_error_remote(tmpdir):
+    """ Test Import Parser Error Remote """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
     <manifest>
@@ -453,20 +470,19 @@ def test_import_parser_error_remote(tmpdir):
       <import manifest="a.git"/>
     </manifest>
     """)
-    # pylint: disable-msg=E1101
     with pytest.raises(Exception)as e:
-        manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+        _manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     assert "Missing 'remotes' attribute" in e.value.args[0]
 
 
 def test_import_parser_error_remote_missing(tmpdir):
+    """ Test Import Parsder Error Remote Missing """
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
     <manifest>
        <import manifest="a.git" remotes="origin" />
     </manifest>
     """)
-    # pylint: disable-msg=E1101
     with pytest.raises(Exception)as e:
-        manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+        _manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     assert "No matching remote: origin for repo a.git" in e.value.args[0]

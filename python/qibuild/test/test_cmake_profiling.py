@@ -1,17 +1,22 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test CMake Profiling """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 
 import qisys.sh
 import qibuild.cmake
-
 from qibuild.cmake.profiling import parse_cmake_log
 from qibuild.cmake.profiling import gen_annotations
 
 
 def test_simple_parse(tmpdir):
+    """ Test Simple Parse """
     out = """Running with trace output on.
 @worktree@/lib/gtest/CMakeLists.txt(3):  cmake_minimum_required(VERSION 2.8 )
 @worktree@/lib/gtest/CMakeLists.txt(4):  project(gtest )
@@ -33,13 +38,13 @@ def test_simple_parse(tmpdir):
     out = out.replace("@qibuild_root@", qibuild_dir)
     cmake_log = tmpdir.join("cmake.log")
     cmake_log.write(out)
-
     profile = parse_cmake_log(cmake_log.strpath, qibuild_dir)
     assert profile["internal/stage.cmake"] == {73: 1, 74: 1}
     assert profile["internal/install.cmake"] == {64: 1, 63: 2}
 
 
 def test_gen_annotations(tmpdir):
+    """ Test Gen Annotations """
     profile = {
         "internal/stage.cmake": {1: 3, 2: 39},
         "internal/install.cmake": {3: 3},

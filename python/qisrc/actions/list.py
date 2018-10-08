@@ -1,18 +1,19 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-""" List the names and paths of every project, or those matching a pattern
-
-"""
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" List the names and paths of every project, or those matching a pattern """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import re
 import operator
 
-from qisys import ui
-import qisys.parsers
 import qisrc.parsers
 import qisrc.worktree
+import qisys.parsers
+from qisys import ui
 
 
 def configure_parser(parser):
@@ -29,7 +30,7 @@ def configure_parser(parser):
 
 
 def do(args):
-    """ Main method """
+    """ Main Entry Point """
     git_worktree = qisrc.parsers.get_git_worktree(args)
     if not git_worktree.git_projects:
         qisrc.worktree.on_no_matching_projects(git_worktree)

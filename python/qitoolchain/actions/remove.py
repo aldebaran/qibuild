@@ -1,18 +1,19 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Uninstall a toolchain """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-"""Uninstall a toolchain
-
-"""
-
-from qisys import ui
-import qisys.parsers
 import qitoolchain
+import qisys.parsers
+from qisys import ui
 
 
 def configure_parser(parser):
-    """Configure parser for this action """
+    """ Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
     parser.add_argument("name",
                         help="The name of the toolchain to remove")

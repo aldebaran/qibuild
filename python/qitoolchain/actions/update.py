@@ -1,17 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-""" Update every toolchain using the feed that was used to create them
-
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+"""
+Update every toolchain using the feed that was used to create them.
 If a toolchain name is given, only update this toolchain.
 If a feed url is given, use this feed instead of the recorded one
 to update the given toolchain.
 """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-from qisys import ui
-import qisys.parsers
 import qitoolchain
+import qisys.parsers
+from qisys import ui
 
 
 def configure_parser(parser):
@@ -29,9 +32,7 @@ def configure_parser(parser):
 
 
 def do(args):
-    """Main entry point
-
-    """
+    """ Main entry point """
     feed = args.feed
     tc_name = args.name
     if tc_name:

@@ -1,15 +1,16 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Display the toolchains names. """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-"""Display the toolchains names.
-
-"""
-
-from qisys import ui
-import qisys.worktree
-import qisys.parsers
 import qitoolchain
+import qisys.parsers
+import qisys.worktree
+from qisys import ui
 
 
 def configure_parser(parser):
@@ -17,7 +18,7 @@ def configure_parser(parser):
     qisys.parsers.default_parser(parser)
 
 
-def do(args):  # pylint: disable=unused-argument
+def do(args):
     """ Main method """
     tc_names = qitoolchain.get_tc_names()
     if not tc_names:

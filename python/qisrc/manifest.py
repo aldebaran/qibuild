@@ -1,27 +1,32 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Set of tools to parse qisrc manifests """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-""" Set of tools to parse qisrc manifests
-
-"""
-
+import io
 import copy
 import functools
-import StringIO
 
 import qisys.sh
 import qisys.qixml
-import qisrc.git_config
 import qisrc.groups
+import qisrc.git_config
 
 
 class ManifestError(Exception):
+    """ ManifestError Exception """
     pass
 
 
 class Manifest(object):
+    """ Manifest Class """
+
     def __init__(self, manifest_xml, review=True):
+        """ Manifest Init """
         self.manifest_xml = manifest_xml
         self.review = review
         self.repos = list()
@@ -30,12 +35,11 @@ class Manifest(object):
         self.groups = qisrc.groups.Groups()
         self.load()
 
-    # pylint: disable-msg=E0213
     def change_config(func):
         """ Decorator for every function that changes the configuration """
         @functools.wraps(func)
         def new_func(self, *args, **kwargs):
-            # pylint: disable-msg=E1102
+            """ New Func """
             res = func(self, *args, **kwargs)
             self.dump()
             # mandatory to re-compute project.remote,
@@ -54,31 +58,25 @@ class Manifest(object):
         root = qisys.qixml.read(self.manifest_xml).getroot()
         parser = ManifestParser(self)
         parser.parse(root)
-
         for repo in self.repos:
             if repo.project in project_names:
                 raise ManifestError("%s found twice" % repo.project)
             project_names.append(repo.project)
-
         for remote in self.remotes:
             if remote.review and not self.review:
                 continue
             remote.parse_url()
-
         review_remotes = list()
         for remote in self.remotes:
             if remote.review:
                 review_remotes.append(remote)
-
         if len(review_remotes) > 1:
             mess = """ \
 Only one remote can be configured with review="true", found {0}
 """.format(len(review_remotes))
             raise ManifestError(mess)
-
         for import_manifest in self.import_manifest:
             self.set_remote(import_manifest, import_manifest.default_remote_name)
-
         srcs = dict()
         for repo in self.repos:
             if repo.src in srcs:
@@ -88,16 +86,14 @@ Found two projects sharing the same sources:
 * {1}
 """.format(srcs[repo.src], repo)
                 raise ManifestError(mess)
-
             for remote_name in repo.remote_names:
                 self.set_remote(repo, remote_name)
-
             srcs[repo.src] = repo
 
     def set_remote(self, repo, remote_name):
-        """ Set the remote of a repo from the list.
-        Assume all the remotes have already been read
-
+        """
+        Set the remote of a repo from the list.
+        Assume all the remotes have already been read.
         """
         matching_remote = self.get_remote(remote_name)
         if not matching_remote:
@@ -129,12 +125,11 @@ Found two projects sharing the same sources:
         qisys.qixml.write(xml_elem, self.manifest_xml)
 
     def get_repos(self, groups=None, get_all=False):
-        """ Get the repositories inside the given group
-
+        """
+        Get the repositories inside the given group
         * If there is a default group, returns projects
           from the default group, unless get_all is True,
           then return all the projects
-
         """
         default_group = self.groups.default_group
         if groups is None:
@@ -142,7 +137,6 @@ Found two projects sharing the same sources:
                 groups = [default_group.name]
             else:
                 return self.repos
-
         repos = dict()
         for group in groups:
             try:
@@ -164,12 +158,14 @@ No such project: {1}
         for repo in self.repos:
             if repo.project == project:
                 return repo
+        return None
 
     def get_remote(self, name):
         """ Get a remote given the name """
         for remote in self.remotes:
             if remote.name == name:
                 return remote
+        return None
 
     # Following methods are mainly use for testing,
     # but could be useful for other use cases anyway
@@ -214,6 +210,7 @@ No such project: {1}
 
 
 def from_git_repo(git_repo, ref):
+    """ From Git Repo """
     git = qisrc.git.Git(git_repo)
     rc, out = git.call("cat-file", "-p", ref + "^{tree}", raises=False)
     if rc != 0:
@@ -229,12 +226,15 @@ def from_git_repo(git_repo, ref):
     rc, as_string = git.call("cat-file", "-p", manifest_blob_sha1, raises=False)
     if rc != 0:
         return None
-    source = StringIO.StringIO(as_string)
+    source = io.StringIO(as_string)
     return Manifest(source)
 
 
 class RepoConfig(object):
+    """ RepoConfig Class """
+
     def __init__(self):
+        """ RepoConfig Init """
         self.src = None
         self.project = None
         self.default_branch = None
@@ -245,33 +245,37 @@ class RepoConfig(object):
 
     @property
     def review_remote(self):
+        """ Review Remote """
         for remote in self.remotes:
             if remote.review:
                 return remote
+        return None
 
     @property
     def default_remote(self):
-        """ Return the remote that will be used to clone
-        the project
-
-        """
+        """ Return the remote that will be used to clone the project """
         for remote in self.remotes:
             if remote.default:
                 return remote
+        return None
 
     @property
     def clone_url(self):
+        """ Clone Url """
         return self.default_remote.url
 
     @property
     def urls(self):
+        """ Urls """
         return [remote.url for remote in self.remotes]
 
     @property
     def review(self):
+        """ Review """
         return self.review_remote is not None
 
     def __repr__(self):
+        """ Representation """
         res = "<Repo %s in %s" % (self.project, self.src)
         if self.default_branch:
             res += " default: %s" % self.default_branch
@@ -284,7 +288,10 @@ class RepoConfig(object):
 
 
 class ImportManifest(object):
+    """ ImportManifest Class """
+
     def __init__(self):
+        """ ImportManifest Init """
         self.project = None
         self.default_branch = None
         self.branch = None
@@ -294,6 +301,7 @@ class ImportManifest(object):
         self.remote_names = None
 
     def __repr__(self):
+        """ Representation """
         res = "<Import manifest %s" % self.project
         if self.branch:
             res += " branch: %s" % self.branch
@@ -302,62 +310,74 @@ class ImportManifest(object):
         res += ">"
         return res
 
-##
-# parsing
-
 
 class ManifestParser(qisys.qixml.XMLParser):
+    """ ManifestParser Class """
+
     def __init__(self, target):
+        """ ManifestParser Init """
         super(ManifestParser, self).__init__(target)
         self._ignore = ["manifest_xml", "review"]
 
     def _parse_branch(self, elem):
+        """ Parse Branch """
         self.target.default_branch = elem.get("default")
 
     def _parse_repo(self, elem):
+        """ Parse Repo """
         repo_config = RepoConfig()
         parser = RepoConfigParser(repo_config)
         parser.parse(elem)
         self.target.repos.append(repo_config)
 
     def _parse_remote(self, elem):
+        """ Parse Remote """
         remote = qisrc.git_config.Remote()
         parser = qisrc.git_config.RemoteParser(remote)
         parser.parse(elem)
         self.target.remotes.append(remote)
 
     def _parse_import(self, elem):
+        """ Parse Import """
         import_manifest = ImportManifest()
         parser = ImportManifestParser(import_manifest)
         parser.parse(elem)
         self.target.import_manifest.append(import_manifest)
 
     def _parse_groups(self, elem):
+        """ Parse Groups """
         parser = qisrc.groups.GroupsParser(self.target.groups)
         parser.parse(elem)
 
     def _write_branch(self, elem):
+        """ Write Branch """
         elem.set("default", self.target.default_branch)
 
     def _write_repos(self, elem):
+        """ Write Repos """
         for repo_config in self.target.repos:
             parser = RepoConfigParser(repo_config)
             repo_elem = parser.xml_elem(node_name="repo")
             elem.append(repo_elem)
 
     def _write_remotes(self, elem):
+        """ Write Remotes """
         for remote in self.target.remotes:
             parser = qisrc.git_config.RemoteParser(remote)
             remote_elem = parser.xml_elem()
             elem.append(remote_elem)
 
     def _write_groups(self, elem):
+        """ Write Groups """
         parser = qisrc.groups.GroupsParser(self.target.groups)
         elem.append(parser.xml_elem())
 
 
 class ImportManifestParser(qisys.qixml.XMLParser):
+    """ ImportManifestParser Class """
+
     def __init__(self, target):
+        """ ImportManifestParser Init """
         super(ImportManifestParser, self).__init__(target)
         self._ignore = ["review_remote",
                         "default_remote_name",
@@ -367,20 +387,19 @@ class ImportManifestParser(qisys.qixml.XMLParser):
                         "remotes"]
         self._required = ["manifest"]
 
-    # the 'remote' XML attribute matches an attribute named
+    # The 'remote' XML attribute matches an attribute named
     # 'remote_name' in the RepoConfig class
     def _parse_attributes(self):
+        """ Parse Attributes """
         self.target.project = self._root.get("manifest")
         if not self.target.project:
             raise ManifestError("Missing 'manifest' attribute")
-
         self.target.branch = self._root.get("branch")
         self.target.fixed_ref = self._root.get("ref")
         if self.target.fixed_ref and self.target.branch:
             mess = "Error when parsing project %s\n" % self.target.project
             mess += "'branch' and 'ref' are mutually exclusive"
             raise ManifestError(mess)
-
         remote_names = self._root.get("remotes")
         if remote_names is None:
             raise ManifestError("Missing 'remotes' attribute")
@@ -394,7 +413,10 @@ class ImportManifestParser(qisys.qixml.XMLParser):
 
 
 class RepoConfigParser(qisys.qixml.XMLParser):
+    """ RepoConfigParser Class """
+
     def __init__(self, target):
+        """ RepoConfigParser Init """
         super(RepoConfigParser, self).__init__(target)
         self._ignore = ["review_remote",
                         "default_remote_name",
@@ -404,9 +426,10 @@ class RepoConfigParser(qisys.qixml.XMLParser):
                         "remotes"]
         self._required = ["project"]
 
-    # the 'remote' XML attribute matches an attribute named
+    # The 'remote' XML attribute matches an attribute named
     # 'remote_name' in the RepoConfig class
     def _parse_attributes(self):
+        """ Parse Attributes """
         self.target.project = self._root.get("project")
         if not self.target.project:
             raise ManifestError("Missing 'project' attribute")
@@ -414,7 +437,6 @@ class RepoConfigParser(qisys.qixml.XMLParser):
         if src is None:
             src = self.target.project.replace(".git", "")
         self.target.src = src
-
         self.target.default_branch = self._root.get("branch")
         self.target.fixed_ref = self._root.get("ref")
         if self.target.fixed_ref and self.target.default_branch:
@@ -431,7 +453,6 @@ class RepoConfigParser(qisys.qixml.XMLParser):
         self.target.default_remote_name = self._root.get("default_remote")
         if not self.target.default_remote_name:
             self.target.default_remote_name = remote_names[0]
-
         for upstream_elem in self._root.findall("upstream"):
             name = qisys.qixml.parse_required_attr(upstream_elem, "name")
             url = qisys.qixml.parse_required_attr(upstream_elem, "url")
@@ -441,12 +462,15 @@ class RepoConfigParser(qisys.qixml.XMLParser):
             self.target.remotes.append(upstream_remote)
 
     def _write_remote_names(self, elem):
+        """ Write Remote Names """
         elem.set("remotes", " ".join(self.target.remote_names))
 
     def _write_fixed_ref(self, elem):
+        """ Write Fixed Ref """
         if self.target.fixed_ref:
             elem.set("ref", self.target.fixed_ref)
 
     def _write_default_branch(self, elem):
+        """ Write Default Branch """
         if self.target.default_branch:
             elem.set("branch", self.target.default_branch)

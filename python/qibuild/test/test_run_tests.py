@@ -1,11 +1,19 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test Run Tests """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
+
 import qisys.qixml
 
 
 def test_run(build_worktree):
+    """ Test Run """
     testme = build_worktree.add_test_project("testme")
     testme.configure()
     testme.build()
@@ -20,6 +28,7 @@ def test_run(build_worktree):
 
 
 def test_keep_output_when_test_times_out(build_worktree):
+    """ Test Keep Output When Test Times Out """
     testme = build_worktree.add_test_project("testme")
     testme.configure()
     testme.build()

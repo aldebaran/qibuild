@@ -1,21 +1,26 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-""" Automatic testing for qibuild.config.QiBuildConfig
-
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
 """
+Test Config.
+Automatic testing for qibuild.config.QiBuildConfig.
+"""
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
+import io
 import unittest
-from StringIO import StringIO
 
 import qibuild
 import qibuild.config
 
 
 def cfg_from_string(input_str, user_config=None):
-    cfg_loc = StringIO(input_str)
+    """ Config From String """
+    cfg_loc = io.BytesIO(input_str.encode("utf-8"))
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read(cfg_loc)
     if user_config:
@@ -24,21 +29,24 @@ def cfg_from_string(input_str, user_config=None):
 
 
 def cfg_to_string(cfg):
-    cfg_loc = StringIO()
+    """ Config To String """
+    cfg_loc = io.BytesIO()
     cfg.write(cfg_loc)
     return cfg_loc.getvalue()
 
 
 def local_cfg_to_string(cfg):
-    cfg_loc = StringIO()
+    """ Local Config To String """
+    cfg_loc = io.BytesIO()
     cfg.write_local_config(cfg_loc)
     return cfg_loc.getvalue()
 
 
-# pylint: disable=too-many-public-methods
 class QiBuildConfig(unittest.TestCase):
+    """ QiBuildConfig Test Case """
 
     def test_simple(self):
+        """ Test Simple """
         xml = """
 <qibuild version="1">
   <config name="linux32">
@@ -53,13 +61,13 @@ class QiBuildConfig(unittest.TestCase):
         ide = qibuild_cfg.ides["qtcreator"]
         self.assertEquals(ide.name, "qtcreator")
         self.assertEquals(ide.path, "/path/to/qtcreator")
-
         config = qibuild_cfg.configs["linux32"]
         self.assertEquals(config.name, "linux32")
         env_path = config.env.path
         self.assertEquals(env_path, "/path/to/swig")
 
     def test_several_configs(self):
+        """ Test Several Configs """
         xml = """
 <qibuild version="1">
   <config name="linux32">
@@ -74,14 +82,13 @@ class QiBuildConfig(unittest.TestCase):
         configs = qibuild_cfg.configs
         self.assertEquals(len(configs), 2)
         [linux32_cfg, linux64_cfg] = [configs["linux32"], configs["linux64"]]
-
         self.assertEquals(linux32_cfg.name, "linux32")
         self.assertEquals(linux64_cfg.name, "linux64")
-
         self.assertEquals(linux32_cfg.env.path, "/path/to/swig32")
         self.assertEquals(linux64_cfg.env.path, "/path/to/swig64")
 
     def test_default_from_conf(self):
+        """ Test Default From Conf """
         xml = """
 <qibuild version="1">
   <config name="linux32">
@@ -98,11 +105,12 @@ class QiBuildConfig(unittest.TestCase):
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml)
-        qibuild_cfg.read_local_config(StringIO(local_xml))
+        qibuild_cfg.read_local_config(io.BytesIO(local_xml.encode("utf-8")))
         self.assertEquals(qibuild_cfg.local.defaults.config, "linux32")
         self.assertEquals(qibuild_cfg.env.path, "/path/to/swig32")
 
     def test_user_active_conf(self):
+        """ Test User Active Conf """
         xml = """
 <qibuild version="1">
   <config name="linux32">
@@ -119,11 +127,12 @@ class QiBuildConfig(unittest.TestCase):
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml, user_config="linux64")
-        qibuild_cfg.read_local_config(StringIO(local_xml))
+        qibuild_cfg.read_local_config(io.BytesIO(local_xml.encode("utf-8")))
         self.assertEquals(qibuild_cfg.local.defaults.config, "linux32")
         self.assertEquals(qibuild_cfg.env.path, "/path/to/swig32")
 
     def test_path_merging(self):
+        """ Test Path Merging """
         xml = """
 <qibuild version="1">
   <defaults>
@@ -141,6 +150,7 @@ class QiBuildConfig(unittest.TestCase):
         self.assertEquals(qibuild_cfg.env.path, excpected_path)
 
     def test_ide_selection(self):
+        """ Test IDE Selection """
         xml = """
 <qibuild version="1">
   <defaults ide="qtcreator" />
@@ -153,6 +163,7 @@ class QiBuildConfig(unittest.TestCase):
         self.assertEquals(qibuild_cfg.ide.path, "/path/to/qtcreator")
 
     def test_add_env_config(self):
+        """ Test Add Env Config """
         xml = """
 <qibuild version="1" />
 """
@@ -168,6 +179,7 @@ class QiBuildConfig(unittest.TestCase):
         self.assertEquals(linux32_conf.env.path, "/path/to/swig32")
 
     def test_add_cmake_config(self):
+        """ Test Add CMake Config """
         qibuild_cfg = cfg_from_string("<qibuild />")
         config = qibuild.config.BuildConfig()
         config.name = "mac64"
@@ -177,10 +189,11 @@ class QiBuildConfig(unittest.TestCase):
         local_xml = local_cfg_to_string(qibuild_cfg)
         new_conf = cfg_to_string(qibuild_cfg)
         new_cfg = cfg_from_string(new_conf)
-        new_cfg.read_local_config(StringIO(local_xml))
+        new_cfg.read_local_config(io.BytesIO(local_xml))
         self.assertEquals(new_cfg.cmake.generator, "Xcode")
 
     def test_default_cmake_generator(self):
+        """ Test Default CMake Generator """
         xml = """
 <qibuild version="1">
   <defaults>
@@ -197,6 +210,7 @@ class QiBuildConfig(unittest.TestCase):
         self.assertEquals(mingw_cfg.cmake.generator, "NMake Makefiles")
 
     def test_set_default_config(self):
+        """ Test Set Default Config """
         xml = """
 <qibuild version="1">
   <config name="linux32">
@@ -212,10 +226,11 @@ class QiBuildConfig(unittest.TestCase):
         local_xml = local_cfg_to_string(qibuild_cfg)
         new_conf = cfg_to_string(qibuild_cfg)
         new_cfg = cfg_from_string(new_conf)
-        new_cfg.read_local_config(StringIO(local_xml))
+        new_cfg.read_local_config(io.BytesIO(local_xml))
         self.assertEquals(new_cfg.cmake.generator, "Unix Makefiles")
 
     def test_change_default_config(self):
+        """ Test Change Default Config """
         xml = """
 <qibuild version="1">
   <config name="linux32">
@@ -236,20 +251,18 @@ class QiBuildConfig(unittest.TestCase):
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml)
-        qibuild_cfg.read_local_config(StringIO(local_xml))
+        qibuild_cfg.read_local_config(io.BytesIO(local_xml.encode("utf-8")))
         self.assertEquals(qibuild_cfg.cmake.generator, "Unix Makefiles")
         qibuild_cfg.set_default_config("win32-vs2010")
         local_xml = local_cfg_to_string(qibuild_cfg)
         new_conf = cfg_to_string(qibuild_cfg)
         new_cfg = cfg_from_string(new_conf)
-        new_cfg.read_local_config(StringIO(local_xml))
+        new_cfg.read_local_config(io.BytesIO(local_xml))
         self.assertEquals(new_cfg.cmake.generator, "Visual Studio 10")
 
     def test_add_ide(self):
-        xml = """
-<qibuild version="1">
-</qibuild>
-"""
+        """ Test Add Ide """
+        xml = """\n<qibuild version="1">\n</qibuild>\n"""
         qibuild_cfg = cfg_from_string(xml)
         self.assertEquals(qibuild_cfg.ide, None)
         ide = qibuild.config.IDE()
@@ -261,11 +274,8 @@ class QiBuildConfig(unittest.TestCase):
         self.assertEquals(new_cfg.ide.name, "qtcreator")
 
     def test_adding_conf_twice(self):
-        xml = """
-<qibuild version="1">
-  <config name="linux32" />
-</qibuild>
-"""
+        """ Test Adding Conf Twice """
+        xml = """\n<qibuild version="1">\n  <config name="linux32" />\n</qibuild>\n"""
         qibuild_cfg = cfg_from_string(xml)
         config = qibuild.config.BuildConfig()
         config.name = "linux32"
@@ -277,6 +287,7 @@ class QiBuildConfig(unittest.TestCase):
                          "Code::Blocks")
 
     def test_ide_from_config(self):
+        """ Test IDE From Config """
         xml = """
 <qibuild version="1">
   <ide
@@ -304,6 +315,7 @@ class QiBuildConfig(unittest.TestCase):
         self.assertEqual(vc_cfg.ide.path, "/path/to/qtsdk/qtcreator")
 
     def test_adding_ide_twice(self):
+        """ Test Adding IDE Twice """
         xml = """
 <qibuild version="1">
   <ide name="qtcreator" />
@@ -320,6 +332,7 @@ class QiBuildConfig(unittest.TestCase):
                          "/path/to/qtcreator")
 
     def test_build_settings(self):
+        """ Test Build Settings """
         xml = """
 <qibuild version="1">
 </qibuild>
@@ -327,7 +340,6 @@ class QiBuildConfig(unittest.TestCase):
         qibuild_cfg = cfg_from_string(xml)
         self.assertTrue(qibuild_cfg.local.build.sdk_dir is None)
         self.assertTrue(qibuild_cfg.local.build.prefix is None)
-
         xml = """
 <qibuild version="1">
 </qibuild>
@@ -341,11 +353,12 @@ class QiBuildConfig(unittest.TestCase):
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml)
-        qibuild_cfg.read_local_config(StringIO(local_xml))
+        qibuild_cfg.read_local_config(io.BytesIO(local_xml.encode("utf-8")))
         self.assertEqual(qibuild_cfg.local.build.sdk_dir, "/path/to/sdk")
         self.assertEqual(qibuild_cfg.local.build.prefix, "/path/to/build")
 
     def test_get_server_access(self):
+        """ Test Get Server Access """
         xml = """
 <qibuild version="1">
   <server name="example.com">
@@ -366,11 +379,11 @@ class QiBuildConfig(unittest.TestCase):
         self.assertEqual(access.username, "john")
         self.assertEqual(access.password, "p4ssw0rd")
         self.assertEqual(access.root, "root")
-
         access = new_cfg.get_server_access("doesnotexists")
         self.assertTrue(access is None)
 
     def test_set_server_access(self):
+        """ Test Set Server Access """
         xml = '<qibuild />'
         qibuild_cfg = cfg_from_string(xml)
         qibuild_cfg.set_server_access("gerrit", "john")
@@ -380,6 +393,7 @@ class QiBuildConfig(unittest.TestCase):
         self.assertEqual(access.username, "john")
 
     def test_change_server_access(self):
+        """ Test Change Server Access """
         xml = """
 <qibuild version="1">
     <server name="gerrit">
@@ -395,6 +409,7 @@ class QiBuildConfig(unittest.TestCase):
         self.assertEqual(access.username, "john")
 
     def test_merge_settings_with_empty_active(self):
+        """ Test Merge Settings With Empty Active """
         xml = """
 <qibuild version="1">
   <defaults>
@@ -410,6 +425,7 @@ class QiBuildConfig(unittest.TestCase):
         self.assertEquals(qibuild_cfg.cmake.generator, "NMake Makefiles")
 
     def test_build_farm_config(self):
+        """ Test BuildFarm Config """
         xml = r"""
 <qibuild version="1">
   <build/>
@@ -428,6 +444,7 @@ class QiBuildConfig(unittest.TestCase):
 
 
 def test_recompute_cmake_generator(tmpdir):
+    """ Test ReCompute CMake Generator """
     global_xml = tmpdir.join("global.xml")
     global_xml.write("""
 <qibuild>
@@ -452,6 +469,7 @@ def test_recompute_cmake_generator(tmpdir):
 
 
 def test_worktree_paths(tmpdir):
+    """ Test WorkTree Paths """
     global_xml = tmpdir.join("global.xml")
     global_xml.write("""
 <qibuild>
@@ -466,6 +484,7 @@ def test_worktree_paths(tmpdir):
 
 
 def test_do_not_leak_default_config(tmpdir):
+    """ Test Do Not Leak Default Config """
     global_xml = tmpdir.join("global.xml")
     global_xml.write("""
 <qibuild>
@@ -491,6 +510,7 @@ def test_do_not_leak_default_config(tmpdir):
 
 
 def test_read_default_config_for_worktree(tmpdir):
+    """ Test Relad Default Config For Worktree """
     global_xml = tmpdir.join("global.xml")
     global_xml.write("""
 <qibuild>
@@ -505,6 +525,7 @@ def test_read_default_config_for_worktree(tmpdir):
 
 
 def test_set_default_config_for_worktree(tmpdir):
+    """ Test Set Default Config For Worktree """
     global_xml = tmpdir.join("global.xml")
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read(global_xml.strpath, create_if_missing=True)
@@ -516,6 +537,7 @@ def test_set_default_config_for_worktree(tmpdir):
 
 
 def test_parse_build_configs(tmpdir):
+    """ Test Parse Build Configs """
     global_xml = tmpdir.join("global.xml")
     global_xml.write("""
 <qibuild>
@@ -536,6 +558,7 @@ def test_parse_build_configs(tmpdir):
 
 
 def test_write_build_configs(tmpdir):
+    """ Test Write Buid Configs """
     global_xml = tmpdir.join("global.xml")
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read(global_xml.strpath, create_if_missing=True)
@@ -554,6 +577,7 @@ def test_write_build_configs(tmpdir):
 
 
 def test_host_config_default_is_none(tmpdir):
+    """ Test Host Config Default Is None """
     global_xml = tmpdir.join("global.xml")
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read(global_xml.strpath, create_if_missing=True)
@@ -561,6 +585,7 @@ def test_host_config_default_is_none(tmpdir):
 
 
 def test_host_config_setting_host():
+    """ Test Host Config Setting Host """
     qibuild.config.add_build_config("foo")
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read()
@@ -569,6 +594,7 @@ def test_host_config_setting_host():
 
 
 def test_host_config_is_persistent():
+    """ Test Host Config Is Persistent """
     qibuild.config.add_build_config("foo")
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read()
@@ -580,6 +606,7 @@ def test_host_config_is_persistent():
 
 
 def test_host_config_is_unique():
+    """ Test Host Config Is Unique """
     qibuild.config.add_build_config("foo")
     qibuild.config.add_build_config("bar")
     qibuild_cfg = qibuild.config.QiBuildConfig()
@@ -592,6 +619,7 @@ def test_host_config_is_unique():
 
 
 def test_setting_env_vars(tmpdir):
+    """ Test Setting Env Var """
     global_xml = tmpdir.join("global.xml")
     global_xml.write("""
 <qibuild>

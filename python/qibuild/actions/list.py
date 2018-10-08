@@ -1,22 +1,22 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-""" List the name and path of every buildable project
-
-"""
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" List the name and path of every buildable project. """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import re
 import operator
 
-
-from qisys import ui
-import qisys.parsers
 import qibuild.parsers
+import qisys.parsers
+from qisys import ui
 
 
 def configure_parser(parser):
-    """ Configure parser for this action """
+    """ Configure parser for this action. """
     qisys.parsers.worktree_parser(parser)
     parser.add_argument("--names", action="store_true", dest="names",
                         help="sort by names")
@@ -28,7 +28,7 @@ def configure_parser(parser):
 
 
 def do(args):
-    """ Main method """
+    """ Main method. """
     build_worktree = qibuild.parsers.get_build_worktree(args)
     projects = build_worktree.build_projects
     if not projects:
@@ -41,9 +41,9 @@ def do(args):
     if args.pattern:
         regex = re.compile(regex)
     if args.names:
-        projects.sort(key=operator.attrgetter("name"))
+        projects = sorted(projects, key=operator.attrgetter("name"))
     else:
-        projects.sort(key=operator.attrgetter("src"))
+        projects = sorted(projects, key=operator.attrgetter("src"))
     for project in projects:
         if args.names:
             items = (project.name.ljust(max_name + 2), project.path)
@@ -54,6 +54,7 @@ def do(args):
 
 
 def on_empty_worktree(worktree):
+    """ On Empty Wortree """
     mess = """The worktree in {worktree.root}
 does not contain any buildable project.
 

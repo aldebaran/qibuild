@@ -1,19 +1,23 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test Sh """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
-import stat
 import sys
+import stat
 import pytest
 
 import qisys.sh
 from qisrc.test.conftest import TestGit
 
-# pylint: disable=unused-variable
-
 
 def test_install_ro(tmpdir):
+    """ Test Install Ro """
     tmp = tmpdir.strpath
     src = os.path.join(tmp, "src")
     os.mkdir(src)
@@ -27,26 +31,28 @@ def test_install_ro(tmpdir):
 
 
 def test_install_on_self(tmpdir):
+    """ Test Install on Self """
     a_file = tmpdir.join("a")
     a_file.write("")
-    # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         qisys.sh.install(a_file.strpath, tmpdir.strpath)
     assert "are the same file" in e.value.message
-    # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         qisys.sh.install(tmpdir.strpath, tmpdir.strpath)
     assert "are the same directory" in e.value.message
 
 
 def test_filter_hidden(tmpdir):
+    """ Test Filter Hidden """
     src = tmpdir.ensure("src", dir=True)
     src.join("a_file").ensure(file=True)
     src.join(".hidden").ensure(file=True)
     dest = tmpdir.join("dest")
 
     def non_hidden(src):
+        """ Non Hidden """
         return not src.startswith(".")
+
     installed = qisys.sh.install(src.strpath, dest.strpath, filter_fun=non_hidden)
     a_file = dest.join("a_file")
     assert a_file.check(file=True)
@@ -55,6 +61,7 @@ def test_filter_hidden(tmpdir):
 
 
 def test_is_path_inside():
+    """ Test Is Path Inside """
     assert qisys.sh.is_path_inside(os.path.join("foo", "bar"), "foo")
     assert qisys.sh.is_path_inside(os.path.join("foo", "bar"),
                                    os.path.join("foo", "bar"))
@@ -66,6 +73,7 @@ def test_is_path_inside():
 
 
 def test_copy_git_src(tmpdir):
+    """ Test Copy Git Src """
     src = tmpdir.mkdir("src")
     dest = tmpdir.mkdir("dest")
     foo_src = src.mkdir("foo")
@@ -80,6 +88,7 @@ def test_copy_git_src(tmpdir):
 
 
 def test_is_runtime():
+    """ Test Is Runtime """
     assert qisys.sh.is_runtime("lib/libfoo.a") is False
     assert qisys.sh.is_runtime("include/foo.h") is False
     assert qisys.sh.is_runtime("lib/python2.7/Makefile") is True
@@ -91,8 +100,9 @@ def test_is_runtime():
 
 
 def test_install_return_value(tmpdir):
+    """ Test Install Return Value """
     src = tmpdir.mkdir("src")
-    b = src.ensure("a", "b", file=True)
+    src.ensure("a", "b", file=True)
     d = src.ensure("a", "c", "d", file=True)
     dest = tmpdir.mkdir("dest")
     ret = qisys.sh.install(src.strpath, dest.strpath)
@@ -102,6 +112,7 @@ def test_install_return_value(tmpdir):
 
 
 def test_install_qt_symlinks(tmpdir):
+    """ Test Install Qt Simlinks """
     tc_path = tmpdir.mkdir("toolchain")
     qt_src = tc_path.mkdir("qt")
     qt_src.ensure("lib", "QtCore.framework", "QtCore", file=True)

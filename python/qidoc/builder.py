@@ -1,25 +1,30 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
 
-from qisys import ui
 import qisys.sort
+from qisys import ui
 
 
-class DocBuilder(object):  # pylint: disable=too-many-instance-attributes
-    """ Build and install doc projects.
-
+class DocBuilder(object):
+    """
+    Build and install doc projects.
     Initialize with a `base_project`, which will
     be at the root of the dest dir when installed.
-
     The `install` step is required to have redistributable
     documentation folder, while you can browse the documentation
     directly from the build dir.
-
     """
 
     def __init__(self, doc_worktree, base_project_name=None):
+        """ DocBuilder Init """
         self.doc_worktree = doc_worktree
         self.single = False
         self.deps_solver = None
@@ -36,16 +41,16 @@ class DocBuilder(object):  # pylint: disable=too-many-instance-attributes
 
     @property
     def base_project(self):
+        """ Base Project """
         return self._base_project
 
     def set_base_project(self, name):
+        """ Base Project Setter """
         self._base_project = self.doc_worktree.get_doc_project(name, raises=True)
         self._base_project.is_base_project = True
 
     def configure(self):
-        """ Configure the projects in the right order
-
-        """
+        """ Configure the projects in the right order """
         projects = self.get_dep_projects()
         configure_args = {
             "version": self.version,
@@ -59,9 +64,9 @@ class DocBuilder(object):  # pylint: disable=too-many-instance-attributes
             project.configure(**configure_args)
 
     def build(self, pdb=False):
-        """ Build the projects in the right order,
-        making sure they are configured first
-
+        """
+        Build the projects in the right order,
+        making sure they are configured first.
         """
         projects = self.get_dep_projects()
         for i, project in enumerate(projects):
@@ -88,9 +93,7 @@ class DocBuilder(object):  # pylint: disable=too-many-instance-attributes
             ui.warning(*mess)
 
     def install(self, destdir, clean=False):
-        """ Install the doc projects to a dest dir
-
-        """
+        """ Install the doc projects to a dest dir """
         projects = self.get_dep_projects()
         ui.info(ui.blue, "::", ui.reset, "Building all projects")
         for i, project in enumerate(projects):
@@ -107,11 +110,9 @@ class DocBuilder(object):  # pylint: disable=too-many-instance-attributes
                 project.clean()
             project.configure(**options)
             project.build(build_type=self.build_type, language=self.language)
-
         if clean:
             qisys.sh.rm(destdir)
             qisys.sh.mkdir(destdir)
-
         ui.info(ui.blue, "::", ui.reset, "Installing all projects")
         for i, project in enumerate(projects):
             real_dest = os.path.join(destdir, project.dest)
@@ -122,9 +123,7 @@ class DocBuilder(object):  # pylint: disable=too-many-instance-attributes
             project.install(real_dest)
 
     def get_dep_projects(self):
-        """ Get the list of project deps
-
-        """
+        """ Get the list of project deps """
         if self.single:
             return [self.base_project]
         projects = list()

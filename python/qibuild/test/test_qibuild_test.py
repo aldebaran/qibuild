@@ -1,33 +1,33 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test QiBuild Test """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
 import sys
 import platform
-
 import xml.etree.ElementTree as etree
 
 import qisys.worktree
 import qibuild.worktree
-
-from qitest.test.conftest import qitest_action  # pylint: disable=unused-import
-
-# pylint: disable=redefined-outer-name
-# pylint: disable=unused-variable
+from qitest.test.conftest import qitest_action
 
 
 def test_various_outcomes(qibuild_action, record_messages):
+    """ Test Various Outcomes """
     qibuild_action.add_test_project("testme")
     qibuild_action("configure", "testme")
     qibuild_action("make", "testme")
     qibuild_action("test", "testme", "-k", "ok")
     assert record_messages.find("All pass")
     record_messages.reset()
-
     rc = qibuild_action("test", "testme", "-k", "fail", retcode=True)
     assert record_messages.find("Return code: 1")
     assert rc == 1
-
     record_messages.reset()
     rc = qibuild_action("test", "testme", "-k", "segfault", retcode=True)
     if os.name == 'nt':
@@ -35,32 +35,27 @@ def test_various_outcomes(qibuild_action, record_messages):
     else:
         assert record_messages.find("Segmentation fault")
     assert rc == 1
-
     record_messages.reset()
     rc = qibuild_action("test", "testme", "-k", "timeout", retcode=True)
     assert record_messages.find("Timed out")
     assert rc == 1
-
     rc = qibuild_action("test", "testme", "-k", "spam", retcode=True)
     result_dir = get_result_dir()
     assert "spam.xml" in os.listdir(result_dir)
     result = os.path.join(result_dir, "spam.xml")
     with open(result, "r") as f:
         assert len(f.read()) < 17000
-
     if qisys.command.find_program("valgrind"):
         # Test one file descriptor leak with --valgrind
         record_messages.reset()
         rc = qibuild_action("test", "testme", "-k", "fdleak", "--valgrind", retcode=True)
         assert record_messages.find("file descriptor leaks: 1")
         assert rc == 1
-
         # Test for false positives with --valgrind
         record_messages.reset()
         rc = qibuild_action("test", "testme", "-k", "ok", "--valgrind", retcode=True)
         assert not record_messages.find("file descriptor leaks")
         assert rc == 0
-
     rc = qibuild_action("test", "testme", "-k", "encoding", retcode=True)
     result_dir = get_result_dir()
     assert "encoding.xml" in os.listdir(result_dir)
@@ -77,6 +72,7 @@ def test_various_outcomes(qibuild_action, record_messages):
 
 
 def get_result_dir():
+    """ Get Result Dir """
     worktree = qisys.worktree.WorkTree(os.getcwd())
     build_worktree = qibuild.worktree.BuildWorkTree(worktree)
     testme = build_worktree.get_build_project("testme")
@@ -85,6 +81,7 @@ def get_result_dir():
 
 
 def test_do_not_overwrite_xml_when_test_fails(qibuild_action):
+    """ Test Do Not Overwrite XML When Test Fails """
     qibuild_action.add_test_project("testme")
     qibuild_action("configure", "testme")
     qibuild_action("make", "testme")
@@ -97,6 +94,7 @@ def test_do_not_overwrite_xml_when_test_fails(qibuild_action):
 
 
 def test_setting_output_dir_with_project(qitest_action, qibuild_action, tmpdir):
+    """ Test Setting Output Dir With Project """
     test_out = tmpdir.join("test-out", "testme")
     qibuild_action.add_test_project("testme")
     qibuild_action("configure", "testme")
@@ -104,13 +102,15 @@ def test_setting_output_dir_with_project(qitest_action, qibuild_action, tmpdir):
     qitest_action("run", "testme", "-k", "ok", "--root-output-dir", test_out.strpath)
     ok_xml = test_out.join("testme", "test-results", "ok.xml")
     assert ok_xml.check(file=True)
-    retcode = qitest_action("run", "testme", "-k", "fail",
-                            "--root-output-dir", test_out.strpath,
-                            retcode=True)
+    _retcode = qitest_action(
+        "run", "testme", "-k", "fail",
+        "--root-output-dir", test_out.strpath, retcode=True
+    )
     assert not ok_xml.check(file=True)
 
 
 def test_setting_output_dir_without_project(qitest_action, qibuild_action, tmpdir):
+    """ Test Setting Output Dir Without Project """
     dest = tmpdir.join("dest")
     qibuild_action.add_test_project("testme")
     qibuild_action("configure", "testme")
@@ -126,6 +126,7 @@ def test_setting_output_dir_without_project(qitest_action, qibuild_action, tmpdi
 
 
 def test_setting_build_prefix(qitest_action, qibuild_action, tmpdir):
+    """ Test Setting Build Prefix """
     prefix = tmpdir.join("prefix")
     qibuild_action.add_test_project("testme")
     qibuild_action("configure", "testme", "--build-prefix", prefix.strpath)

@@ -1,42 +1,46 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-""" Tools to related to command line parsing
-
-"""
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Tools related to command line parsing """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import sys
-import argparse
 import copy
+import doctest
 import operator
+import argparse
+import six
 
 from qisys import ui
 
 
 class InvalidAction(Exception):
-    """Just a custom exception """
+    """ Just a custom exception """
 
     def __init__(self, name, message):
+        """ InvalidAction Init """
         super(InvalidAction, self).__init__()
         self.name = name
         self._message = message
 
     def __str__(self):
+        """ InvalidAction String Representation """
         message = "Invalid action %s\n" % self.name
         message += self._message
         return message
 
 
-def parse_args_for_help(args):  # pylint: disable=too-many-return-statements
-    """Parse a command line for help usage.
-
+def parse_args_for_help(args):
+    """
+    Parse a command line for help usage.
     Returns a tuple:
      - help has been requested
      - name of the action on which help has been requested
        (or None if there was not any)
-
     >>> parse_args_for_help("qibuild".split())
     (True, None)
     >>> parse_args_for_help("qibuild foo".split())
@@ -53,51 +57,45 @@ def parse_args_for_help(args):  # pylint: disable=too-many-return-statements
     (True, 'foo')
     """
     def is_help(arg):
+        """ Return True if the Help Parameter is Present """
         return arg in ("-h", "--help", "help")
-
     if not args:
         return True, None
-
     if len(args) > 2:
         return False, None
-
     if len(args) == 1:
         if is_help(args[0]):
             return True, None
-
         return False, None
-
     if len(args) == 2:
         if is_help(args[0]):
             return True, args[1]
-
         if is_help(args[1]):
             return True, args[0]
-
         return False, None
 
 
 def run_action(module_name, args=None, forward_args=None):
     """
-    Run an action using its module path and a list of arguments
-
+    Run an action using its module path and a list of arguments.
     If forward_args is given, it must be an argparse.Namespace object.
     This namespace will be merged with args before being
     passed to the do() method of module_name.
-
     """
     if not args:
         args = list()
     ui.debug("running", module_name, " ".join(args))
     action_name = module_name.split(".")[-1]
     package_name = ".".join(module_name.split(".")[:-1])
+    if not isinstance(action_name, str):
+        action_name = str(action_name)
     try:
         _tmp = __import__(package_name, globals(), locals(), [action_name])
-    except ImportError, err:
+    except ImportError as err:
         raise InvalidAction(module_name, str(err))
     try:
         module = getattr(_tmp, action_name)
-    except AttributeError, err:
+    except AttributeError as err:
         raise InvalidAction(module_name, "Could not find module %s in package %s" %
                             (module_name, package_name))
     check_module(module)
@@ -109,10 +107,13 @@ def run_action(module_name, args=None, forward_args=None):
     # Instead, raise a nice Exception
 
     def custom_exit():
+        """ Custom Exit """
         return
+
     parser.exit = custom_exit
 
     def error(message):
+        """ Raise an Error Message """
         mess = "Invalid arguments when calling run_action(%s)\n" % module_name
         mess += message + "\n"
         mess += "args: %s\n" % " ".join(args)
@@ -124,12 +125,12 @@ def run_action(module_name, args=None, forward_args=None):
         parsed_args = parser.parse_args(args=args, namespace=copy.deepcopy(forward_args))
     else:
         parsed_args = parser.parse_args(args=args)
-
     return module.do(parsed_args)
 
 
 def main_wrapper(module, args):
-    """This wraps the main method of an action so that:
+    """
+    This wraps the main method of an action so that:
        - backtrace is not printed by default
        - backtrace is printed is --backtrace was given
        - a pdb session is run if --pdb was given
@@ -139,11 +140,10 @@ def main_wrapper(module, args):
     except Exception as e:
         if args.pdb:
             traceback = sys.exc_info()[2]
-            print ""
-            print "### Exception:", e
-            print "### Starting a debugger"
+            print("")
+            print("### Exception:", e)
+            print("### Starting a debugger")
             try:
-                # pylint: disable-msg=F0401
                 import ipdb
                 ipdb.post_mortem(traceback)
                 sys.exit(0)
@@ -163,10 +163,8 @@ def main_wrapper(module, args):
 def _dump_arguments(name, args):
     """ Dump an argparser namespace to log """
     output = ""
-    keys = args.__dict__.keys()
-    keys.sort()
+    keys = sorted(args.__dict__.keys())
     max_len = max(len(k) for k in keys)
-    keys.sort()
     for k in keys:
         value = args.__dict__[k]
         output += "  " + k.ljust(max_len) + " = %s\n" % (value,)
@@ -175,27 +173,24 @@ def _dump_arguments(name, args):
     ui.debug("[%s] arguments:\n%s" % (name, output))
 
 
-def root_command_main(name, parser, modules, args=None):  # pylint: disable=too-many-locals
-    """name : name of the main program
-       parser : an instance of ArgumentParser class
-       modules : list of Python modules
-
+def root_command_main(name, parser, modules, args=None):
+    """
+    Root Command Main
+        name : name of the main program
+        parser : an instance of ArgumentParser class
+        modules : list of Python modules
     """
     if not args:
         args = sys.argv[1:]
-    subparsers = parser.add_subparsers(
-        dest="action",
-        title="actions")
-
+    subparsers = parser.add_subparsers(dest="action", title="actions")
     # A dict name -> python module for the the action
     action_modules = dict()
-
     for module in modules:
         try:
             check_module(module)
-        except InvalidAction, err:
-            print "Warning, skipping", module.__name__
-            print err
+        except InvalidAction as err:
+            print("Warning, skipping", module.__name__)
+            print(err)
             continue
         name = module.__name__.split(".")[-1]
         # we want to type `foo bar-baz', and not type `foo bar_baz',
@@ -206,28 +201,24 @@ def root_command_main(name, parser, modules, args=None):  # pylint: disable=too-
         action_parser = subparsers.add_parser(name, help=first_doc_line)
         configurator(action_parser)
         action_parser.formatter_class = argparse.RawDescriptionHelpFormatter
-
         doc_lines = module.__doc__.splitlines()
         epilog = "\n".join(doc_lines[1:])
         if epilog:
             action_parser.epilog = first_doc_line + "\n" + epilog
-
         action_modules[name] = module
-
     (help_requested, action) = parse_args_for_help(args)
     if help_requested:
         if not action:
             parser.print_help()
         else:
             if action not in action_modules:
-                print "Invalid action!"
-                print "Choose between: ", " ".join(action_modules.keys())
-                print
+                print("Invalid action!")
+                print("Choose between: ", " ".join(action_modules.keys()))
+                print("")
                 parser.print_help()
             else:
                 parser.parse_args([action, "--help"])
         sys.exit(0)
-
     pargs = parser.parse_args(args)
     ui.configure_logging(pargs)
     module = action_modules[pargs.action]
@@ -237,9 +228,9 @@ def root_command_main(name, parser, modules, args=None):  # pylint: disable=too-
 
 
 def check_module(module):
-    """Check that a module really is an action.
+    """
+    Check that a module really is an action.
     Raises InvalidAction error if not
-
     """
     if not hasattr(module, "do"):
         raise InvalidAction(module.__name__, "Could not find a do() method")
@@ -263,23 +254,22 @@ at the top of the file
 
 
 def action_modules_from_package(package_name):
-    """Returns a suitable list of modules from
-    a package.
-
+    """
+    Returns a suitable list of modules from a package.
     Example:
-    assuming you have:
-    actions/foo/__init__.py
-    actions/foo/spam.py
-    actions/foo/eggs.py
-
-    then
-    action_modules_from_package("actions.foo") returns:
-    [actions.foo.spam, actions.foo.eggs]
-
+        assuming you have:
+            actions/foo/__init__.py
+            actions/foo/spam.py
+            actions/foo/eggs.py
+        then:
+            action_modules_from_package("actions.foo") returns:
+            [actions.foo.spam, actions.foo.eggs]
     """
     res = list()
     splitted = package_name.split(".")[1:]
     last_part = ".".join(splitted)
+    if six.PY2:
+        last_part = str(last_part)
     package = __import__(package_name, globals(), locals(), [last_part])
     base_path = os.path.dirname(package.__file__)
     module_paths = os.listdir(base_path)
@@ -287,17 +277,18 @@ def action_modules_from_package(package_name):
     module_paths.remove("__init__")
     for module_path in module_paths:
         try:
-            _tmp = __import__(package_name, globals(), locals(), [module_path], -1)
+            if six.PY3:
+                level = 0
+            else:
+                level = -1
+            _tmp = __import__(package_name, globals(), locals(), [module_path], level)
             module = getattr(_tmp, module_path)
             res.append(module)
-        except ImportError, err:
-            print "Skipping %s (%s)" % (module_path, err)
+        except ImportError as err:
+            print("Skipping %s (%s)" % (module_path, err))
             continue
-
-    res.sort(key=operator.attrgetter("__name__"))
-    return res
+    return sorted(res, key=operator.attrgetter("__name__"))
 
 
 if __name__ == "__main__":
-    import doctest
     doctest.testmod()

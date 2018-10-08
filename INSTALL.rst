@@ -6,7 +6,7 @@ Dependencies
 
 Required:
 
-* ``Python2`` with ``setuptools``
+* ``Python`` with ``setuptools``
 
 Optional:
 
@@ -26,7 +26,7 @@ Install `pip <http://www.pip-installer.org>`_ and then run::
 
   pip install qibuild
 
-On Windows, make sure ``c:\Python27`` and ``c:\Python27\scripts`` are in ``%PATH%``
+On Windows, make sure ``c:\PythonXX`` and ``c:\PythonXX\scripts`` are in ``%PATH%``
 (adapt these paths to reflect your Python's installation)
 
 On Linux and Mac, you may want to add ``--user`` in order to not
@@ -68,4 +68,3 @@ If you are packaging for Linux, you may want to:
  * generate and install the man pages (using ``rst2man`` and the files in ``doc/source/man/``)
  * install ``etc/qibuild.sh`` to ``/etc/profile.d`` or similar so that ``qicd`` becomes
    available
-

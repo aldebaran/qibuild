@@ -1,30 +1,33 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import re
-
 import py
-import pytest
 import mock
+import pytest
 
-from qisys import ui
 import qisys.sh
 import qisys.script
 import qisys.interact
 import qisys.worktree
-
-# pylint: disable=redefined-outer-name
+from qisys import ui
 
 
 class TestNamespace(object):
-    """ A class that behaves like a argparse.Namespace
+    """
+    class that behaves like a argparse.Namespace
     objects, except all unknown attributes are set to None
-
     """
 
     def __getattr__(self, name):
+        """ Get Attribute """
         if name.startswith("_"):
             raise AttributeError()
         setattr(self, name, None)
@@ -32,14 +35,12 @@ class TestNamespace(object):
 
 
 class TestWorkTree(qisys.worktree.WorkTree):
-    """ A subclass of qisys.worktree.WorkTree that
-    can create projects
-
-    """
+    """ A subclass of qisys.worktree.WorkTree that can create projects """
 
     __test__ = False  # Tell PyTest to ignore this Test* named class: This is as test to collect
 
     def __init__(self, root=None):
+        """ TestWorkTree Init """
         if root is None:
             # TestWorkTree is often used with cd_to_tmpdir fixture,
             # so this is safe
@@ -50,8 +51,8 @@ class TestWorkTree(qisys.worktree.WorkTree):
 
     @property
     def tmpdir(self):
-        # pylint: disable-msg=E1101
-        return py.path.local(self.root)
+        """ Temp Dir """
+        return py.path.local(self.root)  # pylint:disable=no-member
 
     def create_project(self, src):
         """ Create a new project """
@@ -59,22 +60,18 @@ class TestWorkTree(qisys.worktree.WorkTree):
         qisys.sh.mkdir(to_make, recursive=True)
         new_project = super(TestWorkTree, self).add_project(src)
         qiproject_xml = self.tmpdir.join(src, "qiproject.xml")
-        qiproject_xml.write("""
-<project version="3" />
-""")
+        qiproject_xml.write("""\n<project version="3" />\n""")
         return new_project
 
 
 # Because sometimes the most popular OS in the world is not the best one ...
-# pylint: disable-msg=E1101
 skip_on_win = pytest.mark.skipif(os.name == 'nt', reason="cannot pass on windows")
-
-# pylint: disable-msg=E1101
 
 
 @pytest.fixture
-def worktree(cd_to_tmpdir):  # pylint: disable=unused-argument
-    """ A new worktree in a temporary dir.
+def worktree(cd_to_tmpdir):
+    """
+    A new worktree in a temporary dir.
     As a bonus, we also change working dir to the temporary dir.
     This object has the same methods as WorkTree, plus:
         * worktree.tmpdir  : get the tmpdir as a py.LocalPath object
@@ -83,15 +80,13 @@ def worktree(cd_to_tmpdir):  # pylint: disable=unused-argument
     wt = TestWorkTree()
     return wt
 
-# pylint: disable-msg=E1101
-
 
 @pytest.fixture
 def interact(request):
-    """ Replace all functions in qisys.interact, and
+    """
+    Replace all functions in qisys.interact, and
     let the user predifine the answers, and inspect the
     questions that were asked
-
     """
     from qisys.test.fake_interact import FakeInteract
     fake_interact = FakeInteract()
@@ -101,11 +96,10 @@ def interact(request):
 
 
 @pytest.fixture
-def args(request):  # pylint: disable=unused-argument
-    """ Forge argparse.Namespace objects
-    All unknown attributes will be initialized to
-    None
-
+def args(request):
+    """
+    Forge argparse.Namespace objects
+    All unknown attributes will be initialized to None
     """
     return TestNamespace()
 
@@ -119,34 +113,39 @@ def record_messages(request):
 
 
 class MessageRecorder(object):
+    """ MessageRecorder """
+
     def __init__(self):
+        """ MessageRecorder Init """
         ui.CONFIG["record"] = True
-        ui._MESSAGES = list()  # pylint: disable=protected-access
+        ui._MESSAGES = list()
 
     @staticmethod
     def stop():
+        """ Stop """
         ui.CONFIG["record"] = False
-        ui._MESSAGES = list()  # pylint: disable=protected-access
+        ui._MESSAGES = list()
 
     @staticmethod
     def reset():
-        ui._MESSAGES = list()  # pylint: disable=protected-access
+        """ Reset """
+        ui._MESSAGES = list()
 
     @staticmethod
     def find(pattern):
+        """ Find """
         regexp = re.compile(pattern)
-        for message in ui._MESSAGES:  # pylint: disable=protected-access
+        for message in ui._MESSAGES:
             if re.search(regexp, message):
                 return message
+        return None
 
 
 @pytest.fixture(autouse=True)
 def tmpfiles(request, tmpdir):
-    """ Configure qisys.sh.get_*_path functions to return temporary
-    files instead
-    """
-
+    """ Configure qisys.sh.get_*_path functions to return temporary files instead """
     def fake_get_path(*args):
+        """ Fake Get Path """
         prefix = args[0]
         rest = args[1:]
         full_path = os.path.join(tmpdir.strpath,
@@ -162,23 +161,27 @@ def tmpfiles(request, tmpdir):
 
 @pytest.fixture
 def cd_to_tmpdir(monkeypatch, tmpdir):
+    """ CD To Temp Dir """
     workdir = tmpdir.mkdir("work")
     monkeypatch.chdir(workdir)
     return workdir
 
 
 class TestAction(object):
-    """ Helper class to test actions
+    """
+    Helper class to test actions
     Make sure cwd is in a temporary directory,
     and provide a nicer syntax for qisys.script.run_action
     """
 
     def __init__(self, package):
+        """ TestAction Init """
         self.package = package
         self.worktree = TestWorkTree()
 
     @staticmethod
     def chdir(directory):
+        """ ChDir """
         try:
             directory = directory.strpath
         except AttributeError:
@@ -186,12 +189,12 @@ class TestAction(object):
         os.chdir(directory)
 
     def __call__(self, action, *args, **kwargs):
+        """ Call """
         module_name = "%s.%s" % (self.package, action.replace("-", "_"))
         cwd = kwargs.get("cwd")
         if cwd:
             self.chdir(cwd)
         if kwargs.get("raises"):
-            # pylint: disable-msg=E1101
             with pytest.raises(Exception) as error:
                 qisys.script.run_action(module_name, args)
             return str(error.value)
@@ -201,5 +204,4 @@ class TestAction(object):
             except SystemExit as e:
                 return e.code
             return 0
-
         return qisys.script.run_action(module_name, args)

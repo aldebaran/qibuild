@@ -1,31 +1,26 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-"""This module contains functions to manipulate archives.
-
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+"""
+This module contains functions to manipulate archives.
 This module can manipulate:
-
 * ``*.zip`` archives on all platforms
 * ``*.tar.gz`` and ``*.tar.bz2`` archives on UNIX
 * ``*.tar.xz`` archive is only supported on Linux
-
 The default archive format is zip, to ensure platform interoperability,
 and also because this is the qiBuild package format.
-
 All archives should have a unique top directory.
-
 To enforce platform interoperability :
-
 * symlinks are dereferenced:
-
   * if the source symlink point to a file, the pointed file is archived in place
   * if the source symlink point to a directory, the directory is dropped from
     the archive
-
 * read-only directories are stored with write access
-
 """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import re
@@ -34,30 +29,30 @@ import posixpath
 import operator
 import subprocess
 import zipfile
+import six
 
 import qisys.sh
 import qisys.command
 from qisys import ui
 
-
 KNOWN_ALGOS = ["zip", "tar", "gzip", "bzip2", "xz"]
 
 
 class InvalidArchive(Exception):
-    """Just a custom exception """
+    """ Just a custom exception """
 
     def __init__(self, message):
+        """ InvalidArchive Init """
         self._message = message
         Exception.__init__(self)
 
     def __str__(self):
+        """ InvalidArchive String Representation """
         return self._message
 
 
 def _check_algo(algo):
-    """ Check that the algo is known
-
-    """
+    """ Check that the algo is known """
     if algo in KNOWN_ALGOS:
         return
     mess = "Unknown algorithm: %s\n" % algo
@@ -66,24 +61,21 @@ def _check_algo(algo):
         mess += " * " + algorithm + "\n"
     raise Exception(mess)
 
-# Symlink support in zip archive (for both compression and extraction) widely
-# inspired from:
-#
+
+# Symlink support in zip archive (for both compression and extraction)
+# Widely inspired from:
 # http://www.mail-archive.com/python-list@python.org/msg34223.html
 
 
-def _compress_zip(directory, quiet=True, verbose=False, display_progress=False,  # pylint: disable=too-many-locals
+def _compress_zip(directory, quiet=True, verbose=False, display_progress=False,
                   flat=False, output=None):
-    """Compress directory in a .zip file
-
+    """
+    Compress directory in a .zip file
     :param directory:        directory to add to the archive
     :param archive_basepath: output archive basepath (without extension)
     :param quiet:            quiet mode (print nothing)
-
     :return: path to the generated archive (archive_basepath.zip)
-
     """
-
     if quiet and verbose:
         mess = """Unconsistent arguments: both 'quiet' and 'verbose' options are set.
 Please set only one of these two options to 'True'
@@ -107,15 +99,14 @@ Please set only one of these two options to 'True'
             else:
                 arcname = os.path.join(os.path.basename(directory), rel_path)
             to_add.append((full_path, arcname))
-
     for i, (full_path, arcname) in enumerate(to_add):
         if os.path.islink(full_path):
-            content = os.readlink(full_path)
+            content = os.readlink(full_path)  # pylint:disable=no-member
             attr = zipfile.ZipInfo(arcname)
             attr.create_system = 3
             # long type of hex val of '0xA1ED0000L',
             # say, symlink attr magic..
-            attr.external_attr = 2716663808L
+            attr.external_attr = 2716663808
             zip_call = archive.writestr
         elif os.path.isdir(full_path):
             continue
@@ -130,24 +121,18 @@ Please set only one of these two options to 'True'
         if display_progress:
             ui.info_progress(i, len(to_add), "Done")
         zip_call(attr, content)
-
     archive.close()
     return output
 
 
-# pylint: disable-msg=R0914
-# pylint: disable=too-many-statements
-# pylint: disable=too-many-branches
 def _extract_zip(archive, directory, quiet, verbose, strict_mode=True):
-    """Extract a zip archive into directory
-
+    """
+    Extract a zip archive into directory
     :param archive:   path of the archive
     :param directory: extract location
     :param quiet:     quiet mode (print nothing)
     :param verbose:   verbose mode (print all the archive content)
-
     :return: path to the extracted archive (directory/topdir)
-
     """
     if quiet and verbose:
         mess = """Unconsistent arguments: both 'quiet' and 'verbose' options are set.
@@ -180,12 +165,11 @@ Please set only one of these two options to 'True'
                 (orig_topdir, member_top_dir)
             if strict_mode:
                 raise InvalidArchive(mess)
-
         new_path = os.path.join(directory, member.filename)
         qisys.sh.mkdir(os.path.dirname(new_path), recursive=True)
-        if member.external_attr == 2716663808L:
+        if member.external_attr == 2716663808:
             target = archive_.read(member.filename)
-            os.symlink(target, new_path)
+            os.symlink(target, new_path)  # pylint:disable=no-member
         else:
             archive_.extract(member, path=directory)
             # Fix permision on extracted file unless it is a directory
@@ -193,31 +177,26 @@ Please set only one of these two options to 'True'
             if member.filename.endswith("/"):
                 directories.append(member)
                 qisys.sh.mkdir(new_path)
-                new_st = 0777
+                new_st = 0o777
             else:
-                new_st = member.external_attr >> 16L
+                new_st = member.external_attr >> 16
             # permissions are meaningless on windows, here only the exension counts
             if not sys.platform.startswith("win"):
                 if new_st != 0:
                     os.chmod(new_path, new_st)
-
             if not quiet:
                 qisys.ui.info_progress(i, size, "Done")
             elif verbose and sys.stdout.isatty():
                 sys.stdout.write(member)
                 sys.stdout.flush()
-
     # Reverse sort directories, and then fix perm on these
-    directories.sort(key=operator.attrgetter('filename'))
-    directories.reverse()
-
+    directories = sorted(directories, key=operator.attrgetter('filename'), reverse=True)
     for zipinfo in directories:
         dirpath = os.path.join(directory, zipinfo.filename)
-        new_st = zipinfo.external_attr >> 16L
+        new_st = zipinfo.external_attr >> 16
         if not sys.platform.startswith("win"):
             if new_st != 0:
                 os.chmod(dirpath, new_st)
-
     archive_.close()
     ui.debug(archive, "extracted in", directory)
     if strict_mode:
@@ -227,10 +206,9 @@ Please set only one of these two options to 'True'
     return res
 
 
-# pylint: disable-msg=R0913
 def _get_tar_command(action, algo, filename, directory, quiet, add_opts=None, flat=False):
-    """Generate a tar command line
-
+    """
+    Generate a tar command line
     :param action:    compression/exctraction switch [compress|extract]
     :param algo:      compression method
     :param filename:  archive path
@@ -241,9 +219,7 @@ def _get_tar_command(action, algo, filename, directory, quiet, add_opts=None, fl
                       generated tar command line
     :param flat:      if False, put all files in a common top dir
                       (default: False)
-
     :return: the list containing the whole tar commnand
-
     """
     cmd = [qisys.command.find_program("tar", raises=True)]
     if not quiet:
@@ -273,10 +249,9 @@ def _get_tar_command(action, algo, filename, directory, quiet, add_opts=None, fl
     return cmd
 
 
-def _compress_tar(directory, output=None, algo=None,
-                  quiet=True, verbose=False, flat=False):
-    """Compress directory in a .tar.* archive
-
+def _compress_tar(directory, output=None, algo=None, quiet=True, verbose=False, flat=False):
+    """
+    Compress directory in a .tar.* archive
     :param directory:        directory to add to the archive
     :param archive_basepath: output archive basepath (without extension)
     :param algo:             compression method
@@ -284,9 +259,7 @@ def _compress_tar(directory, output=None, algo=None,
     :param verbose:          verbose mode (print all the archive content)
     :param flat:             if False, put all files in a common top dir
                              (default: False)
-
     :return: path to the generated archive (archive_basepath.tar.*)
-
     """
     if quiet and verbose:
         mess = """Unconsistent arguments: both 'quiet' and 'verbose' options are set.
@@ -297,9 +270,9 @@ Please set only one of these two options to 'True'
     cmd = _get_tar_command("compress", algo, output, directory, quiet, flat=flat)
     try:
         if verbose:
-            __printed = qisys.command.check_output(cmd, stderr=subprocess.STDOUT)  # pylint: disable=unused-variable
+            __printed = qisys.command.check_output(cmd, stderr=subprocess.STDOUT)
         else:
-            __unused_output, __printed = qisys.command.check_output_error(cmd)  # pylint: disable=unused-variable
+            __unused_output, __printed = qisys.command.check_output_error(cmd)
     except qisys.command.CommandFailedException as err:
         mess = "Could not compress directory %s\n" % directory
         mess += "(algo: %s)\n" % algo
@@ -309,18 +282,16 @@ Please set only one of these two options to 'True'
     return output
 
 
-def _extract_tar(archive, directory, algo, quiet, verbose, output_filter=None):  # pylint: disable=too-many-branches
-    """Extract a .tar.* archive into directory
-
+def _extract_tar(archive, directory, algo, quiet, verbose, output_filter=None):
+    """
+    Extract a .tar.* archive into directory
     :param archive:   path of the archive
     :param directory: extract location
     :param algo:      uncompression method
     :param quiet:     quiet mode (print nothing)
     :param verbose:   verbose mode (print all the archive content)
     :param output_filter:  regex applied on all outputs
-
     :return: path to the extracted archive (directory/topdir)
-
     """
     if quiet and verbose:
         mess = """Unconsistent arguments: both 'quiet' and 'verbose' options are set.
@@ -336,7 +307,10 @@ Please set only one of these two options to 'True'
     list_cmd = [tar, "--list", "--file", archive]
     process = subprocess.Popen(list_cmd, stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
-    line = process.stdout.readline().split(os.sep, 1)[0]
+    lines = process.stdout.readline()
+    if six.PY3:
+        lines = lines.decode()
+    line = lines.split(os.sep, 1)[0]
     topdir = line.split(os.sep, 1)[0]
     archroot = None
     opts = list()
@@ -372,14 +346,14 @@ Please set only one of these two options to 'True'
     if not quiet:
         for line in str(printed).split("\n"):
             if not output_filter or not re.search(output_filter, line):
-                print line.strip()
+                print(line.strip())
     return destdir
 
 
 def compress(directory, algo="zip", output=None, flat=False,
              quiet=False, verbose=False, display_progress=False):
-    """Compress directory in an archive
-
+    """
+    Compress directory in an archive
     :param directory: directory to add to the archive
     :param output:    path to the compressed archive
     :param algo:      compression method (default: zip)
@@ -388,9 +362,7 @@ def compress(directory, algo="zip", output=None, flat=False,
                       (default: False)
     :param flat:      if false, put all files in a common top dir
                       (default: False)
-
     :return: path to the generated archive
-
     """
     if quiet and verbose:
         mess = """Unconsistent arguments: both 'quiet' and 'verbose' options are set.
@@ -413,6 +385,7 @@ Please set only one of these two options to 'True'
 
 
 def get_default_output(directory, algo):
+    """ Get Default Output """
     res = directory
     if algo == "tar":
         res += ".tar"
@@ -427,19 +400,16 @@ def get_default_output(directory, algo):
     return res
 
 
-def extract(archive, directory, algo=None,
-            quiet=False, verbose=False,
-            strict_mode=True):
-    """Extract a an archive into directory
-
+def extract(archive, directory, algo=None, quiet=False,
+            verbose=False, strict_mode=True):
+    """
+    Extract a an archive into directory
     :param archive:   path of the archive
     :param directory: extract location
     :param algo:      uncompression method (default: guessed from the archive name)
     :param quiet:     silent mode (default: False)
     :param verbose:   verbose mode, print all the archive content (default: False)
-
     :return: path to the extracted archive (directory/topdir)
-
     """
     if algo:
         _check_algo(algo)
@@ -458,12 +428,10 @@ def extract(archive, directory, algo=None,
 
 
 def guess_algo(archive):
-    """Guess the compression algorithm from the archive filename
-
+    """
+    Guess the compression algorithm from the archive filename
     :param archive:   path of the archive
-
     :return: the compression algorithm name
-
     """
     extension = archive.rsplit(".", 1)[1]
     if "zip" in extension:

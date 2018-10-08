@@ -1,14 +1,19 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import mock
 
 from qidoc.builder import DocBuilder
 
-# pylint: disable=unused-variable
-
 
 def test_doc_builder_solve_deps_by_default(doc_worktree):
+    """ Test Doc Builder Solved Deps By Default """
     qibuild_doc = doc_worktree.create_sphinx_project("qibuild")
     general_doc = doc_worktree.create_sphinx_project("general", depends=["qibuild"])
     doc_builder = DocBuilder(doc_worktree, "general")
@@ -16,7 +21,8 @@ def test_doc_builder_solve_deps_by_default(doc_worktree):
 
 
 def test_using_dash_s(doc_worktree):
-    qibuild_doc = doc_worktree.create_sphinx_project("qibuild")
+    """ Test Using Dash s """
+    _qibuild_doc = doc_worktree.create_sphinx_project("qibuild")
     general_doc = doc_worktree.create_sphinx_project("general", depends=["qibuild"])
     doc_builder = DocBuilder(doc_worktree, "general")
     doc_builder.single = True
@@ -24,18 +30,20 @@ def test_using_dash_s(doc_worktree):
 
 
 def test_base_project_install(doc_worktree, tmpdir):
+    """ Test Base Project Install """
     doc_worktree.add_test_project("world")
     doc_worktree.add_test_project("hello")
     doc_builder = DocBuilder(doc_worktree, "hello")
     hello_inst = tmpdir.join("inst", "hello")
     doc_builder.install(hello_inst.strpath)
     hello_index = hello_inst.join("index.html")
-    assert "hello" in hello_index.read()
+    assert "hello" in hello_index.read().decode("utf-8")
     world_index = hello_inst.join("ref/world/index.html")
-    assert "world" in world_index.read()
+    assert "world" in world_index.read().decode("utf-8")
 
 
 def test_install_doxy(doc_worktree, tmpdir):
+    """ Test Install Doxy """
     doc_worktree.add_test_project("libqi/doc/doxygen")
     doc_builder = DocBuilder(doc_worktree, "qi-api")
     inst_dir = tmpdir.join("inst")
@@ -46,21 +54,22 @@ def test_install_doxy(doc_worktree, tmpdir):
 
 
 def test_setting_base_project_resets_dests(doc_worktree):
+    """ Test Setting Base Project Reset Dests """
     doc_worktree.add_test_project("world")
     doc_worktree.add_test_project("hello")
-    doc_builder = DocBuilder(doc_worktree, "hello")
+    _doc_builder = DocBuilder(doc_worktree, "hello")
     hello_proj = doc_worktree.get_doc_project("hello")
     world_proj = doc_worktree.get_doc_project("world")
     assert hello_proj.dest == "."
     assert world_proj.dest == "ref/world"
-
-    doc_builder = DocBuilder(doc_worktree, "world")
+    _doc_builder = DocBuilder(doc_worktree, "world")
     world_proj = doc_worktree.get_doc_project("world")
     assert world_proj.dest == "."
 
 
 def test_setting_language(doc_worktree):
-    translateme_proj = doc_worktree.add_test_project("translateme")
+    """ Test Setting Language """
+    _translateme_proj = doc_worktree.add_test_project("translateme")
     doc_builder = DocBuilder(doc_worktree, "translateme")
     doc_builder.language = "fr"
     doc_builder.configure()

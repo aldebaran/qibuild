@@ -1,31 +1,30 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-""" qibuild wizard
-
-"""
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild Wizard """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import sys
 
-from qisys import ui
-import qisys
 import qibuild
+import qisys
+from qisys import ui
 
 
 def guess_cmake(qibuild_cfg):
-    """ Try to find cmake
-
-    """
+    """ Try to find cmake. """
     # FIXME: loook for it in registry on windows
     # FIXME: look for it in /Applications on mac
     build_env = qibuild.config.get_build_env()
     cmake = qisys.command.find_program("cmake", env=build_env)
     if cmake:
-        print "Found CMake:", cmake
+        print("Found CMake:", cmake)
         return cmake
-    print "CMake not found"
+    print("CMake not found")
     cmake = qisys.interact.ask_program("Please enter full CMake path")
     if not cmake:
         raise Exception("qiBuild cannot work without CMake\n"
@@ -38,20 +37,15 @@ def guess_cmake(qibuild_cfg):
 
 
 def ask_cmake_generator():
-    """ Ask the user to choose a cmake generator
-
-    """
+    """ Ask the user to choose a cmake generator. """
     cmake_generators = qibuild.cmake.get_known_cmake_generators()
     cmake_generator = qisys.interact.ask_choice(cmake_generators,
                                                 "Please choose a generator")
-
     return cmake_generator
 
 
 def ask_ide():
-    """ Ask the user to choose an IDE
-
-    """
+    """ Ask the user to choose an IDE. """
     ides = ["None", "QtCreator", "Eclipse CDT"]
     if sys.platform.startswith("win"):
         ides.append("Visual Studio")
@@ -64,9 +58,7 @@ def ask_ide():
 
 
 def configure_qtcreator(qibuild_cfg):
-    """ Configure QtCreator
-
-    """
+    """ Configure QtCreator. """
     if sys.platform == "darwin":
         _configure_qtcreator_mac(qibuild_cfg)
     else:
@@ -74,7 +66,7 @@ def configure_qtcreator(qibuild_cfg):
 
 
 def _configure_qtcreator(qibuild_cfg):
-    """ Helper for configure_qtcreator on Linux and Windows """
+    """ Helper for configure_qtcreator on Linux and Windows. """
     ide = qibuild.config.IDE()
     ide.name = "QtCreator"
     build_env = qibuild.config.get_build_env()
@@ -100,6 +92,7 @@ def _configure_qtcreator(qibuild_cfg):
 
 
 def _configure_qtcreator_mac(qibuild_cfg):
+    """ Configure QtCreator Mac """
     ide = qibuild.config.IDE()
     ide.name = "QtCreator"
     default_path = "/Applications/Qt Creator.app/"
@@ -117,9 +110,7 @@ def _configure_qtcreator_mac(qibuild_cfg):
 
 
 def configure_ide(qibuild_cfg, ide_name):
-    """ Configure an IDE
-
-    """
+    """ Configure an IDE. """
     if ide_name == "QtCreator":
         configure_qtcreator(qibuild_cfg)
         return
@@ -129,10 +120,8 @@ def configure_ide(qibuild_cfg, ide_name):
 
 
 def configure_local_settings(build_worktree):
-    """ Configure local settings for this worktree
-
-    """
-    print
+    """ Configure local settings for this worktree. """
+    print("")
     worktree_root = build_worktree.root
     ui.info(ui.green, "::", ui.reset, "Found a worktree in", worktree_root)
     qibuild_cfg = build_worktree.qibuild_cfg
@@ -158,7 +147,6 @@ def configure_local_settings(build_worktree):
         "Do you want to use a unique build dir?"
         " (mandatory when using Eclipse)",
         default=False)
-
     build_prefix = None
     if answer:
         build_prefix = qisys.interact.ask_string("Path to a build directory")
@@ -171,9 +159,7 @@ def configure_local_settings(build_worktree):
 
 
 def run_config_wizard(build_worktree=None):
-    """ Run a nice interactive config wizard
-
-    """
+    """ Run a nice interactive config wizard. """
     if build_worktree:
         qibuild_cfg = build_worktree.qibuild_cfg
     else:
@@ -185,17 +171,13 @@ def run_config_wizard(build_worktree=None):
             with open(qibuild_cfg_path, "w") as fp:
                 fp.write('<qibuild version="1" />\n')
         qibuild_cfg.read()
-
     # Ask for a default cmake generator
     guess_cmake(qibuild_cfg)
     generator = ask_cmake_generator()
     qibuild_cfg.defaults.cmake.generator = generator
-
     ide = ask_ide()
     if ide:
         configure_ide(qibuild_cfg, ide)
-
     qibuild_cfg.write()
-
     if build_worktree:
         configure_local_settings(build_worktree)

@@ -1,11 +1,17 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import qisys.command
 
 
 def check_gettext():
+    """ Check GetText """
     gettext = qisys.command.find_program("xgettext", raises=False)
     if not gettext:
         return False
@@ -13,6 +19,7 @@ def check_gettext():
 
 
 def test_install_confintl_files(qilinguist_action, tmpdir):
+    """ Test Install ConfIntl Files """
     dest = tmpdir.join("dest")
     if not check_gettext():
         return

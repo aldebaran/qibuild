@@ -1,22 +1,24 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test Build Worktree """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import sys
-
 import pytest
 
 import qibuild.config
-
 from qibuild.test.conftest import TestBuildWorkTree
-from qitoolchain.test.conftest import toolchains  # pylint: disable=unused-import
-from qipy.test.conftest import qipy_action  # pylint: disable=unused-import
-
-# pylint: disable=redefined-outer-name
+from qitoolchain.test.conftest import toolchains
+from qipy.test.conftest import qipy_action
 
 
 def test_read_deps(build_worktree):
+    """ Test Read Deps """
     build_worktree.create_project("world")
     build_worktree.create_project("hello", build_depends=["world"])
     hello = build_worktree.get_build_project("hello")
@@ -24,6 +26,7 @@ def test_read_deps(build_worktree):
 
 
 def test_setting_build_config_sets_projects_cmake_flags(build_worktree):
+    """ Test Setting Build Config Sets Project CMake Flags """
     build_worktree.create_project("world")
     build_worktree.build_config.build_type = "Release"
     world = build_worktree.get_build_project("world")
@@ -32,7 +35,8 @@ def test_setting_build_config_sets_projects_cmake_flags(build_worktree):
     assert cmake_args == ["-DCMAKE_BUILD_TYPE=Release"]
 
 
-def test_changing_active_config_changes_projects_build_dir(cd_to_tmpdir):  # pylint: disable=unused-argument
+def test_changing_active_config_changes_projects_build_dir(cd_to_tmpdir):
+    """ Test Changing Active Config Changes Projects Build Dir """
     qibuild.config.add_build_config("foo")
     build_worktree = TestBuildWorkTree()
     build_worktree.set_active_config("foo")
@@ -41,14 +45,15 @@ def test_changing_active_config_changes_projects_build_dir(cd_to_tmpdir):  # pyl
 
 
 def test_project_names_are_unique(build_worktree):
+    """ Test Project Names Are Unique """
     build_worktree.create_project("foo")
-    # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         build_worktree.create_project("foo", src="bar/foo")
     assert "two projects with the same name" in str(e.value)
 
 
-def test_bad_qibuild2_qiproject(cd_to_tmpdir):  # pylint: disable=unused-argument
+def test_bad_qibuild2_qiproject(cd_to_tmpdir):
+    """ Test Bad QiBuild 2 Project """
     build_worktree = TestBuildWorkTree()
     build_worktree.create_project("foo")
     foo_qiproj_xml = build_worktree.tmpdir.join("foo").join("qiproject.xml")
@@ -64,7 +69,8 @@ def test_bad_qibuild2_qiproject(cd_to_tmpdir):  # pylint: disable=unused-argumen
     build_worktree = TestBuildWorkTree()
 
 
-def test_set_default_config(cd_to_tmpdir):  # pylint: disable=unused-argument
+def test_set_default_config(cd_to_tmpdir):
+    """ Test Set Default Config """
     qibuild.config.add_build_config("foo")
     build_worktree = TestBuildWorkTree()
     build_worktree.set_default_config("foo")
@@ -73,7 +79,8 @@ def test_set_default_config(cd_to_tmpdir):  # pylint: disable=unused-argument
     assert build_worktree2.default_config == "foo"
 
 
-def test_get_env(toolchains, cd_to_tmpdir):  # pylint: disable=unused-argument
+def test_get_env(toolchains, cd_to_tmpdir):
+    """ Test Get Env """
     toolchains.create("foo")
     qibuild.config.add_build_config("foo", toolchain="foo")
     bar_package = toolchains.add_package("foo", "bar")
@@ -98,7 +105,8 @@ def test_get_env(toolchains, cd_to_tmpdir):  # pylint: disable=unused-argument
         assert env["DYLD_FRAMEWORK_PATH"] == bar_package.path
 
 
-def test_set_pythonhome(toolchains, cd_to_tmpdir):  # pylint: disable=unused-argument
+def test_set_pythonhome(toolchains, cd_to_tmpdir):
+    """ Test Set PythonHome """
     toolchains.create("foo")
     qibuild.config.add_build_config("foo", toolchain="foo")
     python_package = toolchains.add_package("foo", "python")
@@ -112,6 +120,7 @@ def test_set_pythonhome(toolchains, cd_to_tmpdir):  # pylint: disable=unused-arg
 
 
 def test_venv_path(qipy_action):
+    """ Test Venv Path """
     # ipython 5 is the last version compatible with Python 2.7
     qipy_action("bootstrap", "pip", "virtualenv", "ipython<=5")
     build_worktree = TestBuildWorkTree()

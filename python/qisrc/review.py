@@ -1,26 +1,25 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-""" Handling pushing changes to gerrit
-
-"""
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Handling pushing changes to gerrit """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import sys
 import subprocess
 
 import qisrc.git
-from qisys import ui
+import qibuild.config
 import qisys.interact
 import qisys.command
-import qibuild.config
+from qisys import ui
 
 
 def fetch_gerrit_hook_ssh(path, username, server, port=None):
-    """ Fetch the ``commit-msg`` hook from gerrit
-
-    """
+    """ Fetch the ``commit-msg`` hook from gerrit """
     if port is None:
         port = 22
     git_hooks_dir = os.path.join(path, ".git", "hooks")
@@ -40,7 +39,6 @@ def fetch_gerrit_hook_ssh(path, username, server, port=None):
     (out, _) = process.communicate()
     if process.returncode == 0:
         return True, ""
-
     return False, out
 
 
@@ -60,40 +58,37 @@ def check_gerrit_connection(username, server, ssh_port=29418):
 
 
 def ask_gerrit_username(server, ssh_port=29418):
-    """ Run a wizard to try to configure gerrit access
-
+    """
+    Run a wizard to try to configure gerrit access
     If that fails, ask the user for its username
     If that fails, give up and suggest upload the public key
-
     """
     ui.info(ui.green, "Configuring gerrit ssh access ...")
     username = os.environ.get("GERRIT_USER", qisys.sh.username())
     if not username:
         username = qisys.interact.ask_string("Please enter your username")
         if not username:
-            return
+            return None
     ui.info("Checking gerrit connection with %s@%s:%i" %
             (username, server, ssh_port))
     if check_gerrit_connection(username, server, ssh_port=ssh_port):
         ui.info("Success")
         return username
-
     ui.warning("Could not connect to ssh using username", username)
     try_other = qisys.interact.ask_yes_no("Do you want to try with another username?")
     if not try_other:
-        return
-
+        return None
     username = qisys.interact.ask_string("Please enter your username")
     if not username:
-        return
-
+        return None
     if check_gerrit_connection(username, server, ssh_port=ssh_port):
         return username
+    return None
 
 
 def get_gerrit_username(server, ssh_port):
-    """ Get the username to use when using code review.
-
+    """
+    Get the username to use when using code review.
     Read it from the config file, or ask it and check it works
     """
     # Get username
@@ -106,7 +101,6 @@ def get_gerrit_username(server, ssh_port):
         username = ask_gerrit_username(server, ssh_port=ssh_port)
         if not username:
             return None
-
     # Add it to config so we ask only once
     qibuild_cfg.set_server_access(server, username)
     qibuild_cfg.write()
@@ -114,17 +108,15 @@ def get_gerrit_username(server, ssh_port):
 
 
 def setup_project(project):
-    """ Setup a project for code review:
-
+    """
+    Setup a project for code review:
     If there is :py:class:`.Remote` configured for code review,
     using the ssh protocol, use it to fetch the gerrit ``commit-msg`` hook
-
     """
     remote = project.review_remote
     server = remote.server
     username = remote.username
     ssh_port = remote.port
-
     # Install the hook
     commit_hook = os.path.join(project.path, ".git", "hooks", "commit-msg")
     if os.path.exists(commit_hook):
@@ -142,14 +134,11 @@ def setup_project(project):
 
 
 def push(project, branch, bypass_review=False, dry_run=False, reviewers=None, topic=None):
-    # pylint: disable=too-many-locals
-    """ Push the changes for review.
-
+    """
+    Push the changes for review.
     Unless review is False, in this case, simply update
     the remote gerrit branch
-
     :param reviewers: A list of reviewers to invite to review
-
     """
     git = qisrc.git.Git(project.path)
     review_remote = project.review_remote
@@ -189,11 +178,10 @@ def push(project, branch, bypass_review=False, dry_run=False, reviewers=None, to
 
 
 def set_reviewers(refs, reviewers, username, server, ssh_port):
-    """ Set reviewers using gerrit set-reviewers command
-
+    """
+    Set reviewers using gerrit set-reviewers command
     :param refs: A list of references to ``patchsets``, can be SHA1s or Change-Ids
-    :param reviewers: A list of Gerrit reviewers, username or group name,
-                      no e-mails
+    :param reviewers: A list of Gerrit reviewers, username or group name, no e-mails
     """
     cmd = ["ssh", "-p", str(ssh_port),
            "%s@%s" % (username, server),

@@ -1,6 +1,11 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Build Config """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import platform
@@ -12,14 +17,14 @@ import qibuild.profile
 import qitoolchain
 
 
-class CMakeBuildConfig(object):  # pylint: disable=too-many-instance-attributes
-    """ Compute a list of CMake flags from all the settings
-    that can affect the build  (the toolchain name, the build
-    profiles, etc ...)
-
+class CMakeBuildConfig(object):
+    """
+    Compute a list of CMake flags from all the settings that can
+    affect the build  (the toolchain name, the build profiles, etc ...).
     """
 
     def __init__(self, build_worktree):
+        """ CMakeBuildConfig Init """
         self.build_worktree = build_worktree
         self.build_type = "Debug"
         self.active_build_config = None
@@ -38,30 +43,29 @@ class CMakeBuildConfig(object):  # pylint: disable=too-many-instance-attributes
 
     @property
     def profiles(self):
+        """ Profiles """
         return self._profiles
 
     @property
     def local_cmake(self):
-        """ Path to the "custom" CMake file. Its content will be added
-        to the generated CMake files when running ``qibuild configure``
-
+        """
+        Path to the "custom" CMake file. Its content will be added
+        to the generated CMake files when running ``qibuild configure``.
         :returns: None if the custom CMake file does not exist
         """
         if not self.active_build_config:
             return None
-
         custom_cmake = os.path.join(self.build_worktree.root, ".qi",
                                     self.active_build_config.name + ".cmake")
         if os.path.exists(custom_cmake):
             return custom_cmake
-
         return None
 
     @property
     def toolchain(self):
-        """ The current toolchain, either set by the user from the command
-        line or read from the local qibuild settings
-
+        """
+        The current toolchain, either set by the user from the command
+        line or read from the local qibuild settings.
         """
         if self._toolchain:
             return self._toolchain
@@ -75,9 +79,9 @@ class CMakeBuildConfig(object):  # pylint: disable=too-many-instance-attributes
 
     @property
     def cmake_generator(self):
-        """ The current CMake generator, either set by the user from the command
-        line or read from the qibuild configuration files
-
+        """
+        The current CMake generator, either set by the user from the command
+        line or read from the qibuild configuration files.
         """
         if self._cmake_generator:
             return self._cmake_generator
@@ -85,10 +89,7 @@ class CMakeBuildConfig(object):  # pylint: disable=too-many-instance-attributes
 
     @property
     def debug(self):
-        """ Whether we are building in debug. True unless user
-        specified --release
-
-        """
+        """ Whether we are building in debug. True unless user specified --release """
         return self.build_type == "Debug"
 
     @property
@@ -98,44 +99,42 @@ class CMakeBuildConfig(object):  # pylint: disable=too-many-instance-attributes
 
     @property
     def using_visual_studio(self):
-        " Whether we are using visual studio "
+        """ Whether we are using visual studio """
         return self.cmake_generator and "Visual Studio" in self.cmake_generator
 
     @property
     def using_mingw(self):
+        """ Whether we are using MinGW """
         return self.cmake_generator and "mingw" in self.cmake_generator.lower()
 
-    # pylint: disable-msg=E1101
     @cmake_generator.setter
-    # pylint: disable-msg=E0102
     def cmake_generator(self, value):
+        """ CMake  Generator Setter """
         self._cmake_generator = value
 
     @property
     def build_env(self):
-        """ A dictionary defining the environment used when building, as
+        """
+        A dictionary defining the environment used when building, as
         read from qibuild configuration files.
         ``os.environ`` will remain unchanged
-
         """
         envsetter = qisys.envsetter.EnvSetter()
         envsetter.read_config(self.qibuild_cfg)
         return envsetter.get_build_env()
 
     def build_directory(self, prefix="build", name=None, system=False):
-        """ Return a suitable build directory, making sure
+        """
+        Return a suitable build directory, making sure
         there is one build directory per config name.
-
         If name is None, read the active build config
         (set by the user with ``-c``, or read as the default config for the worktree0
-
         If system is True, returns ``sys-<system>-<arch>``
         """
         if prefix:
             res = prefix + "-"
         else:
             res = ""
-
         if name:
             res += name
         else:
@@ -144,14 +143,11 @@ class CMakeBuildConfig(object):  # pylint: disable=too-many-instance-attributes
             else:
                 res += "sys-%s-%s" % (platform.system().lower(),
                                       platform.machine().lower())
-
         return res
 
     @property
     def cmake_args(self):
-        """ The CMake arguments to use
-
-        """
+        """ The CMake arguments to use. """
         self.parse_profiles(warns=False)
         args = list()
         if self.cmake_generator:
@@ -159,30 +155,26 @@ class CMakeBuildConfig(object):  # pylint: disable=too-many-instance-attributes
         if self.toolchain:
             args.append("-DCMAKE_TOOLCHAIN_FILE=%s" % self.toolchain.toolchain_file)
         args.append("-DCMAKE_BUILD_TYPE=%s" % self.build_type)
-
         for (name, value) in self._profile_flags:
             args.append("-D%s=%s" % (name, value))
         for (name, value) in self.user_flags:
             args.append("-D%s=%s" % (name, value))
-
         venv_path = self.build_worktree.venv_path
         args.append("-DQI_VIRTUALENV_PATH=%s" % qisys.sh.to_posix_path(venv_path))
-
         return args
 
     @property
     def default_config(self):
-        """ The default configuration, as read from the local build settings """
+        """ The default configuration, as read from the local build settings. """
         self.read_local_settings()
         return self._default_config
 
     def read_local_settings(self):
-        """ Read ``<worktree>/.qi/qibuild.xml`` """
+        """ Read ``<worktree>/.qi/qibuild.xml``. """
         local_settings = qibuild.config.LocalSettings()
         tree = qisys.qixml.read(self.build_worktree.qibuild_xml)
         local_settings.parse(tree)
         self.build_prefix = local_settings.build.prefix
-
         # Legacy: in .qi/qibuild.xml
         default_config = local_settings.defaults.config
         if not default_config:
@@ -205,6 +197,7 @@ config in ~/.config/qi/qibuild.xml
             self.set_active_config(matching_config.name)
 
     def parse_profiles(self, warns=True):
+        """ Parse Profiles """
         self._profile_flags = list()
         known_profiles = self.build_worktree.get_known_profiles(warns=warns)
         known_names = known_profiles.keys()
@@ -215,11 +208,9 @@ config in ~/.config/qi/qibuild.xml
             self._profile_flags.extend(flags)
 
     def set_active_config(self, config_name):
-        """ Set the active configuration. This should match an
-        existing config name
-
+        """
+        Set the active configuration. This should match an  existing config name.
         Used when running ``qibuild configure -c <config>``
-
         """
         self.qibuild_cfg.read()
         self.active_build_config = self.qibuild_cfg.configs.get(config_name)
@@ -235,12 +226,14 @@ class NoSuchProfile(Exception):
     """ The profile specified by the user cannot be found """
 
     def __init__(self, name, known_profiles):
+        """ NoSuchProfile Init """
         super(NoSuchProfile, self).__init__()
         self.name = name
         self.known_profiles = known_profiles
 
     def __str__(self):
-        return """ Could not find profile {name}.
-Known profiles are: {profiles}
-""".format(name=self.name,
-           profiles=', '.join(sorted(self.known_profiles)))
+        """ String Representation """
+        return """ Could not find profile {name}.\nKnown profiles are: {profiles}\n""".format(
+            name=self.name,
+            profiles=', '.join(sorted(self.known_profiles))
+        )

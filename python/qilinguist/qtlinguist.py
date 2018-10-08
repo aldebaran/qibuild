@@ -1,25 +1,29 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-""" Library to generate, update and compile translatable sentences with
-QtLinguist
-
-"""
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Library to generate, update and compile translatable sentences with QtLinguist """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import subprocess
 
-from qisys import ui
-import qisys.command
 import qilinguist.project
+import qisys.command
+from qisys import ui
 
 
 class QtLinguistProject(qilinguist.project.LinguistProject):
+    """ QtLinguistProject Class """
+
     def __init__(self, *args, **kwargs):
+        """ QtLinguistProject Init """
         super(QtLinguistProject, self).__init__(*args, **kwargs)
 
     def update(self):
+        """ Update """
         output_files = list()
         for locale in self.linguas:
             output_files.append(os.path.join(self.po_path, locale + ".ts"))
@@ -30,6 +34,7 @@ class QtLinguistProject(qilinguist.project.LinguistProject):
         qisys.command.call(cmd, cwd=self.path)
 
     def release(self, raises=True):
+        """ Release """
         all_ok = True
         for locale in self.linguas:
             input_file = os.path.join(self.po_path, locale + ".ts")
@@ -49,21 +54,25 @@ class QtLinguistProject(qilinguist.project.LinguistProject):
         return all_ok
 
     def install(self, destination):
+        """ Install """
         full_dest = os.path.join(destination, "share", "locale")
 
         def filter_fun(f):
+            """ Filter Fun """
             return f.endswith(".qm")
+
         qisys.sh.install(self.po_path, full_dest, filter_fun=filter_fun)
 
     def __repr__(self):
+        """ Representation """
         return "<QtLinguistProject %s in %s>" % (self.name, self.path)
 
 
 def generate_qm_file(input_file, output):
-    """ Generate a ``.qm`` file from a ``.ts`` file.
+    """
+    Generate a ``.qm`` file from a ``.ts`` file.
     Returns (True, "") if everything went well,
     (False, "<error message>") otherwise
-
     """
     cmd = ["lrelease", "-compress", input_file, "-qm", output]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

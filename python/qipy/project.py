@@ -1,15 +1,22 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
 
 import qisys.sh
 
 
-class PythonProject(object):  # pylint: disable=too-many-instance-attributes
+class PythonProject(object):
     """ Collections of scripts, modules and packages """
 
     def __init__(self, worktree, src, name):
+        """ PythonProject Init """
         self.worktree = worktree
         self.src = src
         self.path = os.path.join(worktree.root, src)
@@ -31,7 +38,7 @@ class PythonProject(object):  # pylint: disable=too-many-instance-attributes
                 res.append(to_add)
         return res
 
-    def install(self, dest):  # pylint: disable=too-many-locals
+    def install(self, dest):
         """ Install scripts, modules and packages to the given destination """
         empty = (not self.setup_with_distutils) and \
             (not self.scripts) and \
@@ -55,20 +62,16 @@ in the qiproject.xml file
             cmd = [python, "setup.py", "install", "--root", dest, "--prefix=."]
             qisys.command.call(cmd, cwd=self.path)
             return
-
         for script in self.scripts:
             script_dest = os.path.join(dest, "bin")
             qisys.sh.mkdir(script_dest, recursive=True)
             script_src = os.path.join(self.path, script.src)
             qisys.sh.install(script_src, script_dest)
-
         site_packages = os.path.join(dest, "lib", "python2.7", "site-packages")
         qisys.sh.mkdir(site_packages, recursive=True)
-
         for module in self.modules:
             full_src = os.path.join(self.path, module.src, module.name + ".py")
             qisys.sh.install(full_src, site_packages)
-
         for package in self.packages:
             package_contents = self.walk_package(package)
             for filename in package_contents:
@@ -82,7 +85,7 @@ in the qiproject.xml file
         """ Returns all the .py files in the given package"""
         res = list()
         full_package_path = os.path.join(self.path, package.src, package.name)
-        for root, __directories, filenames in os.walk(full_package_path):  # pylint: disable=unused-variable
+        for root, __directories, filenames in os.walk(full_package_path):
             init_py = os.path.join(root, "__init__.py")
             if not os.path.exists(init_py):
                 continue
@@ -92,31 +95,41 @@ in the qiproject.xml file
                 full_path = os.path.join(root, filename)
                 rel_src = os.path.relpath(full_path, full_package_path)
                 res.append(rel_src)
-        res.sort()
-        return res
+        return sorted(res)
 
     @property
     def setup_dot_py(self):
+        """ Setup Dot Py """
         return os.path.join(self.path, "setup.py")
 
     def __repr__(self):
+        """  Representation """
         return "<%s in %s>" % (self.name, self.src)
 
 
 class Module(object):
+    """ Module Class """
+
     def __init__(self, name, src):
+        """ Module Init """
         self.name = name
         self.src = src
         self.qimodule = False
 
 
 class Package(object):
+    """ Package Class """
+
     def __init__(self, name, src):
+        """ Package Init """
         self.name = name
         self.src = src
         self.qimodule = False
 
 
 class Script(object):
+    """ Script Class """
+
     def __init__(self, src):
+        """ Script Init """
         self.src = src

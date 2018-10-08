@@ -1,22 +1,25 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-"""Init a new qisrc workspace """
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Init a new qisrc workspace """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import os
 import sys
 
-from qisys import ui
+import qisrc.parsers
+import qisrc.worktree
 import qisys.sh
 import qisys.parsers
 import qisys.worktree
-import qisrc.parsers
-import qisrc.worktree
+from qisys import ui
 
 
 def configure_parser(parser):
-    """Configure parser for this action """
+    """ Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
     qisrc.parsers.groups_parser(parser)
     parser.add_argument("manifest_url", nargs="?")
@@ -31,7 +34,7 @@ def configure_parser(parser):
 
 
 def do(args):
-    """Main entry point"""
+    """ Main entry point """
     root = args.worktree or os.getcwd()
     qisys.sh.mkdir(root, recursive=True)
     worktree = qisys.worktree.WorkTree(root)
@@ -46,6 +49,5 @@ def do(args):
                                              all_repos=args.all)
         if not ok:
             sys.exit(1)
-
     ui.info(ui.green, "New qisrc worktree initialized in",
             ui.reset, ui.bold, root)

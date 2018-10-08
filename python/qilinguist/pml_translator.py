@@ -1,22 +1,31 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-import os
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-from qisys import ui
-import qisys.command
-import qisys.qixml
+import os
 
 import qilinguist.project
 import qilinguist.qtlinguist
+import qisys.qixml
+import qisys.command
+from qisys import ui
 
 
 def new_pml_translator(pml_path):
+    """ New Pml Translator """
     return PMLTranslator(pml_path)
 
 
 class PMLTranslator(qilinguist.project.LinguistProject):
+    """ PMLTranslator Class """
+
     def __init__(self, pml_path):
+        """ PMLTranslator Init """
         self.pml_path = pml_path
         self.path = os.path.dirname(pml_path)
         self.ts_files = translations_files_from_pml(pml_path)
@@ -26,9 +35,11 @@ class PMLTranslator(qilinguist.project.LinguistProject):
         super(PMLTranslator, self).__init__(name, path)
 
     def update(self):
+        """ Update """
         raise NotImplementedError()
 
     def release(self, raises=True):
+        """ Release """
         all_ok = True
         for ts_file in self.ts_files:
             qm_file = ts_file.replace(".ts", ".qm")
@@ -46,16 +57,19 @@ class PMLTranslator(qilinguist.project.LinguistProject):
         return all_ok
 
     def install(self, dest):
+        """ Install """
         translations_dest = os.path.join(dest, "translations")
         qisys.sh.mkdir(translations_dest, recursive=True)
         for qm_file in self.qm_files:
             qisys.sh.install(qm_file, translations_dest)
 
     def __repr__(self):
+        """ Represenation """
         return "<PMLTranslator for %s>" % self.pml_path
 
 
 def translations_files_from_pml(pml_path):
+    """ Translations Files From Pml """
     res = list()
     tree = qisys.qixml.read(pml_path)
     root = tree.getroot()
@@ -69,6 +83,7 @@ def translations_files_from_pml(pml_path):
 
 
 def get_name(pml_path):
+    """ Get Name """
     tree = qisys.qixml.read(pml_path)
     root = tree.getroot()
     return qisys.qixml.parse_required_attr(root, "name", xml_path=pml_path)

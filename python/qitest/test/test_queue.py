@@ -1,26 +1,39 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Test Queue """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import time
 
-from qisys import ui
-import qitest.test_queue
 import qitest.runner
 import qitest.result
+import qitest.test_queue
+from qisys import ui
 
 
 class DummyProject(object):
+    """ DummyProject """
+
     def __init__(self, tmpdir):
+        """ DummyProject Init """
         self.sdk_directory = tmpdir.strpath
 
 
 class DummyLauncher(qitest.runner.TestLauncher):
+    """ DummyLauncher """
+
     def __init__(self, tmpdir):
+        """ DummyLauncher Init """
         super(DummyLauncher, self).__init__()
         self.results = dict()
         self.project = DummyProject(tmpdir)
 
     def launch(self, test):
+        """ Launch """
         default_time = 0.2
         default_result = qitest.result.TestResult(test)
         default_result.ok = True
@@ -38,6 +51,7 @@ class DummyLauncher(qitest.runner.TestLauncher):
 
 
 def test_queue_happy(tmpdir):
+    """ Test Queue Happy """
     tests = [
         {"name": "one"},
         {"name": "two"},
@@ -53,6 +67,7 @@ def test_queue_happy(tmpdir):
 
 
 def test_queue_sad(tmpdir):
+    """ Test Queue Sad """
     tests = [
         {"name": "one"},
         {"name": "two"},
@@ -70,13 +85,13 @@ def test_queue_sad(tmpdir):
         "three": {"raises": True},
         "four": {"sleep_time": 0.4},
     }
-
     test_queue.launcher = dummy_launcher
     test_queue.run(num_jobs=3)
     assert not test_queue.ok
 
 
 def test_one_job(tmpdir):
+    """ Test One Job """
     tests = [
         {"name": "one"},
         {"name": "two"},
@@ -90,6 +105,7 @@ def test_one_job(tmpdir):
 
 
 def test_no_tests(tmpdir):
+    """ Test No Tests """
     tests = list()
     test_queue = qitest.test_queue.TestQueue(tests)
     dummy_launcher = DummyLauncher(tmpdir)
@@ -99,12 +115,16 @@ def test_no_tests(tmpdir):
 
 
 class SporadicallyFailingLauncher(qitest.runner.TestLauncher):
+    """ SporadicallyFailingLauncher """
+
     def __init__(self, tmpdir):
+        """ SporadicallyFailingLauncher Init """
         super(SporadicallyFailingLauncher, self).__init__()
         self.num_runs = 0
         self.project = DummyProject(tmpdir)
 
     def launch(self, test):
+        """ Launch """
         result = qitest.result.TestResult(test)
         if self.num_runs == 3:
             result.ok = False
@@ -117,6 +137,7 @@ class SporadicallyFailingLauncher(qitest.runner.TestLauncher):
 
 
 def test_repeat_until_fail(tmpdir):
+    """ Test Repeat Until Fail """
     tests = [
         {"name": "one"},
         {"name": "two"}

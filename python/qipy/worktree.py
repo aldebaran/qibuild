@@ -1,6 +1,12 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Worktree """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import os
 import virtualenv
 
@@ -15,6 +21,7 @@ class PythonWorkTree(qisys.worktree.WorkTreeObserver):
     """ Container for Python projects """
 
     def __init__(self, worktree, config="system"):
+        """ PythonWorkTree Init """
         self.worktree = worktree
         self.python_projects = list()
         self._load_python_projects()
@@ -22,13 +29,16 @@ class PythonWorkTree(qisys.worktree.WorkTreeObserver):
         worktree.register(self)
 
     def reload(self):
+        """ Reload """
         self._load_python_projects()
 
     @property
     def root(self):
+        """ Root """
         return self.worktree.root
 
     def _load_python_projects(self):
+        """ Load Python Projects """
         seen_names = dict()
         self.python_projects = list()
         for project in self.worktree.projects:
@@ -88,12 +98,13 @@ Found two projects with the same name. (%s)
         execfile(activate_this_dot_py, {"__file__": activate_this_dot_py})
 
 
-def new_python_project(worktree, project):  # pylint: disable=too-many-locals
+def new_python_project(worktree, project):
+    """ New Python Project """
     qiproject_xml = project.qiproject_xml
     tree = qisys.qixml.read(qiproject_xml)
     qipython_elem = tree.find("qipython")
     if qipython_elem is None:
-        return
+        return None
     name = qisys.qixml.parse_required_attr(qipython_elem, "name",
                                            xml_path=qiproject_xml)
     python_project = qipy.project.PythonProject(worktree, project.src, name)
@@ -103,7 +114,6 @@ def new_python_project(worktree, project):  # pylint: disable=too-many-locals
                                               xml_path=qiproject_xml)
         script = qipy.project.Script(src)
         python_project.scripts.append(script)
-
     module_elems = qipython_elem.findall("module")
     for module_elem in module_elems:
         src = module_elem.get("src", "")
@@ -112,7 +122,6 @@ def new_python_project(worktree, project):  # pylint: disable=too-many-locals
         module = qipy.project.Module(name, src)
         module.qimodule = qisys.qixml.parse_bool_attr(module_elem, "qimodule")
         python_project.modules.append(module)
-
     package_elems = qipython_elem.findall("package")
     for package_elem in package_elems:
         name = qisys.qixml.parse_required_attr(package_elem, "name",
@@ -121,10 +130,8 @@ def new_python_project(worktree, project):  # pylint: disable=too-many-locals
         package = qipy.project.Package(name, src)
         package.qimodule = qisys.qixml.parse_bool_attr(package_elem, "qimodule")
         python_project.packages.append(package)
-
     setup_elem = qipython_elem.find("setup")
     if setup_elem is not None:
         python_project.setup_with_distutils = \
             qisys.qixml.parse_bool_attr(setup_elem, "with_distutils")
-
     return python_project

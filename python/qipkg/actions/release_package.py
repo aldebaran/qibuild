@@ -10,12 +10,14 @@ import qipkg.release
 
 
 def configure_parser(parser):
+    """ Configure Parser """
     qisys.parsers.default_parser(parser)
     parser.add_argument("pkg_path")
     parser.add_argument("-o", "--output")
 
 
 def do(args):
+    """ Main Entry Point """
     pkg_path = args.pkg_path
     output_path = args.output
     if not output_path:

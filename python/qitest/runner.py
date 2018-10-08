@@ -1,20 +1,28 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-import abc
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiTest Runner """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import re
 import os
 import json
+import abc
 
-from qisys import ui
 import qitest.test_queue
+from qisys import ui
 
 
-class TestSuiteRunner(object):  # pylint: disable=too-many-instance-attributes
+class TestSuiteRunner(object):
     """ Interface for a class able to run a test suite """
+
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, project):
+        """ TestSuiteRunner Init """
         self.project = project
         self._patterns = list()
         self._excludes = list()
@@ -34,15 +42,13 @@ class TestSuiteRunner(object):  # pylint: disable=too-many-instance-attributes
 
     @abc.abstractproperty
     def launcher(self):
-        """ This function should return a :py:class:`.TestLauncher`
-
-        """
+        """ This function should return a :py:class:`.TestLauncher` """
         pass
 
     def run(self):
-        """ Run all the tests.
+        """
+        Run all the tests.
         Return True if and only if the whole suite passed.
-
         """
         test_queue = qitest.test_queue.TestQueue(self.tests)
         test_queue.launcher = self.launcher
@@ -53,28 +59,33 @@ class TestSuiteRunner(object):  # pylint: disable=too-many-instance-attributes
 
     @property
     def patterns(self):
+        """ Patters Getter """
         return self._patterns
 
     @patterns.setter
     def patterns(self, value):
+        """ Patters Setter """
         if value:
             # just checking regexps are valid
-            [re.compile(x) for x in value]  # pylint: disable=expression-not-assigned
+            _unused = [re.compile(x) for x in value]
         self._patterns = value
 
     @property
     def excludes(self):
+        """ Excludes Getter """
         return self._excludes
 
     @excludes.setter
     def excludes(self, value):
+        """ Excludes Setter """
         if value:
             # just checking regexps are valid
-            [re.compile(x) for x in value]  # pylint: disable=expression-not-assigned
+            _unused = [re.compile(x) for x in value]
         self._excludes = value
 
     @property
     def tests(self):
+        """ Tests """
         res = [x for x in self._tests if
                match_patterns(self.patterns, x["name"], default=True)]
         res = [x for x in res if not
@@ -92,9 +103,7 @@ class TestSuiteRunner(object):  # pylint: disable=too-many-instance-attributes
         return res
 
     def get_last_failed_names(self):
-        """ Return the list of the test names that failed
-        during the previous run
-        """
+        """ Return the list of the test names that failed during the previous run """
         path = self.launcher.project.sdk_directory
         fail_json = os.path.join(path, ".failed.json")
         names = list()
@@ -107,11 +116,11 @@ class TestSuiteRunner(object):  # pylint: disable=too-many-instance-attributes
 
 class TestLauncher(object):
     """ Interface for a class able to launch a test. """
+
     __metaclass__ = abc.ABCMeta
 
     def __init__(self):
-        # Set by the test suite, the launcher may need to know about its worker
-        # index
+        """ Set by the test suite, the launcher may need to know about its worker index """
         self.worker_index = None
         self.capture = True
 
@@ -122,6 +131,7 @@ class TestLauncher(object):
 
 
 def match_patterns(patterns, name, default=True):
+    """ Retur True if Match Patterns """
     if not patterns:
         return default
     for pattern in patterns:

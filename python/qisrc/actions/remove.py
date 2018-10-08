@@ -1,10 +1,11 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-""" Remove a project from a worktree
-
-"""
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Remove a project from a worktree """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import qisys
 import qisys.parsers
@@ -21,7 +22,7 @@ def configure_parser(parser):
 
 
 def do(args):
-    """Main entry point"""
+    """ Main entry point """
     src = args.src
     path = qisys.sh.to_native_path(src)
     worktree = qisys.parsers.get_worktree(args)

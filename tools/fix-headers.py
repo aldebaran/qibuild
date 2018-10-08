@@ -1,18 +1,19 @@
 #!/usr/bin/env python
-
-
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" QiBuild """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import sys
 
-HEADER = """## Copyright (C) 2011-2014 Aldebaran Robotics
-"""
+HEADER = """## Copyright (C) 2011-2018 SoftBank Robotics\n"""
 
 
 def fix_file(filename):
+    """ Fix File """
     start_header = -1
     end_header = -1
     was_in_header = False
@@ -20,7 +21,6 @@ def fix_file(filename):
     seen_shebang = False
     with open(filename, "r") as fp:
         lines = fp.readlines()
-
     for (i, line) in enumerate(lines):
         if line.startswith("#!"):
             seen_shebang = True
@@ -36,7 +36,6 @@ def fix_file(filename):
                 end_header = i
                 was_in_header = False
                 continue
-
     header_lines = [l + "\n" for l in HEADER.splitlines()]
     if not seen_header:
         if seen_shebang:
@@ -47,12 +46,11 @@ def fix_file(filename):
         new_lines = lines[:start_header] +\
             header_lines +\
             lines[end_header:]
-
     with open(filename, "w") as fp:
         fp.writelines(new_lines)
 
 
 if __name__ == "__main__":
-    for file in sys.argv[1:]:
-        print "fixing ", file
-        fix_file(file)
+    for filearg in sys.argv[1:]:
+        print("fixing ", filearg)
+        fix_file(filearg)

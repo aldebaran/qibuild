@@ -1,22 +1,27 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
 """ Generate a binary package, ready to be used for a behavior """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-import qibuild.parsers
+import qisys.parsers
 import qipkg.builder
 import qipkg.metabuilder
 import qipkg.metapackage
-import qisys.parsers
+import qibuild.parsers
 
 
 def pml_parser(parser):
+    """ Pml Parser """
     qisys.parsers.build_parser(parser)
     parser.add_argument("pml_path")
 
 
 def pkg_parser(parser):
+    """ Pkg Parser """
     parser.add_argument("--with-breakpad", action="store_true")
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--with-toolchain", action="store_true")
@@ -24,6 +29,7 @@ def pkg_parser(parser):
 
 
 def get_pml_builder(args):
+    """ Get Pml Builder """
     worktree = qisys.parsers.get_worktree(args, raises=False)
     pml_path = args.pml_path
     if pml_path.endswith(".mpml"):
@@ -36,6 +42,7 @@ def get_pml_builder(args):
 
 
 def configure_builder(pml_builder, args):
+    """ Configure Builder """
     build_worktree = pml_builder.build_worktree
     if not build_worktree:
         return
@@ -47,5 +54,6 @@ def configure_builder(pml_builder, args):
 
 
 def configure_meta_builder(meta_builder, args):
+    """ Configure Meta Builder """
     for pml_builder in meta_builder.pml_builders:
         configure_builder(pml_builder, args)

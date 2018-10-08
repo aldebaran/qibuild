@@ -1,16 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-"""Install a project and its dependencies """
-
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Install a project and its dependencies. """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import qisys.sh
 import qibuild.parsers
 
 
 def configure_parser(parser):
-    """Configure parser for this action"""
+    """ Configure parser for this action. """
     qibuild.parsers.project_parser(parser)
     qibuild.parsers.cmake_build_parser(parser)
     group = parser.add_argument_group("install options")
@@ -26,7 +28,6 @@ def configure_parser(parser):
                        help="Also install tests")
     group.add_argument("--no-packages", action="store_false", dest="install_tc_packages",
                        help="Do not install packages from toolchain")
-
     parser.set_defaults(prefix="/", split_debug=False, dep_types="default",
                         install_tc_packages=True)
     if not parser.epilog:
@@ -39,7 +40,7 @@ Warning:
 
 
 def do(args):
-    """Main entry point"""
+    """ Main entry point. """
     dest_dir = qisys.sh.to_native_path(args.dest_dir)
     cmake_builder = qibuild.parsers.get_cmake_builder(
         args, default_dep_types=["build", "runtime"])
@@ -56,7 +57,6 @@ def do(args):
             components.append("runtime")
         if "test" in args.dep_types:
             components.append("test")
-
     res = cmake_builder.install(dest_dir, prefix=args.prefix,
                                 split_debug=args.split_debug,
                                 components=components,

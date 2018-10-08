@@ -1,15 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-
-"""A set of function to know the status of a git repository."""
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" A set of function to know the status of a git repository. """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 import qisrc.git
 from qisys import ui
 
 
 def stat_tracking_remote(git, branch, tracking):
-    """Check if branch is ahead and / or behind tracking."""
+    """ Check if branch is ahead and / or behind tracking. """
     if branch is None or tracking is None:
         return 0, 0
     _, local_ref = git.call("rev-parse", branch, raises=False)
@@ -24,9 +27,9 @@ def stat_fixed_ref(git, remote_ref):
 
 
 def stat_ahead_behind(git, local_ref, remote_ref):
-    """ Returns a tuple (ahead, behind) describing how far
-    from the remote ref the local ref is
-
+    """
+    Returns a tuple (ahead, behind) describing how far
+    from the remote ref the local ref is.
     """
     behind = 0
     ahead = 0
@@ -41,10 +44,11 @@ def stat_ahead_behind(git, local_ref, remote_ref):
     return ahead, behind
 
 
-class ProjectState(object):  # pylint: disable=too-many-instance-attributes
-    """A class which represent a project and is cleanlyness."""
+class ProjectState(object):
+    """ A class which represent a project and is cleanlyness. """
 
     def __init__(self, project):
+        """ ProjectState Init """
         self.project = project
         self.fixed_ref = None
         self.not_on_a_branch = False
@@ -62,45 +66,38 @@ class ProjectState(object):  # pylint: disable=too-many-instance-attributes
 
     @property
     def sync(self):
-        """Tell if project is synced."""
+        """ Tell if project is synced. """
         return self.ahead == 0 and self.behind == 0
 
     @property
     def sync_and_clean(self):
-        """Tell if project is synced and if it's clean."""
+        """ Tell if project is synced and if it's clean. """
         return self.clean and self.sync
 
 
 def check_state(project, untracked):
-    """Check and register the state of a project."""
+    """ Check and register the state of a project. """
     state_project = ProjectState(project)
-
     git = qisrc.git.Git(project.path)
-
     if not git.is_valid():
         state_project.valid = False
         return state_project
-
     state_project.clean = git.is_clean(untracked=untracked)
     if project.fixed_ref:
         state_project.ahead, state_project.behind = stat_fixed_ref(git, project.fixed_ref)
         state_project.fixed_ref = project.fixed_ref
         _set_status(git, state_project, untracked=untracked)
         return state_project
-
     state_project.current_branch = git.get_current_branch()
     state_project.tracking = git.get_tracking_branch()
     if project.default_remote and project.default_branch:
         state_project.manifest_branch = "%s/%s" % (project.default_remote.name, project.default_branch.name)
-
     if state_project.current_branch is None:
         state_project.not_on_a_branch = True
         return state_project
-
     if project.default_branch:
         if state_project.current_branch != project.default_branch.name:
             state_project.incorrect_proj = True
-
     (state_project.ahead, state_project.behind) = stat_tracking_remote(
         git,
         state_project.current_branch,
@@ -109,15 +106,14 @@ def check_state(project, untracked):
         (state_project.ahead_manifest, state_project.behind_manifest) = stat_tracking_remote(
             git, state_project.current_branch, "%s/%s" % (
                 project.default_remote.name, project.default_branch.name))
-
     _set_status(git, state_project, untracked=untracked)
     return state_project
 
 
 def _set_status(git, state_project, untracked=False):
-    """ When project is not clean, display git status
+    """
+    When project is not clean, display git status.
     (untracked files and the like)
-
     """
     if not state_project.sync_and_clean:
         out = git.get_status(untracked)
@@ -126,6 +122,7 @@ def _set_status(git, state_project, untracked=False):
 
 
 def _print_behind_ahead(behind, ahead):
+    """ Print Behind Ahead """
     numcommits = ""
     if behind:
         numcommits += "-" + str(behind)
@@ -137,7 +134,7 @@ def _print_behind_ahead(behind, ahead):
 
 
 def print_state(project, max_len):
-    """Print a state project."""
+    """ Print a state project. """
     if project.valid:
         if project.ahead or project.behind:
             numcommits = _print_behind_ahead(project.behind, project.ahead)
@@ -169,17 +166,16 @@ def print_state(project, max_len):
             ui.info(ui.bold, "Your branch", ui.green, project.current_branch,
                     ui.reset, ui.bold, "is", numcommits, "commits from branch",
                     ui.blue, project.manifest_branch)
-
     if not project.sync_and_clean:
         if project.status is not None:
             nlines = [x[:3] + project.project.src + "/" + x[3:]
                       for x in project.status]
             if nlines:
-                print "\n".join(nlines)
+                print("\n".join(nlines))
 
 
 def print_incorrect_projs(projects, max_len):
-    """Print list of projets which are not on correct branch."""
+    """ Print list of projets which are not on correct branch. """
     incorrect_projs = [x for x in projects if x.incorrect_proj]
     if incorrect_projs:
         ui.info()
@@ -197,7 +193,7 @@ def print_incorrect_projs(projects, max_len):
 
 
 def print_not_on_a_branch(projects):
-    """Print list of projects not on a branch."""
+    """ Print list of projects not on a branch. """
     not_on_a_branchs = [x for x in projects if x.not_on_a_branch]
     if not_on_a_branchs:
         ui.info()

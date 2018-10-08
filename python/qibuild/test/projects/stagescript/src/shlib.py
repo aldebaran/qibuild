@@ -1,11 +1,15 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" ShLib """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
 
 def load_shlib(name, verbose=False):
-    """ Load a shared library, try to handle as many cases as possible
-    """
+    """ Load a shared library, try to handle as many cases as possible """
     import ctypes
     import os
     import sys
@@ -29,7 +33,6 @@ def load_shlib(name, verbose=False):
         soname = [".dll", "_d.dll"]
         prefix = ''
         paths = ['', '.', os.path.join(medir, '..', 'lib'), os.path.join(medir, '..', 'bin')]
-
     if verbose:
         print("Loading " + name)
     handle = None

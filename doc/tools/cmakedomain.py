@@ -1,41 +1,42 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the COPYING file.
-"""
-Sphinx domain for documenting CMake functions
+# Use of this source code is governed by a BSD-style license (see the COPYING file).
+""" Sphinx Domain for Documenting CMake Functions """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
 
-
-"""
 import docutils
-
-
 import sphinx
 from sphinx.roles import XRefRole
-from sphinx import addnodes
 from sphinx.locale import l_
-from sphinx.domains import ObjType, Index
-from sphinx.util.docfields import TypedField, Field
 from sphinx.util.nodes import make_refnode
+from sphinx.domains import ObjType, Index
+from sphinx.util.docfields import TypedField
 
 
 class CMakeFunctionIndex(Index):
+    """ CMake Function Index """
     name = 'functions-index'
     localname = l_('CMake functions Index')
     shortname = l_('cmake functions')
     _data = 'function'
 
     def generate(self, docnames=None):
+        """ Generate the Index """
         content = {}
-        for ev, modname in sorted(self.domain.data[self._data].iteritems()):
+        for ev, modname in sorted(self.domain.data[self._data].items()):
             entries = content.setdefault(ev[0].lower(), [])
             entries.append([ev, 2, modname, ev, '', '', ''])
         # sort by first letter
-        result = sorted(content.iteritems())
+        result = sorted(content.items())
         collapse = False
         return result, collapse
 
 
 class CMakeFunction(sphinx.directives.ObjectDescription):
+    """ CMake Function """
     objtype_pretty = u"CMake function"
     doc_field_types = [
         TypedField('arg', label=l_('Arguments'),
@@ -43,6 +44,7 @@ class CMakeFunction(sphinx.directives.ObjectDescription):
     ]
 
     def add_target_and_index(self, name, sig, signode):
+        """ Add Target and Index """
         signode['ids'].append(name)
         self.state.document.note_explicit_target(signode)
         inv = self.env.domaindata['cmake'][self.objtype]
@@ -57,10 +59,8 @@ class CMakeFunction(sphinx.directives.ObjectDescription):
 
     def handle_signature(self, sig, signode):
         """
-        Transform a CMake function signature
-        into RST nodes.
-
-        Return a name to add to the index
+        Transform CMake Function Signature to RST nodes.
+        Return a name to add to the index.
         """
         nb_param = len(sig.split(" "))
         code = sig.replace("] ", "]\n    ")
@@ -74,9 +74,9 @@ class CMakeFunction(sphinx.directives.ObjectDescription):
 
 
 class CMakeDomain(sphinx.domains.Domain):
+    """ CMake Domain """
     name = 'cmake'
     label = 'CMake'
-
     object_types = {
         'function': ObjType(l_('functions'), 'functions'),
     }
@@ -94,13 +94,14 @@ class CMakeDomain(sphinx.domains.Domain):
     ]
 
     def clear_doc(self, docname):
+        """ Clear Doc """
         for objtype in (u'function',):
             for (objname, objdocname) in self.data[objtype].items():
                 if objdocname == docname:
                     del self.data[objtype][objname]
 
-    def resolve_xref(self, env, fromdocname, builder,
-                     typ, target, node, contnode):
+    def resolve_xref(self, env, fromdocname, builder, typ, target, node, contnode):
+        """ Resolve XRef """
         try:
             todocname = self.data[typ][target]
         except KeyError:
@@ -110,4 +111,5 @@ class CMakeDomain(sphinx.domains.Domain):
 
 
 def setup(app):
+    """ Application Setup """
     app.add_domain(CMakeDomain)
