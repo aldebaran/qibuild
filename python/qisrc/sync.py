@@ -280,10 +280,10 @@ Please run `qisrc init MANIFEST_URL`
         """ Sync Git """
         git = qisrc.git.Git(repo)
         git.set_remote("origin", url)
-        git.call("remote", "prune", "origin")
         if git.get_current_branch() != branch:
             git.checkout("-B", branch)
         with git.transaction() as transaction:
+            git.call("remote", "update", "--prune", "origin")
             git.fetch("origin")
             if ref:
                 to_reset = ref
