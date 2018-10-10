@@ -68,8 +68,8 @@ def open_git_feed(toolchain_name, feed_url, name=None, branch="master", first_pa
     if first_pass:
         if os.path.exists(git_path):
             git.call("remote", "set-url", "origin", feed_url)
+            git.call("remote", "update", "--prune", "origin")
             git.call("fetch", "origin", "--quiet")
-            git.call("remote", "prune", "origin")
             git.call("reset", "--hard", "--quiet", "origin/%s" % branch)
         else:
             git.clone(feed_url, "--quiet", "--branch", branch)
