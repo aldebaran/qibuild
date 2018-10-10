@@ -10,3 +10,8 @@ from __future__ import print_function
 import os
 
 QIBUILD_ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def stringify_env(env):
+    """ convert each key value pairs to strings in env list"""
+    return dict(((str(key), str(val)) for key, val in env.items()))

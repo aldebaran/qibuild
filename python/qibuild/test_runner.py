@@ -13,6 +13,7 @@ import sys
 import datetime
 import multiprocessing
 
+import qibuild
 import qitest.conf
 import qitest.runner
 import qisys.sh
@@ -154,9 +155,8 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         self._update_test(test)
         cmd = test["cmd"]
         timeout = test["timeout"]
-        env = test["env"]
         cwd = test["working_directory"]
-        process = qisys.command.Process(cmd, cwd=cwd, env=env, capture=self.capture)
+        process = qisys.command.Process(cmd, cwd=cwd, env=qibuild.stringify_env(test["env"]), capture=self.capture)
         start = datetime.datetime.now()
         if self.ignore_timeouts:
             process.run(timeout=None)
