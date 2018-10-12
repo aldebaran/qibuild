@@ -116,11 +116,11 @@ Please set only one of these two options to 'True'
             zip_call = archive.write
         if not quiet and not display_progress:
             rel_path = os.path.relpath(full_path, directory)
-            sys.stdout.write("adding {0}\n".format(rel_path))
+            sys.stdout.write("adding {0}\n".format(rel_path.encode('utf-8', "ignore")))
             sys.stdout.flush()
         if display_progress:
             ui.info_progress(i, len(to_add), "Done")
-        zip_call(attr, content)
+        zip_call(attr, content.encode('utf-8', "ignore"))
     archive.close()
     return output
 
@@ -187,7 +187,7 @@ Please set only one of these two options to 'True'
             if not quiet:
                 qisys.ui.info_progress(i, size, "Done")
             elif verbose and sys.stdout.isatty():
-                sys.stdout.write(member)
+                sys.stdout.write(member.encode('utf-8', "ignore"))
                 sys.stdout.flush()
     # Reverse sort directories, and then fix perm on these
     directories = sorted(directories, key=operator.attrgetter('filename'), reverse=True)
