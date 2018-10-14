@@ -36,6 +36,17 @@ def do(args):
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args, default_all=True,
                                                   use_build_deps=args.use_deps)
     git_grep_opts = args.git_grep_opts
+    git_grep_cmd = ["grep"]
+
+    # -l and -i must come before non-option arguments
+    # Remove them from the arguments and put them right after grep command
+    git_special_options = ("-l", "--files-with-matches", "-i", "--ignore-case")
+    if "-l" in git_grep_opts or "--files-with-matches" in git_grep_opts:
+        git_grep_cmd.append("-l")
+    if "-i" in git_grep_opts or "--ignore-case" in git_grep_opts:
+        git_grep_cmd.append("-i")
+    git_grep_opts = [x for x in git_grep_opts if x not in git_special_options]
+
     if args.path == 'none':
         git_grep_opts.insert(0, "-h")
     else:
@@ -48,6 +59,8 @@ def do(args):
     if not git_projects:
         qisrc.worktree.on_no_matching_projects(git_worktree, groups=args.groups)
         sys.exit(0)
+
+    git_cmd_line = git_grep_cmd + git_grep_opts
     max_src = max(len(x.src) for x in git_projects)
     retcode = 1
     for i, project in enumerate(git_projects):
@@ -56,7 +69,7 @@ def do(args):
                       ui.blue, project.src.ljust(max_src),
                       end="\r")
         git = qisrc.git.Git(project.path)
-        (status, out) = git.call("grep", *git_grep_opts, raises=False)
+        (status, out) = git.call(*git_cmd_line, raises=False)
         if out != "":
             if args.path == 'absolute' or args.path == 'worktree':
                 lines = out.splitlines()

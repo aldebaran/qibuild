@@ -49,6 +49,10 @@ def test_using_git_grep_options(qisrc_action, record_messages):
     rc = qisrc_action("grep", "--", "-i", "-l", "Spam", retcode=True)
     assert rc == 0
     assert record_messages.find("a.txt")
+    # Simple use of -l or -i args (GitHub issue #91)
+    rc = qisrc_action("grep", "Spam", "--", "-i", "-l", retcode=True)
+    assert rc == 0
+    assert record_messages.find("a.txt")
 
 
 def test_worktree_paths(qisrc_action, record_messages):
