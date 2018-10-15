@@ -4,11 +4,11 @@
 
 
 include(CMakeParseArguments)
+FIND_PACKAGE(SWIG REQUIRED)
+INCLUDE(${SWIG_USE_FILE})
 
 #! CMake wrapper for swig / Python
 # ================================
-
-
 
 #!
 # Create a python wrapping of the C/C++ library
