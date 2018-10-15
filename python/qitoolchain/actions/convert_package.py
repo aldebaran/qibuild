@@ -10,7 +10,7 @@ from __future__ import print_function
 import qisys
 import qisys.parsers
 from qisys import ui
-from qitoolchain.convert import convert_package
+from qitoolchain.convert import convert_package, convert_from_conan
 
 
 def configure_parser(parser):
@@ -21,6 +21,8 @@ def configure_parser(parser):
                         help="The path to the archive to be converted")
     parser.add_argument("--batch", dest="interactive", action="store_false",
                         help="Do not prompt for cmake module edition")
+    parser.add_argument("--conan", action="store_true",
+                        help="Define if the package_path is a conan package output")
     parser.set_defaults(interactive=True)
 
 
@@ -29,8 +31,12 @@ def do(args):
     name = args.name
     interactive = args.interactive
     package_path = args.package_path
-    ui.info("Converting", package_path, "into a qiBuild package")
-    res = convert_package(package_path, name, interactive=interactive)
+    if args.conan:
+        ui.info("Converting Conan package", package_path, "into a qiBuild package")
+        res = convert_from_conan(package_path, name)
+    else:
+        ui.info("Converting", package_path, "into a qiBuild package")
+        res = convert_package(package_path, name, interactive=interactive)
     message = """Conversion succeeded.\n\nqiBuild package:\n  {0}\n
 You can add this qiBuild package to a toolchain using:
   qitoolchain add-package -c <toolchain name> {0}""".format(res)
