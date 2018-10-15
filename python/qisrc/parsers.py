@@ -88,7 +88,7 @@ class GitProjectParser(qisys.parsers.AbstractProjectParser):
         return self.git_worktree.git_projects
 
     def parse_no_project(self, args):
-        """ PArse No Project """
+        """ Parse No Project """
         repo_root = qisrc.git.get_repo_root(os.getcwd())
         if not repo_root:
             raise qisrc.worktree.NotInAGitRepo()
