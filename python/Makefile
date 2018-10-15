@@ -29,7 +29,7 @@ pylint:
 
 check:
 	@echo :: Running tests:
-	@$(PYTHON) -m pytest $(PYTEST_ARGS) $(TEST_MODULES) --cov=. --cov-report=html -n auto
+	@$(PYTHON) -m pytest $(PYTEST_ARGS) $(TEST_MODULES) --cov=. --cov-report=html
 
 doc:
 	qidoc build qibuild
