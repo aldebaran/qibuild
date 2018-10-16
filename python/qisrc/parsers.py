@@ -128,35 +128,41 @@ class GitBuildProjectParser(qisys.parsers.AbstractProjectParser):
     def parse_one_project(self, args, project_arg):
         """ Implements AbstractProjectParser.parse_one_project """
         git_project = self.parser.parse_one_project(args, project_arg)[0]
-        return [git_project]
+        build_project = None
+        try:
+            build_project = self.build_parser.parse_one_project(args, project_arg)[0]
+        except Exception:
+            pass
+        return self.solve_deps(args, git_project, build_project)
 
     def parse_no_project(self, args):
         """ Implements AbstractProjectParser.parse_no_project """
         git_project = self.parser.parse_no_project(args)[0]
-        return self.solve_deps(args, git_project)
+        build_project = None
+        try:
+            build_project = self.build_parser.parse_no_project(args)[0]
+        except Exception:
+            pass
+        return self.solve_deps(args, git_project, build_project)
 
-    def solve_deps(self, args, git_project):
+    def solve_deps(self, args, git_project, build_project):
         """
         Called when use_build_deps is True
         * find the current build project as qibuild would do
         * solve the dependencies
         * find the git projects matching the dependencies
         """
-        build_project = None
-        try:
-            build_project = self.build_parser.parse_no_project(args)[-1]
-        except qibuild.parsers.CouldNotGuessProjectName:
-            pass
-        if not build_project:
-            return [git_project]
+        if build_project is None:  # No qiproject?
+            return [git_project]  # Return the repository instead.
+
         git_projects = list()  # Order matters
         deps_solver = qibuild.deps.DepsSolver(self.build_worktree)
         dep_types = qibuild.parsers.get_dep_types(args)
         deps_solver.dep_types = dep_types
-        build_projects = deps_solver.get_dep_projects([build_project], dep_types)
-        for build_project in build_projects:
-            git_project = qisys.parsers.find_parent_project(self.git_worktree.git_projects,
-                                                            build_project.path)
-            git_projects.append(git_project)
+        dep_build_projects = deps_solver.get_dep_projects([build_project], dep_types)
+        for dep_build_project in dep_build_projects:
+            dep_git_project = qisys.parsers.find_parent_project(
+                self.git_worktree.git_projects, dep_build_project.path)
+            git_projects.append(dep_git_project)
         # Idiom to sort an iterable preserving order
         return list(OrderedDict.fromkeys(git_projects))
