@@ -19,7 +19,7 @@ import qisys.script
 def print_version(script_name):
     """ Print QiBuild Version """
     # TODO: Version number should be at one place only
-    sys.stdout.write("%s version 3.12\n" % script_name)
+    sys.stdout.write("%s version 3.13\n" % script_name)
     qibuild_dir = os.path.dirname(qibuild.__file__)
     python_dir = os.path.dirname(qibuild_dir)
     print("Using Python code from", python_dir)
