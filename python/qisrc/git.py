@@ -190,7 +190,15 @@ class Git(object):
         args = list(args)
         args.append(self.repo)
         kwargs["cwd"] = None
-        return self.call("clone", *args, **kwargs)
+        clone_result = self.call("clone", *args, **kwargs)
+        if clone_result is not None:
+            (clone_rc, clone_out) = clone_result
+            if clone_rc != 0:
+                return (clone_rc, clone_out)
+        submodule_out = self.update_submodules()
+        if submodule_out is not None:
+            return (1, submodule_out)
+        return None
 
     def update_submodules(self, raises=True):
         """ Update submodule, cloning them if necessary. """
@@ -366,7 +374,10 @@ class Git(object):
         message = ""
         (update_rc, out) = self.call(*update_cmd, raises=False)
         if update_rc == 0:
-            update_successful = True
+            submodule_out = self.update_submodules()
+            update_successful = submodule_out is None
+            if not update_successful:
+                message = "Submodule update failed with the following output\n\n" + submodule_out
         else:
             if update_cmd[0] == "rebase":
                 # run rebase --abort so that the user is left
@@ -379,7 +390,6 @@ class Git(object):
                 full_message += "\n\nAdditionally, git rebase --abort failed "
                 full_message += "with following output:\n\n"
                 full_message += abort_out
-                return False, full_message
         return update_successful, message
 
     def is_ff(self, local_sha1, remote_sha1):

@@ -1,0 +1,8 @@
+v3.13
+========
+
+qisrc
+-----------
+
+* Update submodules when syncing (including when cloning)
+* Let qisrc sync resolve the dependencies of subprojects in submodules
