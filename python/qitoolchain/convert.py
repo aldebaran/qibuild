@@ -97,6 +97,7 @@ def _compress_package(package_path, name, settings, version):
 def _fix_rpaths(package_path):
     """ Search all dylib in lib directory and fix rpaths. """
     ui.info("search librairies in", package_path)
+    # pylint: disable=W0612
     for root, dirs, files in os.walk(package_path):
         for basename in files:
             if basename.endswith("dylib"):
@@ -121,6 +122,7 @@ def _fix_rpath(binary_path, package_path):
         if not os.path.exists(dep):
             lib_name = os.path.basename(dep)
             lib_abs_path = None
+            # pylint: disable=W0612
             for root, dirs, files in os.walk(package_path):
                 for basename in files:
                     filename = os.path.join(root, basename)

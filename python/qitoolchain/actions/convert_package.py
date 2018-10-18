@@ -17,13 +17,14 @@ def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.default_parser(parser)
     parser.add_argument("--name", required=True, help="The name of the package")
+    parser.add_argument("--version", help="The name of the package")
     parser.add_argument("package_path", metavar='PACKAGE_PATH',
                         help="The path to the archive to be converted")
     parser.add_argument("--batch", dest="interactive", action="store_false",
                         help="Do not prompt for cmake module edition")
     parser.add_argument("--conan", action="store_true",
                         help="Define if the package_path is a conan package output")
-    parser.set_defaults(interactive=True)
+    parser.set_defaults(interactive=True, version="0.0.1")
 
 
 def do(args):
@@ -33,7 +34,7 @@ def do(args):
     package_path = args.package_path
     if args.conan:
         ui.info("Converting Conan package", package_path, "into a qiBuild package")
-        res = convert_from_conan(package_path, name)
+        res = convert_from_conan(package_path, name, args.version)
     else:
         ui.info("Converting", package_path, "into a qiBuild package")
         res = convert_package(package_path, name, interactive=interactive)
