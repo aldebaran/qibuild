@@ -15,7 +15,7 @@ from qisys import ui
 
 def fix_dlls(sdk_dir, env=None, paths=None, mingw=False):
     """
-    Copy the dlls fron the toolchains and the other build dirs
+    Copy the dlls from the toolchains and the other build dirs
     into a sdk directory, so that running the executable just works.
     """
     if not paths:

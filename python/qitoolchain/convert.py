@@ -51,7 +51,7 @@ def convert_from_conan(package_path, name, version="0.0.1"):
     ui.info("Exposed librairies:")
     for n, deps in enumerate(info.get("dependencies")):
         ui.info_count(n, len(info.get("dependencies")), ui.blue, "{}@{}".format(deps.get("name"), deps.get("version")))
-        _copy_conan_share_cmake(package_path, deps)
+        _generate_conan_share_cmake(package_path, deps)
     if sys.platform == "darwin":
         _fix_rpaths(os.path.join(package_path, "lib"))
     _add_conan_package_xml(package_path, name, info, version)
@@ -60,17 +60,13 @@ def convert_from_conan(package_path, name, version="0.0.1"):
     return res
 
 
-def _copy_conan_share_cmake(package_path, deps):
+def _generate_conan_share_cmake(package_path, deps):
     """ Copy qibuild cmake module files. """
     name = deps.get("name")
-    if not os.path.exists(os.path.join(package_path, "share")):
-        ui.info(" -> Create share/")
-        os.mkdir(os.path.join(package_path, "share"))
-    if not os.path.exists(os.path.join(package_path, "share", "cmake")):
-        ui.info(" -> Create share/cmake/")
-        os.mkdir(os.path.join(package_path, "share", "cmake"))
-    res = qibuild.cmake.modules.generate_cmake_module(package_path, name)
-    ui.info(ui.green, "CMake module generated in", ui.reset, ui.bold, res)
+    cmake_path = os.path.join(package_path, "share", "cmake")
+    qisys.sh.mkdir(cmake_path, recursive=True)
+    cmake_path = qibuild.cmake.modules.generate_cmake_module(package_path, name, deps)
+    ui.info(ui.green, "CMake module generated in", ui.reset, ui.bold, cmake_path)
 
 
 def _add_conan_package_xml(package_path, name, info, version):
@@ -96,12 +92,12 @@ def _compress_package(package_path, name, settings, version):
 
 def _fix_rpaths(package_path):
     """ Search all dylib in lib directory and fix rpaths. """
-    ui.info("search librairies in", package_path)
+    ui.info("Fix RPATH for", package_path, "librairies")
     # pylint: disable=W0612
     for root, dirs, files in os.walk(package_path):
         for basename in files:
             if basename.endswith("dylib"):
-                ui.info("Fixing RPATH for", basename)
+                ui.debug("Fixing RPATH for", basename)
                 filename = os.path.join(root, basename)
                 _fix_rpath(filename, package_path)
 

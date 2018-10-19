@@ -18,7 +18,10 @@ function(boost_flib _prefix)
   # Use shared libraries everywhere
   set(Boost_USE_STATIC_LIBS OFF)
   if(MSVC)
-    qi_persistent_set(${_prefix}_DEFINITIONS  "BOOST_ALL_DYN_LINK")
+    qi_persistent_append(${_prefix}_DEFINITIONS  "BOOST_ALL_DYN_LINK")
+    qi_persistent_append(${_prefix}_DEFINITIONS  "BOOST_ALL_NO_LIB")
+    # fix compilation without bcrypt
+    qi_persistent_append(${_prefix}_DEFINITIONS  "BOOST_UUID_FORCE_AUTO_LINK")
   endif()
 
   foreach(_libname ${_libnames})
