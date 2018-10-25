@@ -8,7 +8,10 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 import os
+import sys
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
 QIBUILD_ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
