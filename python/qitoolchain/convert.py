@@ -36,13 +36,24 @@ def convert_package(package_path, name, interactive=False):
     return qibuild_package_path
 
 
-def convert_from_conan(package_path, name, version="0.0.1"):
-    """ Convert a conan build output directory to a qibuild package. """
+def conan_json_exists(package_path):
+    """ Check whether the conanbuildinfo file exists. """
     conanbuildinfo_json = os.path.join(package_path, "conanbuildinfo.json")
-    assert os.path.isfile(conanbuildinfo_json), "{} not found".format(conanbuildinfo_json)
+    return os.path.isfile(conanbuildinfo_json)
+
+
+def load_conan_json(package_path):
+    """ Load the conanbuildinfo file as a dict and return it. """
+    conanbuildinfo_json = os.path.join(package_path, "conanbuildinfo.json")
     with open(conanbuildinfo_json, 'r') as f:
         info = json.load(f)
+        return info
 
+
+def convert_from_conan(package_path, name, version="0.0.1"):
+    """ Convert a conan build output directory to a qibuild package. """
+    assert conan_json_exists(package_path), "{} not found".format(os.path.join(package_path, "conanbuildinfo.json"))
+    info = load_conan_json(package_path)
     settings = info.get("settings")
     ui.info(ui.white, "Compiled on {} {} with {} version {}".format(settings.get("os"), settings.get("arch"),
                                                                     settings.get("compiler"),

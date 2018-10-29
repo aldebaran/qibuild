@@ -47,9 +47,6 @@ Let's assume we will need a package for qitoolchain with shared boost inside.
 
     conan install boost-conanfile.txt --build=missing --install-folder package
 
-Notes: In a future version we will add an interactive way to create the package.
-
-
 Converting package directory to qitoolchain package
 ---------------------------------------------------
 
@@ -57,11 +54,11 @@ So, we have a common directory structure with ./lib, ./bin, ./include.
 
 .. code-block:: console
 
-    qitoolchain convert-package --conan --name=boost --version=1.68-r1 package/
+    qitoolchain convert-package --conan --name=boost --version=1.68.0 package/
 
 
 Here we are. A new package is now available and you can add it to you toolchain feed:
 
 .. code-block:: console
 
-    qitoolchain add-package -t linux64 boost-Linux-x86_64-1.68-r1.zip
+    qitoolchain add-package -t linux64 boost-Linux-x86_64-1.68.0.zip

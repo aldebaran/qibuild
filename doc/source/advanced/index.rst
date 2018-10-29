@@ -33,4 +33,5 @@ Toolchains with conan
 .. toctree::
     :maxdepth: 1
 
+    qitoolchain/tutorial_interactive
     qitoolchain/tutorial

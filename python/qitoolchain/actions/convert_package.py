@@ -10,7 +10,8 @@ from __future__ import print_function
 import qisys
 import qisys.parsers
 from qisys import ui
-from qitoolchain.convert import convert_package, convert_from_conan
+from qitoolchain.convert import convert_package, convert_from_conan, conan_json_exists
+from qitoolchain.conan import Conan
 
 
 def configure_parser(parser):
@@ -19,7 +20,7 @@ def configure_parser(parser):
     parser.add_argument("--name", required=True, help="The name of the package")
     parser.add_argument("--version", help="The name of the package")
     parser.add_argument("package_path", metavar='PACKAGE_PATH',
-                        help="The path to the archive to be converted")
+                        help="The path to the archive or conan directory to be converted")
     parser.add_argument("--batch", dest="interactive", action="store_false",
                         help="Do not prompt for cmake module edition")
     parser.add_argument("--conan", action="store_true",
@@ -33,6 +34,10 @@ def do(args):
     interactive = args.interactive
     package_path = args.package_path
     if args.conan:
+        conan = Conan(args.name, args.version)
+        if not conan_json_exists(package_path):
+            ui.info("Switch to interactive mode")
+            package_path = conan.create()
         ui.info("Converting Conan package", package_path, "into a qiBuild package")
         res = convert_from_conan(package_path, name, args.version)
     else:
