@@ -38,9 +38,10 @@ class PMLTranslator(qilinguist.project.LinguistProject):
         """ Update """
         raise NotImplementedError()
 
-    def release(self, raises=True):
+    def release(self, raises=True, build_config=None):
         """ Release """
         all_ok = True
+        lrelease = qisys.command.find_program("lrelease", raises=True, build_config=build_config)
         for ts_file in self.ts_files:
             qm_file = ts_file.replace(".ts", ".qm")
             input_file = os.path.join(self.path, ts_file)
@@ -49,7 +50,7 @@ class PMLTranslator(qilinguist.project.LinguistProject):
             if not ok:
                 ui.error(message)
                 all_ok = False
-            cmd = ["lrelease", "-compress", input_file, "-qm", output_file]
+            cmd = [lrelease, "-compress", input_file, "-qm", output_file]
             qisys.command.call(cmd)
             self.qm_files.append(output_file)
         if not all_ok and raises:

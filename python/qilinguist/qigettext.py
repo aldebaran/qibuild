@@ -53,7 +53,7 @@ class GettextProject(qilinguist.project.LinguistProject):
                 # generate PO file if it doesn't exist
                 self.generate_po_file(locale)
 
-    def release(self, raises=True):
+    def release(self, raises=True, build_config=None):
         """ Compile every catalog. """
         mo_output_dir = os.path.join(self.path, "po",
                                      "share", "locale", self.name)
