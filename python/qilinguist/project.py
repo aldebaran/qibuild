@@ -60,6 +60,6 @@ class LinguistProject(object):
         pass
 
     @abc.abstractmethod
-    def release(self, raises=True):
+    def release(self, raises=True, build_config=None):
         """ Release """
         pass

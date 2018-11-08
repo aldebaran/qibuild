@@ -33,7 +33,7 @@ class QtLinguistProject(qilinguist.project.LinguistProject):
         cmd.extend(output_files)
         qisys.command.call(cmd, cwd=self.path)
 
-    def release(self, raises=True):
+    def release(self, raises=True, build_config=None):
         """ Release """
         all_ok = True
         for locale in self.linguas:

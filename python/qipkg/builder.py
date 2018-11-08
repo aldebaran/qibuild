@@ -180,12 +180,14 @@ class PMLBuilder(object):
         qisys.sh.install(self.manifest_xml,
                          os.path.join(destination, "manifest.xml"))
         # Use every available builder to install
+        build_config = None
         for builder in self.builders:
             desc = desc_from_builder(builder)
             if builder.projects:
                 ui.info(ui.bold, "-> Adding %s ..." % desc)
             if isinstance(builder, qibuild.cmake_builder.CMakeBuilder):
                 builder.dep_types = ["runtime"]
+                build_config = builder.build_config
                 builder.install(destination, components=["runtime"],
                                 install_tc_packages=install_tc_packages)
             else:
@@ -201,7 +203,7 @@ class PMLBuilder(object):
         # Generate and install translations
         ui.info(ui.bold, "-> Generating translations ...")
         pml_translator = qilinguist.pml_translator.PMLTranslator(self.pml_path)
-        pml_translator.release()
+        pml_translator.release(build_config=build_config)
         pml_translator.install(destination)
 
     def deploy(self, url):
