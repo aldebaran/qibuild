@@ -37,7 +37,6 @@ setup(
     package_dir={"": "python".encode("utf-8")},
     include_package_data=True,
     install_requires=[
-        "qi>=1.5",
         "six>=1.11",
         "sphinx<=1.3.1",
         "sphinx_intl<=0.9.5",
