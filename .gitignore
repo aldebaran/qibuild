@@ -18,6 +18,7 @@ debian/qibuild/
 
 # IDE project's files
 .idea
+*.user
 
 # Generic transient files
 *~
