@@ -1,5 +1,5 @@
 # Main dependency
-cmake==3.11.4.post1
+cmake>=3.11.4.post1
 
 # For QiPkg Deploy
 qi==1.5.0
