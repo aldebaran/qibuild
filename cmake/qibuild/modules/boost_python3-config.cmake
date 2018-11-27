@@ -8,5 +8,5 @@ include("${_ROOT_DIR}/boostutils.cmake")
 
 # boost-python3 have different names depending on the distribution,
 # it's libboost_python3.so on archlinux but libboost_python-py33.so on ubuntu
-boost_flib(PYTHON3 "python3" "python-py34" "python-py33" "python-py32" "python-py31")
+boost_flib(PYTHON3 "python3" "python-py37" "python-py36" "python-py35" "python-py34" "python-py33" "python-py32" "python-py31")
 qi_persistent_set(BOOST_PYTHON3_DEPENDS "PYTHON3")
