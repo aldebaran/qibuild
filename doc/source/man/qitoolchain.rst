@@ -34,14 +34,20 @@ convert-package [NAME] PACKAGE_PATH
   Current supported binary package formats:
 
   * Gentoo
+  * Conan
+
+  Note: to convert a conan package directory use ``--conan``.
+  In this case you can add ``--version`` parameter which will be append to the
+  output package name (for more information about create qiToolchain package with conan follow the tutorial).
+
 
 add-package -c TOOLCHAIN_NAME PACKAGE_NAME PACKAGE_PATH
-  add a new qiBuild package to the given toolchain
+  add a new qiToolchain package to the given toolchain
 
 import-package -c TOOLCHAIN_NAME [PACKAGE_NAME] PACKAGE_PATH
-  import a package (binary archive or install directory) into a qiBuild package
+  import a package (binary archive or install directory) into a qiToolchain package
 
-  Convert the binary package to a qiBuild package and automatically
+  Convert the binary package to a qiToolchain package and automatically
   add it to the toochain.
 
   Current supported binary package formats:

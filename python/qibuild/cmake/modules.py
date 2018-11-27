@@ -8,13 +8,13 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 import os
-
 import qisys.sh
 import qisys.interact
+from qisys import ui
 import qibuild.config
 
 
-def find_libs(directory):
+def find_libs(directory, info=None):
     """ Find Libs """
     lib_directory = os.path.join(directory, "lib")
     res = list()
@@ -22,14 +22,21 @@ def find_libs(directory):
         return list()
     candidates = os.listdir(lib_directory)
     for candidate in candidates:
-        if candidate.endswith((".so", ".a", ".lib", ".dylib")):
-            res.append("lib/" + candidate)
+        if info:
+            clues = info.get("libs")
+            for c in clues:
+                if candidate.endswith((".so", ".a", ".lib", ".dylib")) and c.lower() in candidate.lower():
+                    ui.debug("found:", candidate)
+                    res.append("lib/" + candidate)
+        else:
+            if candidate.endswith((".so", ".a", ".lib", ".dylib")):
+                res.append("lib/" + candidate)
     return sorted(res)
 
 
-def generate_cmake_module(directory, name):
+def generate_cmake_module(directory, name, info=None):
     """ Generate CMake Module """
-    libraries = find_libs(directory)
+    libraries = find_libs(directory, info)
     libs_string = ""
     for library in libraries:
         libs_string += "  ${_root}/%s\n" % library

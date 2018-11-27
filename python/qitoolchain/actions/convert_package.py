@@ -10,18 +10,22 @@ from __future__ import print_function
 import qisys
 import qisys.parsers
 from qisys import ui
-from qitoolchain.convert import convert_package
+from qitoolchain.convert import convert_package, convert_from_conan, conan_json_exists
+from qitoolchain.conan import Conan
 
 
 def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.default_parser(parser)
     parser.add_argument("--name", required=True, help="The name of the package")
+    parser.add_argument("--version", help="The name of the package")
     parser.add_argument("package_path", metavar='PACKAGE_PATH',
-                        help="The path to the archive to be converted")
+                        help="The path to the archive or conan directory to be converted")
     parser.add_argument("--batch", dest="interactive", action="store_false",
                         help="Do not prompt for cmake module edition")
-    parser.set_defaults(interactive=True)
+    parser.add_argument("--conan", action="store_true",
+                        help="Define if the package_path is a conan package output")
+    parser.set_defaults(interactive=True, version="0.0.1")
 
 
 def do(args):
@@ -29,8 +33,16 @@ def do(args):
     name = args.name
     interactive = args.interactive
     package_path = args.package_path
-    ui.info("Converting", package_path, "into a qiBuild package")
-    res = convert_package(package_path, name, interactive=interactive)
+    if args.conan:
+        conan = Conan(args.name, args.version)
+        if not conan_json_exists(package_path):
+            ui.info("Switch to interactive mode")
+            package_path = conan.create()
+        ui.info("Converting Conan package", package_path, "into a qiBuild package")
+        res = convert_from_conan(package_path, name, args.version)
+    else:
+        ui.info("Converting", package_path, "into a qiBuild package")
+        res = convert_package(package_path, name, interactive=interactive)
     message = """Conversion succeeded.\n\nqiBuild package:\n  {0}\n
 You can add this qiBuild package to a toolchain using:
   qitoolchain add-package -c <toolchain name> {0}""".format(res)
