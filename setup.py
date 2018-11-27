@@ -34,7 +34,7 @@ setup(
     author_email="qibuild-dev@aldebaran-robotics.com",
     py_modules=["qicd"],
     packages=find_packages("python"),
-    package_dir={"": "python".encode("utf-8")},
+    package_dir={"": str("python")},
     include_package_data=True,
     install_requires=[
         "six>=1.11",
