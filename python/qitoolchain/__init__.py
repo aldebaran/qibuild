@@ -11,7 +11,7 @@ from qitoolchain.toolchain import Toolchain
 from qitoolchain.toolchain import get_tc_names
 
 
-def get_toolchain(tc_name):
+def get_toolchain(tc_name, raises=True):
     """ Get an existing tolchain using its name """
     tc_names = get_tc_names()
     if tc_name not in tc_names:
@@ -19,5 +19,7 @@ def get_toolchain(tc_name):
         mess += "Known toolchains are:\n"
         for name in tc_names:
             mess += "  * " + name + "\n"
-        raise Exception(mess)
+        if raises:
+            raise Exception(mess)
+        return None
     return Toolchain(tc_name)

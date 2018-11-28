@@ -17,6 +17,9 @@ def configure_parser(parser):
     qisys.parsers.worktree_parser(parser)
     parser.add_argument("name",
                         help="The name of the toolchain to remove")
+    parser.add_argument('-i', "--ignore",
+                        dest="ignore", action="store_false",
+                        help="""Ignore error if the toolchain does not exists.""")
     parser.add_argument('-f', "--force",
                         dest="force", action="store_true",
                         help="""remove the whole toolchain, including any local packages you may
@@ -25,12 +28,17 @@ def configure_parser(parser):
 
 def do(args):
     """ Main entry point  """
-    tc = qitoolchain.get_toolchain(args.name)
-    if args.force:
-        ui.info(ui.green, "Removing toolchain", ui.blue, tc.name)
-        tc.remove()
-        ui.info(ui.green, "done")
+    tc = qitoolchain.get_toolchain(args.name, args.ignore)
+    if tc:
+        if args.force:
+            ui.info(ui.green, "Removing toolchain", ui.blue, tc.name)
+            tc.remove()
+            ui.info(ui.green, "done")
+        else:
+            ui.info("Would remove toolchain", ui.blue, tc.name)
+            ui.info("Use --force to actually remove it.")
+            return
     else:
-        ui.info("Would remove toolchain", ui.blue, tc.name)
-        ui.info("Use --force to actually remove it.")
+        ui.info("Would remove toolchain", ui.blue, args.name)
+        ui.info("This toolchain does not exists.")
         return
