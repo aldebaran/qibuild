@@ -1,8 +1,38 @@
 v3.12
 ========
 
+misc
+----
+
+* PyLint and PyCodeStyle Cleanup.
+* Continuous integration improvement with gitlab CI.
+* Python 3 Compatibility Preparation.
+* Add new logo.
+
 qibuild
+-------
+
+* Minor bugfixes and typo fixes.
+* Fix unicode support.
+
+qisys
+-----
+* Improvement of find_program() when cross-compiling.
+
+qitoolchain
 -----------
 
-* PyLint and PyCodeStyle Cleanup
-* Python 3 Compatibility Preparation
+* Add option in qitoolchain to ignore error when removing an inexistant toolchain.
+
+.. code-block:: console
+
+    qitoolchain remove -f -i unknown_toolchain
+
+* Add experimental conan support (create toolchain packages from conan tools).
+
+.. code-block:: console
+
+    export BOOST_VERSION=1.68.0
+    export ICU_VERSION=60.2
+    qitoolchain convert-package --conan --conan-channel boost/$BOOST_VERSION@conan/stable --conan-channel icu/$ICU_VERSION@bincrafters/stable --conan-shared --name=boost --version=$BOOST_VERSION .
+    qitoolchain add-package -t my_toolchain boost-Linux-x86_64-$BOOST_VERSION.zip
