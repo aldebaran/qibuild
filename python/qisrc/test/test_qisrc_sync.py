@@ -588,7 +588,7 @@ def test_switching_from_fixed_ref_to_branch_local_changes(qisrc_action, git_serv
 def test_sync_initialize_submodule(qisrc_action, git_server):
     """ Test Sync Clones New Repos """
     git_server.create_repo("foo.git")
-    bar_remote_path = git_server._create_repo("bar.git") # do not add it to the manifest
+    bar_remote_path = git_server._create_repo("bar.git")  # do not add it to the manifest
     git_server.push_file("bar.git", "README", "This is bar\n")
     qisrc_action("init", git_server.manifest_url)
     cwd = py.path.local(os.getcwd())  # pylint:disable=no-member
@@ -611,7 +611,7 @@ def test_sync_directory_replaced_by_submodule(qisrc_action, git_server):
     assert bar_local_path.isdir()
     assert bar_local_path.join("README").isfile()
 
-    bar_remote_path = git_server._create_repo("bar.git") # do not add it to the manifest
+    bar_remote_path = git_server._create_repo("bar.git")  # do not add it to the manifest
     git_server.push_file("bar.git", "README", "This is bar\n")
     git_server.delete_file("foo.git", "bar/README")
     git_server.push_submodule("foo.git", bar_remote_path, "bar")

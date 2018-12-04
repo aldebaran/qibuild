@@ -311,7 +311,6 @@ class TestGitServer(object):
         git.commit("--message", "remove %s" % filename)
         git.push("origin", "master:master")
 
-
     def push_submodule(self, project, submodule_url, destination_dir,
                        branch="master", fast_forward=True,
                        message=None):
