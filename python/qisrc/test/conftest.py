@@ -312,6 +312,37 @@ class TestGitServer(object):
         git.push("origin", "master:master")
 
 
+    def push_submodule(self, project, submodule_url, destination_dir,
+                       branch="master", fast_forward=True,
+                       message=None):
+        """
+        Push a submodule to the given project.
+        It is assumed that the project has been created.
+        """
+        src = project.replace(".git", "")
+        repo_src = self.src.join(src)
+        git = qisrc.git.Git(repo_src.strpath)
+        if git.get_current_branch() != branch:
+            git.checkout("--force", "-B", branch)
+        if not fast_forward:
+            git.reset("--hard", "HEAD~1")
+
+        to_write = repo_src.join(destination_dir)
+        if to_write.exists():
+            raise RuntimeError("path %s already exists" % destination_dir)
+
+        if not message:
+            message = "Add submodule %s" % destination_dir
+
+        git.call("submodule", "add", submodule_url, destination_dir)
+        git.add(destination_dir)
+        git.commit("--message", message)
+        if fast_forward:
+            git.push("origin", "%s:%s" % (branch, branch))
+        else:
+            git.push("origin", "--force", "%s:%s" % (branch, branch))
+
+
 class TestGit(qisrc.git.Git):
     """ the Git class with a few other helpful methods """
 
