@@ -24,8 +24,14 @@ def configure_parser(parser):
     parser.add_argument("--batch", dest="interactive", action="store_false",
                         help="Do not prompt for cmake module edition")
     parser.add_argument("--conan", action="store_true",
-                        help="Define if the package_path is a conan package output")
-    parser.set_defaults(interactive=True, version="0.0.1")
+                        help="Define if we work on a conan package")
+    parser.add_argument("--conan-shared", dest="shared", action="store_true",
+                        help="Set to get the shared version of the conan library")
+    parser.add_argument("--conan-static", dest="shared", action="store_false",
+                        help="Set to get the static version of the conan library")
+    parser.add_argument("--conan-channel", dest='channel',
+                        help="The channel of the conan package to be converted")
+    parser.set_defaults(interactive=True, version="0.0.1", shared=None)
 
 
 def do(args):
@@ -34,7 +40,7 @@ def do(args):
     interactive = args.interactive
     package_path = args.package_path
     if args.conan:
-        conan = Conan(args.name, args.version)
+        conan = Conan(args.name, args.version, args.channel, args.shared)
         if not conan_json_exists(package_path):
             ui.info("Switch to interactive mode")
             package_path = conan.create()

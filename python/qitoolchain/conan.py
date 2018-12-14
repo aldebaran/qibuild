@@ -18,7 +18,7 @@ from qisys import ui
 class Conan(object):
     """ This class create a conan package directory ready to be converted by qitoolchain """
 
-    def __init__(self, name, version, channel=None, is_shared=True):
+    def __init__(self, name, version, channel=None, is_shared=None):
         """ Conan class allows us to create a conanfile and compile the library with conan."""
         self.name = name
         self.version = version
@@ -40,8 +40,9 @@ class Conan(object):
         if not self.channel:
             question = "Which conan library do you want to add?"
             self.channel = qisys.interact.ask_string(question, default=True)
-        question = "Do you want it to be shared (highly recommended)?"
-        self.is_shared = qisys.interact.ask_yes_no(question, default=True)
+        if self.is_shared is None:
+            question = "Do you want it to be shared (highly recommended)?"
+            self.is_shared = qisys.interact.ask_yes_no(question, default=True)
         self.prepare()
         self.write_conanfile()
         self.build()
