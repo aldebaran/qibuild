@@ -62,7 +62,7 @@ export_lib(@NAME@)
     contents = contents.replace("@libraries@", libs_string)
     to_make = os.path.join(directory, "share", "cmake", name)
     qisys.sh.mkdir(to_make, recursive=True)
-    to_write = os.path.join(to_make, "%s-config.cmake" % name)
+    to_write = os.path.join(to_make, "%s-config.cmake" % name.lower())
     with open(to_write, "w") as fp:
         fp.write(contents)
     return to_write
