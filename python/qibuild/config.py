@@ -16,6 +16,7 @@ import qisys.qixml
 import qisys.envsetter
 from qisys import ui
 from qisys.qixml import etree
+import qitoolchain
 
 
 def get_global_cfg_path():
@@ -900,6 +901,7 @@ def add_build_config(name, toolchain=None, profiles=None,
     else:
         build_config = BuildConfig()
     build_config.name = name
+    qitoolchain.ensure_name_is_valid(toolchain)
     build_config.toolchain = toolchain
     if profiles:
         build_config.profiles = profiles
