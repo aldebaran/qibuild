@@ -23,3 +23,16 @@ def get_toolchain(tc_name, raises=True):
             raise Exception(mess)
         return None
     return Toolchain(tc_name)
+
+
+def ensure_name_is_valid(tc_name):
+    """ Validate the name has no unsupported characters """
+    if tc_name:
+        bad_chars = r'<>:"/\|?*'
+        for bad_char in bad_chars:
+            if bad_char in tc_name:
+                mess = "Invalid toolchain name: '%s'\n" % tc_name
+                mess += "A valid toolchain name should not contain any "
+                mess += "of the following chars:\n"
+                mess += " ".join(bad_chars)
+                raise Exception(mess)
