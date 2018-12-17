@@ -51,6 +51,9 @@ def do(args):
         res = convert_package(package_path, name, interactive=interactive)
     message = """Conversion succeeded.\n\nqiBuild package:\n  {0}\n
 You can add this qiBuild package to a toolchain using:
-  qitoolchain add-package -c <toolchain name> {0}""".format(res)
+  qitoolchain add-package -c <config name> {0}
+  or
+  qitoolchain add-package -t <toolchain name> {0}""".format(res)
+
     qisys.ui.info(message)
     return res
