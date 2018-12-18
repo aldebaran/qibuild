@@ -84,7 +84,7 @@ include, * -> ./include
         ui.info(" * Building library with conan in", self.package_path)
         qisys.command.check_is_in_path("conan")
         conan_path = qisys.command.find_program("conan")
-        cmd = [conan_path, "install", self.conanfile, "--build=missing", "--install-folder", self.package_path]
+        cmd = [conan_path, "install", self.conanfile, "--build", "--install-folder", self.package_path]
         qisys.command.call(cmd)
 
     def clean(self):
