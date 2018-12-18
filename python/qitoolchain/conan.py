@@ -72,6 +72,7 @@ bin, *.dll -> ./bin
 lib, *.lib* -> ./lib
 lib, *.dylib* -> ./lib
 lib, *.so* -> ./lib
+lib, *.a* -> ./lib
 include, * -> ./include
 """
         contents = template.replace("@CHANNEL@", self.channel)

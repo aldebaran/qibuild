@@ -42,7 +42,6 @@ def do(args):
     if args.conan:
         conan = Conan(args.name, args.version, args.channel, args.shared)
         if not conan_json_exists(package_path):
-            ui.info("Switch to interactive mode")
             package_path = conan.create()
         ui.info("Converting Conan package", package_path, "into a qiBuild package")
         res = convert_from_conan(package_path, name, args.version)
