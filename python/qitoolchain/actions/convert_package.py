@@ -27,11 +27,11 @@ def configure_parser(parser):
                         help="Define if we work on a conan package")
     parser.add_argument("--conan-shared", dest="shared", action="store_true",
                         help="Set to get the shared version of the conan library")
-    parser.add_argument("--conan-static", dest="shared", action="store_false",
+    parser.add_argument("--conan-static", dest="static", action="store_true",
                         help="Set to get the static version of the conan library")
     parser.add_argument("--conan-channel", dest='channel',
                         help="The channel of the conan package to be converted")
-    parser.set_defaults(interactive=True, version="0.0.1", shared=None)
+    parser.set_defaults(interactive=True, version="0.0.1")
 
 
 def do(args):
@@ -40,7 +40,14 @@ def do(args):
     interactive = args.interactive
     package_path = args.package_path
     if args.conan:
-        conan = Conan(args.name, args.version, args.channel, args.shared)
+        shared = None
+        if args.shared or args.static:
+            assert args.shared != args.static, "--conan-shared and --conan-static are mutualy exlusive, please remove one of them."
+        if args.shared is True:
+            shared = True
+        if args.static is True:
+            shared = False
+        conan = Conan(args.name, args.version, args.channel, shared)
         if not conan_json_exists(package_path):
             package_path = conan.create()
         ui.info("Converting Conan package", package_path, "into a qiBuild package")
