@@ -18,11 +18,11 @@ from qisys import ui
 class Conan(object):
     """ This class create a conan package directory ready to be converted by qitoolchain """
 
-    def __init__(self, name, version, channel=None, is_shared=None):
+    def __init__(self, name, version, channels=None, is_shared=None):
         """ Conan class allows us to create a conanfile and compile the library with conan."""
         self.name = name
         self.version = version
-        self.channel = channel
+        self.channels = channels
         self.is_shared = is_shared
         self.temp_dir = None
         self.conanfile = None
@@ -37,9 +37,10 @@ class Conan(object):
         Ask conan channel and parameters to create a conanfile and build it
         Tested with: "boost/1.68.0@conan/stable" shared
         """
-        if not self.channel:
+        if not self.channels:
             question = "Which conan library do you want to add?"
-            self.channel = qisys.interact.ask_string(question, default=True)
+            channel = qisys.interact.ask_string(question, default=True)
+            self.channels = [channel]
         if self.is_shared is None:
             question = "Do you want it to be shared (highly recommended)?"
             self.is_shared = qisys.interact.ask_yes_no(question, default=True)
@@ -58,12 +59,16 @@ class Conan(object):
         assert self.temp_dir, "This build is not ready, please call prepare()"
         self.conanfile = os.path.join(self.temp_dir, "conanfile.txt")
         ui.info(" * Write conanfile in", self.conanfile)
-        template = """\
-[requires]
-@CHANNEL@
-[options]
-boost:shared=@IS_SHARED@
-
+        with open(self.conanfile, "w") as fp:
+            fp.write("[requires]" + os.linesep)
+            for c in self.channels:
+                fp.write(c + os.linesep)
+            fp.write(os.linesep)
+            fp.write("[options]" + os.linesep)
+            for c in self.channels:
+                fp.write("{}:shared={}{}".format(c.split('/')[0], self.is_shared, os.linesep))
+            fp.write(os.linesep)
+            contents = """\
 [generators]
 json
 
@@ -75,9 +80,6 @@ lib, *.so* -> ./lib
 lib, *.a* -> ./lib
 include, * -> ./include
 """
-        contents = template.replace("@CHANNEL@", self.channel)
-        contents = contents.replace("@IS_SHARED@", str(self.is_shared))
-        with open(self.conanfile, "w") as fp:
             fp.write(contents)
 
     def build(self):
