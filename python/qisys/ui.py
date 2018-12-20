@@ -19,6 +19,7 @@ import platform
 import datetime
 import functools
 import traceback
+import six
 
 # Try using pyreadline so that we can
 # have colors on windows, too.
@@ -212,7 +213,13 @@ def _msg(*tokens, **kwargs):
             if isinstance(token, unicode):
                 token_string = token
             elif isinstance(token, str):
-                token_string = token.decode("utf-8")
+                if six.PY2:
+                    try:
+                        token_string = token.decode("utf-8")
+                    except Exception:
+                        token_string = token
+                else:
+                    token_string = token
             else:
                 token_string = _unicode_representation(token)
             if sep == " " and token_string.endswith("\n"):
