@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.abspath('../tools'))
 sys.path.insert(0, os.path.abspath('../../python'))
 
 project = "qiBuild"
-version = "3.12"
+version = "3.12.1"
 release = version
 extensions.append("cmakedomain")
 extensions.append("sphinx.ext.autodoc")
