@@ -1,5 +1,4 @@
 <project version="3">
-  <maintainer email="mballarini@softbankrobotics.com">Matthias Ballarini</maintainer>
   <maintainer email="ngargaud@softbankrobotics.com">Nicolas Gargaud</maintainer>
   <project src="doc" />
   <qipython name="qibuild">
