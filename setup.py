@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Copyright (c) 2012-2019 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license (see the COPYING file).
 """ QiBuild Setup """
 from __future__ import absolute_import
@@ -27,7 +27,7 @@ def get_qibuild_cmake_files():
 
 setup(
     name="qibuild",
-    version="3.12",
+    version="3.12.1",
     description="The Meta Build Framework",
     url="http://doc.aldebaran.com/qibuild",
     author="SoftBank Robotics",

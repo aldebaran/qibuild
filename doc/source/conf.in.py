@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Copyright (c) 2012-2019 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license (see the COPYING file).
 """ QiBuild """
 
@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.abspath('../tools'))
 sys.path.insert(0, os.path.abspath('../../python'))
 
 project = "qiBuild"
-version = "3.12"
+version = "3.12.1"
 release = version
 extensions.append("cmakedomain")
 extensions.append("sphinx.ext.autodoc")

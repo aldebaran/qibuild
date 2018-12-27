@@ -1,0 +1,8 @@
+v3.12.1
+=======
+
+qisys
+-----
+
+* Minor bugfixes and typo fixes.
+* Fix unicode support in python3.
