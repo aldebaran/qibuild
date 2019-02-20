@@ -210,12 +210,27 @@ class Git(object):
             mess += "git status returned %s\n" % out
             if raises:
                 raise Exception(mess)
-            else:
-                return mess
+            return mess
         if not out:
             return None
-        res, out = self.submodule("update", "--init", "--recursive",
-                                  raises=False)
+
+        for submodule_info in out.splitlines():
+            submodule_info_split = submodule_info.split(" ")
+            if len(submodule_info_split) < 3:  # The submodule is new, not yet initialized
+                assert len(submodule_info_split) > 1
+                submodule_path = submodule_info_split[1]
+                path = os.path.join(self.repo, submodule_path)
+                dirty = os.path.exists(path) and (not os.path.isdir(path) or os.listdir(path))
+                if dirty:  # But some files are still there
+                    mess = "Submodule %s of repository %s cannot be initialized, because directory already exists.\n"
+                    mess += "Please consider cleaning the repository first using qibuild clean, git clean,"
+                    mess += "or by removing the directory.\n"
+                    mess = mess % (submodule_path, self.repo)
+                    if raises:
+                        raise Exception(mess)
+                    return mess
+
+        res, out = self.submodule("update", "--init", "--recursive", raises=False)
         if res == 0:
             return None
         mess = "Failed to update submodules\n"
