@@ -195,9 +195,10 @@ class Git(object):
             (clone_rc, clone_out) = clone_result
             if clone_rc != 0:
                 return (clone_rc, clone_out)
-        submodule_out = self.update_submodules()
-        if submodule_out is not None:
-            return (1, submodule_out)
+        if "--bare" not in args:
+            submodule_out = self.update_submodules()
+            if submodule_out is not None:
+                return (1, submodule_out)
         return None
 
     def update_submodules(self, raises=True):
