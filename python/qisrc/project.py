@@ -271,6 +271,7 @@ class GitProject(object):
     def apply_config(self):
         """ Apply configuration to the underlying git repository. """
         git = qisrc.git.Git(self.path)
+        git.update_submodules()
         if git.is_empty():
             ui.error("repo in %s has no commits yet" % self.src)
         for remote in self.remotes:

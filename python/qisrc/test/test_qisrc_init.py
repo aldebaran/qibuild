@@ -9,6 +9,7 @@ from __future__ import print_function
 
 import os
 import pytest
+import py
 
 import qisys.script
 import qisrc.git
@@ -228,3 +229,16 @@ def test_tags(qisrc_action, git_server):
     _, sha1 = git.call("rev-parse", "HEAD", raises=False)
     expected = git.get_ref_sha1("refs/tags/v0.1")
     assert sha1 == expected
+
+
+def test_init_submodule(qisrc_action, git_server):
+    """ Test Sync Clones New Repos """
+    git_server.create_repo("foo.git")
+    bar_remote_path = git_server._create_repo("bar.git")  # do not add it to the manifest
+    git_server.push_file("bar.git", "README", "This is bar\n")
+    git_server.push_submodule("foo.git", bar_remote_path, "bar")
+    qisrc_action("init", git_server.manifest_url)
+    cwd = py.path.local(os.getcwd())  # pylint:disable=no-member
+    bar_local_path = cwd.join("foo").join("bar")
+    assert bar_local_path.isdir()
+    assert bar_local_path.join("README").isfile()

@@ -87,7 +87,10 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             if git_project.src == src:
                 return git_project
         if auto_add:
-            self.worktree.add_project(path)
+            # In the case of submodules, the project may already be found
+            # in the qisys WorkTree, but not yet in the GitWorkTree.
+            if not self.worktree.has_project(path):
+                self.worktree.add_project(path)
             return self.get_git_project(path)
         if raises:
             raise NoSuchGitProject(src)

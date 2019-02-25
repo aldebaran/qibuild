@@ -583,3 +583,69 @@ def test_switching_from_fixed_ref_to_branch_local_changes(qisrc_action, git_serv
     qisrc_action("sync", retcode=True)
     # if modification is revert sync must be successful
     assert git.get_current_branch() == "master"
+
+
+def test_sync_initialize_submodule(qisrc_action, git_server):
+    """ Test Sync Clones New Repos """
+    git_server.create_repo("foo.git")
+    bar_remote_path = git_server._create_repo("bar.git")  # do not add it to the manifest
+    git_server.push_file("bar.git", "README", "This is bar\n")
+    qisrc_action("init", git_server.manifest_url)
+    cwd = py.path.local(os.getcwd())  # pylint:disable=no-member
+    bar_local_path = cwd.join("foo").join("bar")
+    assert not bar_local_path.exists()
+
+    git_server.push_submodule("foo.git", bar_remote_path, "bar")
+    qisys.script.run_action("qisrc.actions.sync")
+    assert bar_local_path.isdir()
+    assert bar_local_path.join("README").isfile()
+
+
+def test_sync_directory_replaced_by_submodule(qisrc_action, git_server):
+    """ Test Sync Does Not Fail To Replace Existing Directories With Submodules """
+    git_server.create_repo("foo.git")
+    git_server.push_file("foo.git", "bar/README", "This is bar\n")
+    cwd = py.path.local(os.getcwd())  # pylint:disable=no-member
+    bar_local_path = cwd.join("foo").join("bar")
+    qisrc_action("init", git_server.manifest_url)
+    assert bar_local_path.isdir()
+    assert bar_local_path.join("README").isfile()
+
+    bar_remote_path = git_server._create_repo("bar.git")  # do not add it to the manifest
+    git_server.push_file("bar.git", "README", "This is bar\n")
+    git_server.delete_file("foo.git", "bar/README")
+    git_server.push_submodule("foo.git", bar_remote_path, "bar")
+    qisys.script.run_action("qisrc.actions.sync")
+    assert bar_local_path.isdir()
+    assert bar_local_path.join("README").isfile()
+
+
+def test_sync_replacing_dirty_directory_with_submodule_fails(qisrc_action, git_server):
+    """ Test Sync Does Not Fail To Replace Existing Dirty Directories With Submodules """
+    git_server.create_repo("foo.git")
+    git_server.push_file("foo.git", "bar/README", "This is bar\n")
+    git_server.push_file("foo.git", ".gitignore", "DONTREADME\n*/DONTREADME\n")
+
+    cwd = py.path.local(os.getcwd())  # pylint:disable=no-member
+    bar_local_path = cwd.join("foo").join("bar")
+    qisrc_action("init", git_server.manifest_url)
+    assert bar_local_path.isdir()
+    assert bar_local_path.join("README").isfile()
+
+    bar_ignored_path = bar_local_path.join("DONTREADME")
+    with bar_ignored_path.open("w") as f:
+        f.write("This bar is a lie.")
+
+    bar_remote_path = git_server._create_repo("bar.git")  # do not add it to the manifest
+    git_server.push_file("bar.git", "README", "This is bar\n")
+    git_server.delete_file("foo.git", "bar/README")
+    git_server.push_submodule("foo.git", bar_remote_path, "bar")
+    error_message = None
+    try:
+        qisys.script.run_action("qisrc.actions.sync")
+    except Exception as e:
+        error_message = str(e)
+    assert error_message is not None
+    assert bar_local_path.isdir()
+    assert not bar_local_path.join("README").isfile()
+    assert bar_local_path.join("DONTREADME").exists()
