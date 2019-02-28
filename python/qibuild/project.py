@@ -13,6 +13,7 @@ import json
 import argparse
 import platform
 from xml.etree import ElementTree as etree
+import six
 
 import qibuild
 import qibuild.gdb
@@ -379,11 +380,15 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
                 if self.cmake_generator == "Ninja":
                     cmd.append("-v")
         build_env_str = {}
-        for key, value in build_env.iteritems():
-            if isinstance(key, unicode):
-                key = key.encode('utf-8')
-            if isinstance(value, unicode):
-                value = value.encode('utf-8')
+        for key, value in build_env.items():
+            if six.PY2:
+                if isinstance(key, unicode):
+                    key = key.encode('utf-8')
+                if isinstance(value, unicode):
+                    value = value.encode('utf-8')
+            else:
+                key = str(key)
+                value = str(value)
             build_env_str[key] = value
         try:
             qisys.command.call(cmd, env=build_env_str)

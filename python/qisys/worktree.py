@@ -32,7 +32,7 @@ class WorkTree(object):
         :param root: The root directory of the worktree.
         :param allow_nested: Allow nested worktrees.
         """
-        if isinstance(root, str):
+        if six.PY2 and isinstance(root, str):
             root = root.decode("utf-8")
         if not os.path.exists(root):
             raise Exception(""" \
