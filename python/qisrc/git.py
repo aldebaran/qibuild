@@ -82,11 +82,12 @@ class Git(object):
             if key.startswith("GIT_"):
                 del env[key]
         env_str = {}
-        for key, value in env.iteritems():
-            if isinstance(key, unicode):
-                key = key.encode('utf-8')
-            if isinstance(value, unicode):
-                value = value.encode('utf-8')
+        for key, value in env.items():
+            if six.PY2:
+                if isinstance(key, unicode):
+                    key = key.encode('utf-8')
+                if isinstance(value, unicode):
+                    value = value.encode('utf-8')
             env_str[key] = value
         if not raises:
             del kwargs["quiet"]

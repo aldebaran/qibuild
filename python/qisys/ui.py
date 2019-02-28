@@ -170,7 +170,7 @@ def _update_title_windows(mystr):
 
 def _unicode_representation(data):
     """ Return an unicode representation of a data """
-    if isinstance(data, (unicode, str)):
+    if isinstance(data, six.string_types):
         return "'" + data + "'"
     elif isinstance(data, tuple):
         unicode_data = "("
@@ -188,6 +188,8 @@ def _unicode_representation(data):
             unicode_data += _unicode_representation(value)
         unicode_data += "]"
         return unicode_data
+    if six.PY3:
+        return str(data).encode("utf-8")
     return unicode(data)
 
 
@@ -210,18 +212,18 @@ def _msg(*tokens, **kwargs):
             if with_color:
                 res.append(token.code)
         else:
-            if isinstance(token, unicode):
-                token_string = token
-            elif isinstance(token, str):
-                if six.PY2:
+            if six.PY2:
+                if isinstance(token, unicode):
+                    token_string = token
+                elif isinstance(token, str):
                     try:
                         token_string = token.decode("utf-8")
                     except Exception:
                         token_string = token
                 else:
-                    token_string = token
+                    token_string = _unicode_representation(token)
             else:
-                token_string = _unicode_representation(token)
+                token_string = str(token)
             if sep == " " and token_string.endswith("\n"):
                 res.append(token_string)
                 nocolorres.append(token_string)
