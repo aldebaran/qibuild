@@ -249,7 +249,10 @@ def _msg(*tokens, **kwargs):
     if _console and with_color:
         _console.write_color(stringres)
     else:
-        fp.write(stringres.encode("utf-8"))
+        try:
+            fp.write(stringres.encode("utf-8"))
+        except Exception:
+            fp.write(stringres)
         fp.flush()
 
 

@@ -20,7 +20,7 @@ max-branches=25
 # Maximum number of locals for function / method body (default 15)
 max-locals=30
 # Maximum number of statements in function / method body (default 50)
-max-statements=55
+max-statements=60
 # Maximum number of return / yield for function / method body (default 6)
 max-returns=10
 # Maximum number of public methods for a class (see R0904) (default 20)
