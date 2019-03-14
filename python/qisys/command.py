@@ -292,6 +292,7 @@ def find_program(executable, env=None, raises=False, build_config=None):
     for path in env["PATH"].split(os.pathsep):
         res = _find_program_in_path(executable, path)
         if res and _is_runnable(res):
+            ui.debug("Use %s from: %s" % (executable, res))
             _FIND_PROGRAM_CACHE[executable] = res
             return res
     if raises:
