@@ -240,14 +240,13 @@ class PMLBuilder(object):
         if with_breakpad and self.build_project:
             ui.info(ui.bold, "-> Generating breakpad symbols ...")
             dirname = os.path.dirname(output)
-            build_config = kwargs.get('build_config', self.cmake_builder.build_config)
             symbols_archive = os.path.join(dirname, self.pkg_name + "-symbols.zip")
             qibuild.breakpad.gen_symbol_archive(base_dir=self.stage_path,
                                                 output=symbols_archive,
                                                 strip=strip,
                                                 strip_exe=strip_exe,
                                                 strip_args=strip_args,
-                                                build_config=build_config)
+                                                build_config=self.cmake_builder.build_config)
             ui.info(ui.bold, "-> Symbols generated in", symbols_archive)
         ui.info(ui.bold, "-> Package generated in", output, "\n")
         ui.info(ui.bold, "-> Compressing package ...")
