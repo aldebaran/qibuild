@@ -116,11 +116,11 @@ Please set only one of these two options to 'True'
             zip_call = archive.write
         if not quiet and not display_progress:
             rel_path = os.path.relpath(full_path, directory)
-            sys.stdout.write("adding {0}\n".format(rel_path.encode('ascii', "ignore")))
+            sys.stdout.write("adding {0}\n".format(rel_path))
             sys.stdout.flush()
         if display_progress:
             ui.info_progress(i, len(to_add), "Done")
-        zip_call(attr, content.encode('ascii', "ignore"))
+        zip_call(attr, content)
     archive.close()
     return output
 
