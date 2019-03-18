@@ -64,6 +64,10 @@ function(_qi_install_internal)
   endif()
   install(DIRECTORY ${_dirs_to_install}
     USE_SOURCE_PERMISSIONS
+    DIRECTORY_PERMISSIONS
+      OWNER_READ OWNER_WRITE OWNER_EXECUTE
+      GROUP_READ GROUP_WRITE GROUP_EXECUTE
+      WORLD_READ             WORLD_EXECUTE
     COMPONENT "${ARG_COMPONENT}"
     DESTINATION "${_dest}"
         PATTERN "*.pyc" EXCLUDE
