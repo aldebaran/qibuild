@@ -82,7 +82,7 @@ Please set only one of these two options to 'True'
 """
         raise ValueError(mess)
     ui.debug("Compressing", directory, "to", output)
-    archive = zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED)
+    archive = zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED, allowZip64=True)
     # a list of tuple src, arcname to be added in the archive
     to_add = list()
     for root, directories, filenames in os.walk(directory):
@@ -141,7 +141,7 @@ Please set only one of these two options to 'True'
         raise ValueError(mess)
     ui.debug("Extracting", archive, "to", directory)
     try:
-        archive_ = zipfile.ZipFile(archive)
+        archive_ = zipfile.ZipFile(archive, allowZip64=True)
     except zipfile.BadZipfile:
         mess = 'ZIP file seems corrupted. Try removing it and relaunch command.\n'
         mess += '              rm ' + archive + '\n'

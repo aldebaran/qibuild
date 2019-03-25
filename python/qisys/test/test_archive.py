@@ -94,7 +94,7 @@ def test_extract_invalid_no_topdir(tmpdir):
     src.ensure("foo/b.txt", file=True)
     buggy_zip_path = src.join("buggy.zip").strpath
     with qisys.sh.change_cwd(src.strpath):
-        with zipfile.ZipFile(buggy_zip_path, "w") as archive:
+        with zipfile.ZipFile(buggy_zip_path, "w", allowZip64=True) as archive:
             archive.write("superfluous.txt")
             archive.write("foo/a.txt")
             archive.write("foo/b.txt")
