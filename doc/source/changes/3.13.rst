@@ -1,8 +1,26 @@
 v3.13
 ========
 
+
+misc
+----
+
+* Fix unicode support in python3.
+
+qibuild
+-------
+
+* Minor bugfixes and typo fixes.
+* Add QT5_QUICKCONTROLS2 cmake module
+* Ensure subdirectories have correct permissions
+
 qisrc
------------
+-----
 
 * Update submodules when syncing (including when cloning)
 * Let qisrc sync resolve the dependencies of subprojects in submodules
+
+qipkg
+-----
+
+* Use custom build_config in pml packager to find breakpad in the host config
