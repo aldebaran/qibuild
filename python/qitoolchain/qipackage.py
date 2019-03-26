@@ -297,7 +297,7 @@ def from_xml(element):
 
 def from_archive(archive_path):
     """ Load a Package from an Archive """
-    archive = zipfile.ZipFile(archive_path)
+    archive = zipfile.ZipFile(archive_path, allowZip64=True)
     xml_data = archive.read("package.xml")
     element = etree.fromstring(xml_data)
     return from_xml(element)
@@ -307,7 +307,7 @@ def extract(archive_path, dest):
     """ Extract an Archive """
     if archive_path.endswith((".tar.gz", ".tbz2")):
         return _extract_legacy(archive_path, dest)
-    with zipfile.ZipFile(archive_path) as archive:
+    with zipfile.ZipFile(archive_path, allowZip64=True) as archive:
         names = archive.namelist()
     archive.close()
     if "package.xml" in names:

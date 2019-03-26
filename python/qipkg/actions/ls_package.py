@@ -36,7 +36,7 @@ def human_size(n):
 
 def build_list(pkgname):
     """ Build List """
-    with zipfile.ZipFile(pkgname, "r") as pkg:
+    with zipfile.ZipFile(pkgname, "r", allowZip64=True) as pkg:
         def get_entry(f):
             """ Get Entry """
             info = pkg.getinfo(f)

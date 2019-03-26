@@ -26,7 +26,7 @@ def do(args):
     """ Main Entry Point """
     pkg_path = args.pkg_path
     with qisys.sh.TempDir() as tmp:
-        archive = zipfile.ZipFile(pkg_path)
+        archive = zipfile.ZipFile(pkg_path, allowZip64=True)
         archive.extract("manifest.xml", path=tmp)
         archive.close()
         # read the manifest and validate it

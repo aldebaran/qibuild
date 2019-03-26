@@ -25,7 +25,7 @@ def do(args):
     if not output_path:
         output_path = os.getcwd()
     # Extract the manifest to a tempfile to parse it
-    archive = zipfile.ZipFile(pkg_path)
+    archive = zipfile.ZipFile(pkg_path, allowZip64=True)
     pkg_name = None
     with qisys.sh.TempDir() as tmp:
         for name in archive.namelist():
