@@ -9,6 +9,7 @@ from __future__ import print_function
 
 import os
 import tempfile
+import python_minifier
 
 import qipkg.manifest
 import qipy.worktree
@@ -21,6 +22,27 @@ import qilinguist.builder
 import qilinguist.pml_translator
 import qisys.qixml
 from qisys import ui
+
+
+def minify_python(filepath):
+    """ Minify a Python File """
+    try:
+        if not os.path.isfile(filepath):
+            return False
+        if not filepath.endswith(".py"):
+            return False
+        print("-- Minifying  %s" % filepath)
+        with open(filepath, "r") as fileread:
+            filecontent = fileread.read()
+        fileread.close()
+        filemini = python_minifier.minify(filecontent)
+        with open(filepath, "w") as filewrite:
+            filewrite.write(filemini)
+        filewrite.close()
+        return True
+    except Exception:
+        print("-- Unable to minify %s" % filepath)
+    return False
 
 
 class PMLBuilder(object):
@@ -173,7 +195,7 @@ class PMLBuilder(object):
         for builder in self.builders:
             builder.build()
 
-    def install(self, destination, install_tc_packages=False):
+    def install(self, destination, install_tc_packages=False, python_minify=False):
         """ Install every project to the given destination """
         qisys.sh.mkdir(destination, recursive=True)
         # Copy the manifest
@@ -200,6 +222,11 @@ class PMLBuilder(object):
             rel_src = os.path.relpath(full_src, self.base_dir)
             full_dest = os.path.join(destination, rel_src)
             qisys.sh.install(full_src, full_dest)
+            # Minify Python Files if requested
+            if python_minify is True:
+                extension = os.path.splitext(rel_src)[1].strip().lower()
+                if extension == ".py":
+                    minify_python(full_dest)
         # Generate and install translations
         ui.info(ui.bold, "-> Generating translations ...")
         pml_translator = qilinguist.pml_translator.PMLTranslator(self.pml_path)
@@ -220,6 +247,7 @@ class PMLBuilder(object):
         output = kwargs.get('output', None)
         force = kwargs.get('force', False)
         with_breakpad = kwargs.get('with_breakpad', False)
+        python_minify = kwargs.get('python_minify', False)
         strip = kwargs.get('strip', True)
         install_tc_packages = kwargs.get('install_tc_packages', False)
         strip_args = kwargs.get('strip_args', None)
@@ -235,7 +263,7 @@ class PMLBuilder(object):
         if not output:
             output = os.path.join(os.getcwd(), self.pkg_name + ".pkg")
         # Add everything from the staged path
-        self.install(self.stage_path, install_tc_packages=install_tc_packages)
+        self.install(self.stage_path, install_tc_packages=install_tc_packages, python_minify=python_minify)
         symbols_archive = None
         if with_breakpad and self.build_project:
             ui.info(ui.bold, "-> Generating breakpad symbols ...")

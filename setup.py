@@ -42,6 +42,7 @@ setup(
         "sphinx_intl<=0.9.5",
         "tabulate>=0.8",
         "virtualenv>=16",
+        "python-minifier>=2.1",
     ],
     data_files=get_qibuild_cmake_files(),
     license="BSD",

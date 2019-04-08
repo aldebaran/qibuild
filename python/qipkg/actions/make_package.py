@@ -24,6 +24,8 @@ def do(args):
     with_breakpad = args.with_breakpad
     force = args.force
     with_toolchain = args.with_toolchain
+    python_minify = args.python_minify
     pml_builder = qipkg.parsers.get_pml_builder(args)
     return pml_builder.package(output=output, with_breakpad=with_breakpad,
-                               force=force, install_tc_packages=with_toolchain)
+                               force=force, install_tc_packages=with_toolchain,
+                               python_minify=python_minify)
