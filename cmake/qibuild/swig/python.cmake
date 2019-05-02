@@ -2,9 +2,14 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
+FIND_PACKAGE(PYTHON QUIET)
+FIND_PACKAGE(SWIG QUIET)
+if ((NOT PYTHON_FOUND) OR (NOT SWIG_FOUND))
+  message(STATUS "Swig/python: swig or python not found, qi_swig_wrap_python will not be defined")
+  return()
+endif()
 
 include(CMakeParseArguments)
-FIND_PACKAGE(SWIG REQUIRED)
 INCLUDE(${SWIG_USE_FILE})
 
 #! CMake wrapper for swig / Python
