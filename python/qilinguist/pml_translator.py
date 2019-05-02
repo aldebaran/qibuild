@@ -41,18 +41,19 @@ class PMLTranslator(qilinguist.project.LinguistProject):
     def release(self, raises=True, build_config=None):
         """ Release """
         all_ok = True
-        lrelease = qisys.command.find_program("lrelease", raises=True, build_config=build_config)
-        for ts_file in self.ts_files:
-            qm_file = ts_file.replace(".ts", ".qm")
-            input_file = os.path.join(self.path, ts_file)
-            output_file = os.path.join(self.path, qm_file)
-            ok, message = qilinguist.qtlinguist.generate_qm_file(input_file, output_file)
-            if not ok:
-                ui.error(message)
-                all_ok = False
-            cmd = [lrelease, "-compress", input_file, "-qm", output_file]
-            qisys.command.call(cmd)
-            self.qm_files.append(output_file)
+        if self.ts_files:
+            lrelease = qisys.command.find_program("lrelease", raises=True, build_config=build_config)
+            for ts_file in self.ts_files:
+                qm_file = ts_file.replace(".ts", ".qm")
+                input_file = os.path.join(self.path, ts_file)
+                output_file = os.path.join(self.path, qm_file)
+                ok, message = qilinguist.qtlinguist.generate_qm_file(input_file, output_file)
+                if not ok:
+                    ui.error(message)
+                    all_ok = False
+                cmd = [lrelease, "-compress", input_file, "-qm", output_file]
+                qisys.command.call(cmd)
+                self.qm_files.append(output_file)
         if not all_ok and raises:
             raise Exception("`qilinguist release` failed")
         return all_ok
