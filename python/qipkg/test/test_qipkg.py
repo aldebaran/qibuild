@@ -17,6 +17,7 @@ import qipkg.package
 import qisys.qixml
 import qisys.command
 from qisys.qixml import etree
+from qisys.test.conftest import record_messages
 from qibuild.test.test_qibuild_deploy import get_ssh_url
 
 
@@ -246,56 +247,111 @@ def test_bump_version(qipkg_action):
 def test_install(qipkg_action, tmpdir):
     """ Test Install """
     d_proj = qipkg_action.add_test_project("d_pkg")
-    pml = os.path.join(d_proj.path, "d_pkg.pml")
+    pml_path = os.path.join(d_proj.path, "d_pkg.pml")
+    d_package = qipkg_action("make-package", pml_path)
     _url = get_ssh_url(tmpdir)
-    qipkg_action("install", pml, tmpdir.strpath)
+    qipkg_action("install", pml_path, tmpdir.strpath)
     assert tmpdir.join("manifest.xml").check(file=True)
 
 
 def test_deploy(qipkg_action, tmpdir):
     """ Test Deploy """
     d_proj = qipkg_action.add_test_project("d_pkg")
-    pml = os.path.join(d_proj.path, "d_pkg.pml")
+    pml_path = os.path.join(d_proj.path, "d_pkg.pml")
+    d_package = qipkg_action("make-package", pml_path)
     url = get_ssh_url(tmpdir)
-    qipkg_action("deploy", pml, "--url", url)
+    qipkg_action("deploy", pml_path, "--url", url)
     assert tmpdir.join("manifest.xml").check(file=True)
 
 
-def test_deploy_package(qipkg_action, tmpdir, record_messages):
+def test_deploy_package_no_qi(qipkg_action, tmpdir, record_messages):
     """ Test Deploy Package """
     d_proj = qipkg_action.add_test_project("d_pkg")
     pml_path = os.path.join(d_proj.path, "d_pkg.pml")
     d_package = qipkg_action("make-package", pml_path)
     url = get_ssh_url(tmpdir)
-    parsed = qisys.remote.URL(url)
-    username = parsed.user
-    fake_qi = mock.Mock()
-    fake_qi.Application = mock.Mock()
-    fake_app = mock.Mock()
-    fake_qi.Application.return_value = fake_app
-    session = fake_qi.Session()
-    mock_connect = session.connect
-    fake_pm = mock.Mock()
-    session.service.return_value = fake_pm
-    remove_mock = fake_pm.removePkg
-    install_mock = fake_pm.install
-    install_mock.return_value = True
-    sys.modules["qi"] = fake_qi
     record_messages.reset()
     qipkg_action("deploy-package", d_package, "--url", url)
-    assert mock_connect.call_args_list == [mock.call("tcp://localhost:9559")]
-    assert session.service.call_args_list == [mock.call("PackageManager")]
-    assert remove_mock.call_args_list == [mock.call("d")]
-    assert install_mock.call_args_list == [mock.call("/home/%s/d-0.1.pkg" % username)]
-    assert record_messages.find("PackageManager returned: True")
-    del sys.modules["qi"]
+    try:
+        qipkg_action("deploy-package", d_package, "--url", url)
+    except ImportError:
+        assert record_messages("Unable to install pkg, please install qi from pip and retry.")
 
 
-def test_deploy_package_from_pml(qipkg_action, tmpdir):
+def test_deploy_package(qipkg_action, tmpdir, record_messages):
+    """ Test Deploy Package """
+    try:
+        import qi
+        d_proj = qipkg_action.add_test_project("d_pkg")
+        pml_path = os.path.join(d_proj.path, "d_pkg.pml")
+        d_package = qipkg_action("make-package", pml_path)
+        url = get_ssh_url(tmpdir)
+        parsed = qisys.remote.URL(url)
+        username = parsed.user
+        fake_qi = mock.Mock()
+        fake_qi.Application = mock.Mock()
+        fake_app = mock.Mock()
+        fake_qi.Application.return_value = fake_app
+        session = fake_qi.Session()
+        mock_connect = session.connect
+        fake_pm = mock.Mock()
+        session.service.return_value = fake_pm
+        remove_mock = fake_pm.removePkg
+        install_mock = fake_pm.install
+        install_mock.return_value = True
+        sys.modules["qi"] = fake_qi
+        record_messages.reset()
+        qipkg_action("deploy-package", d_package, "--url", url)
+        assert mock_connect.call_args_list == [mock.call("tcp://localhost:9559")]
+        assert session.service.call_args_list == [mock.call("PackageManager")]
+        assert remove_mock.call_args_list == [mock.call("d")]
+        assert install_mock.call_args_list == [mock.call("/home/%s/d-0.1.pkg" % username)]
+        assert record_messages.find("PackageManager returned: True")
+        del sys.modules["qi"]
+    except ImportError:
+        pass
+
+
+def test_deploy_package_from_pml_no_qi(qipkg_action, tmpdir, record_messages):
     """ Test Deploy Package From Pml """
     d_proj = qipkg_action.add_test_project("d_pkg")
     pml_path = os.path.join(d_proj.path, "d_pkg.pml")
     url = get_ssh_url(tmpdir)
-    qipkg_action("deploy-package", pml_path, "--url", url)
-    expected_path = os.path.expanduser("~/d-0.1.pkg")
-    assert os.path.exists(expected_path)
+    record_messages.reset()
+    try:
+        qipkg_action("deploy-package", pml_path, "--url", url)
+    except ImportError:
+        assert record_messages("Unable to install pkg, please install qi from pip and retry.")
+
+
+def test_deploy_package_from_pml(qipkg_action, tmpdir, record_messages):
+    """ Test Deploy Package From Pml """
+    try:
+        import qi
+        d_proj = qipkg_action.add_test_project("d_pkg")
+        pml_path = os.path.join(d_proj.path, "d_pkg.pml")
+        url = get_ssh_url(tmpdir)
+        parsed = qisys.remote.URL(url)
+        username = parsed.user
+        fake_qi = mock.Mock()
+        fake_qi.Application = mock.Mock()
+        fake_app = mock.Mock()
+        fake_qi.Application.return_value = fake_app
+        session = fake_qi.Session()
+        mock_connect = session.connect
+        fake_pm = mock.Mock()
+        session.service.return_value = fake_pm
+        remove_mock = fake_pm.removePkg
+        install_mock = fake_pm.install
+        install_mock.return_value = True
+        sys.modules["qi"] = fake_qi
+        record_messages.reset()
+        qipkg_action("deploy-package", pml_path, "--url", url)
+        assert mock_connect.call_args_list == [mock.call("tcp://localhost:9559")]
+        assert session.service.call_args_list == [mock.call("PackageManager")]
+        assert remove_mock.call_args_list == [mock.call("d")]
+        assert install_mock.call_args_list == [mock.call("/home/%s/d-0.1.pkg" % username)]
+        assert record_messages.find("PackageManager returned: True")
+        del sys.modules["qi"]
+    except ImportError:
+        pass
