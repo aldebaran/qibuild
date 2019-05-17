@@ -26,7 +26,12 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    test_runners = qitest.parsers.get_test_runners(args)
+    try:
+        test_runners = qitest.parsers.get_test_runners(args)
+    except qitest.parsers.EmptyTestListException:
+        if not args.allow_no_test:
+            raise
+        test_runners = []
     global_res = True
     n = len(test_runners)
     for i, test_runner in enumerate(test_runners):

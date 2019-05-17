@@ -25,7 +25,12 @@ def configure_parser(parser):
 
 def do(args):
     """ Main Entry Point """
-    test_runners = qitest.parsers.get_test_runners(args)
+    try:
+        test_runners = qitest.parsers.get_test_runners(args)
+    except qitest.parsers.EmptyTestListException:
+        if not args.allow_no_test:
+            raise
+        test_runners = []
     # rule to check for tests which doesn't follow naming convention
     expr = re.compile("^test_.*")
     warn_name_count = 0
