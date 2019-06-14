@@ -31,13 +31,14 @@ def _reset_hard_to_refs_prefixed_ref(git, remote_name, ref, raises=True):
     # Check the ref format to retrieve the effective ref name to switch on
     if ref.startswith("refs/remotes") and "/{}/".format(remote_name) in ref:
         # When the ref format begin with refs/remotes/<remote_name>/, that's the format seen by the local (git show-ref)
-        git.fetch(remote_name)
+        git.fetch(remote_name, "--prune")
         ref_to_reset_to = ref
         is_tag = False
     else:
         # The ref is in the format seen by a remote (git ls-remote):
         # refs/heads/xxx, refs/tags/xxx, refs/remotes/<other_remote>/xxx, refs/merge-requests/xxx
-        git.fetch(remote_name, ref)  # This command will write the pointed commit number into the pseudo ref FETCH_HEAD
+        # This command will write the pointed commit number into the pseudo ref FETCH_HEAD
+        git.fetch(remote_name, ref, "--prune")
         ref_to_reset_to = "FETCH_HEAD"
         is_tag = ref.startswith("refs/tags")
     # Perform effective switch
@@ -49,7 +50,7 @@ def _reset_hard_to_local_refs_name(git, remote_name, ref, raises=True):
     """ deals with the git reset --hard command for short name ref (NOT on the format 'refs/xxx') """
     need_to_fetch, _ = git.call("show", "--oneline", ref, "--", raises=False)
     if need_to_fetch:
-        git.fetch(remote_name, "--tags")
+        git.fetch(remote_name, "--tags", "--prune")
     # else: SHA-1 already exists locally, no need to fetch
     _, tag_list = git.tag("-l", ref, raises=False)
     is_tag = ref == tag_list
@@ -75,7 +76,7 @@ def clever_reset_ref(git_project, ref, raises=True):
     rc, ref_sha1 = git.call("rev-parse", ref, "--", raises=False)
     if rc != 0:
         # Maybe this is a newly pushed tag, try to fetch:
-        git.fetch(remote_name)
+        git.fetch(remote_name, "--prune")
         rc, ref_sha1 = git.call("rev-parse", ref, "--", raises=False)
         if rc != 0:
             return False, "Could not parse %s as a valid ref" % ref
