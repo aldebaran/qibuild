@@ -14,6 +14,11 @@ import qitest.project
 import qibuild.parsers
 
 
+class EmptyTestListException(Exception):
+    """ No test to run exception """
+    pass
+
+
 def test_parser(parser, with_num_jobs=True):
     """ Test Parser """
     qisys.parsers.worktree_parser(parser)
@@ -42,10 +47,10 @@ def test_parser(parser, with_num_jobs=True):
     group.add_argument("--qitest-json", dest="qitest_jsons", action="append")
     group.add_argument("--test-output-dir", type=os.path.abspath,
                        dest="test_output_dir",
-                       help="Generate XML test reports in the given directory " +
+                       help="Generate XML test reports in the given directory "
                        "(instead of build-<platform>/sdk/test-results)")
     group.add_argument("--coverage-output-dir", dest="coverage_output_dir",
-                       help="Generate XML and HTML coverage reports in the given " +
+                       help="Generate XML and HTML coverage reports in the given "
                        "directory (instead of build-<platform>/sdk/coverage-results)")
     group.add_argument("--root-output-dir", dest="test_output_dir", metavar="ROOT_OUTPUT_DIR",
                        help="same as --test-output-dir (deprecated)")
@@ -54,6 +59,8 @@ def test_parser(parser, with_num_jobs=True):
                        help="Ignore timeouts when running tests")
     group.add_argument("--lf", "--last-failed", dest="last_failed", action="store_true",
                        help="Run the failing test from previous run")
+    group.add_argument("--allow-no-test", dest="allow_no_test", action="store_true",
+                       help="Don't fail if no tests to run")
     parser.set_defaults(nightly=False, capture=True, last_failed=False,
                         ignore_timeouts=False)
     if with_num_jobs:
@@ -152,5 +159,5 @@ def get_test_runners(args):
     elif args.coverage:
         return build_projects_runners
     if not res:
-        raise Exception("Nothing found to test")
+        raise EmptyTestListException("Nothing found to test")
     return res

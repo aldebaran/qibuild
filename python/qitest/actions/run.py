@@ -26,13 +26,21 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    test_runners = qitest.parsers.get_test_runners(args)
+    try:
+        test_runners = qitest.parsers.get_test_runners(args)
+    except qitest.parsers.EmptyTestListException:
+        if not args.allow_no_test:
+            raise
+        test_runners = []
     global_res = True
     n = len(test_runners)
     for i, test_runner in enumerate(test_runners):
         if n != 1:
             ui.info(ui.bold, "::", "[%i on %i]" % (i + 1, len(test_runners)),
                     ui.reset, "Running tests in", ui.blue, test_runner.cwd)
+        if not test_runner.tests and args.allow_no_test:
+            ui.warning("No test to run")
+            continue
         res = test_runner.run()
         if args.coverage:
             build_worktree = qibuild.parsers.get_build_worktree(args, verbose=False)

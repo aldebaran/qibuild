@@ -31,3 +31,4 @@ debian/qibuild/
 
 # Others
 desktop.ini
+pytest.json
