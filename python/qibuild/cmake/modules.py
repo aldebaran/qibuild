@@ -21,13 +21,21 @@ def find_libs(directory, info=None):
     if not os.path.exists(lib_directory):
         return list()
     candidates = os.listdir(lib_directory)
+    ui.debug("info:", info)
     for candidate in candidates:
         if info:
             clues = info.get("libs")
+            clues.append(info.get("name"))
             for c in clues:
-                if candidate.endswith((".so", ".a", ".lib", ".dylib")) and c.lower() in candidate.lower():
-                    ui.debug("found:", candidate)
-                    res.append("lib/" + candidate)
+                candidate_path = "lib/{}".format(candidate)
+                if candidate.endswith((".so", ".a", ".lib", ".dylib")) and \
+                   candidate.lower().startswith(c.lower()) or \
+                   "lib{}".format(c.lower()) in candidate.lower() or \
+                   "{}lib".format(c.lower()) in candidate.lower() or \
+                   "{}.".format(c.lower()) in candidate.lower():
+                    ui.debug("search:", c, "found:", candidate)
+                    res.append(candidate_path)
+                    break
         else:
             if candidate.endswith((".so", ".a", ".lib", ".dylib")):
                 res.append("lib/" + candidate)
@@ -38,8 +46,11 @@ def generate_cmake_module(directory, name, info=None):
     """ Generate CMake Module """
     libraries = find_libs(directory, info)
     libs_string = ""
-    for library in libraries:
-        libs_string += "  ${_root}/%s\n" % library
+    if libraries:
+        for library in libraries:
+            libs_string += "  ${_root}/%s\n" % library
+    else:
+        ui.warning("No library found: no path set in the config.cmake file")
     libs_string = libs_string[:-1]  # remove trailing \n
     template = """\
 set(_root "${CMAKE_CURRENT_LIST_DIR}/../../..")
