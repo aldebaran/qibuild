@@ -67,16 +67,19 @@ def deploy(pkg_path, url):
 def _install_package(url, pkg_name, pkg_path):
     """ Install Package """
     # TODO: This will need NAOqi authentication
-    import qi
-    session = qi.Session()
-    session.connect("tcp://%s:9559" % (url.host))
-    package_manager = session.service("PackageManager")
-    ui.info(ui.blue, "::", ui.reset, ui.bold, "Removing previous installation of the package")
     try:
-        package_manager.removePkg(pkg_name)
-    except Exception:
-        pass
-    ui.info(ui.blue, "::", ui.reset, ui.bold, "Installing package")
-    ret = package_manager.install(
-        "/home/%s/%s" % (url.user, os.path.basename(pkg_path)))
-    ui.info("PackageManager returned:", ret)
+        import qi
+        session = qi.Session()
+        session.connect("tcp://%s:9559" % (url.host))
+        package_manager = session.service("PackageManager")
+        ui.info(ui.blue, "::", ui.reset, ui.bold, "Removing previous installation of the package")
+        try:
+            package_manager.removePkg(pkg_name)
+        except Exception:
+            pass
+        ui.info(ui.blue, "::", ui.reset, ui.bold, "Installing package")
+        ret = package_manager.install(
+            "/home/%s/%s" % (url.user, os.path.basename(pkg_path)))
+        ui.info("PackageManager returned:", ret)
+    except ImportError:
+        ui.error("Unable to install pkg, please install qi from pip and retry.")
