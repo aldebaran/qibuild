@@ -87,6 +87,9 @@ class GettextProject(qilinguist.project.LinguistProject):
             "--keyword=trContext:1,2c,2t", "--keyword=trContext:1,2c,3t",
             "--keyword=translateContext:1,2c,2t", "--keyword=translateContext:1,2c,3t",
         ])
+        # Omit the header, which contains timestamps, to ensure the xgetext result
+        # depends only on the intputs (and not the date it was last invoked).
+        cmd.append("--omit-header")
         # generate sorted output
         cmd.append("--sort-output")
         cmd.extend(["--output-dir", self.po_path])
