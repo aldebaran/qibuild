@@ -25,14 +25,22 @@ class DataBase(object):
     def __init__(self, name, db_path):
         """ Binary Packages Storage Init """
         self.name = name
+        self.build_target = None
         self.db_path = db_path
         self.packages = dict()
         self.load()
         self.packages_path = qisys.sh.get_share_path("qi", "toolchains", self.name)
 
+    @property
+    def target(self):
+        """ Build target from the feed """
+        return self.build_target
+
     def load(self):
         """ Load the packages from the xml file """
         tree = qisys.qixml.read(self.db_path)
+        self.build_target = tree.getroot().get("target")
+        ui.debug("Load target from database xml", self.build_target, "in", self.db_path)
         for element in tree.findall("package"):
             to_add = qitoolchain.qipackage.from_xml(element)
             self.packages[to_add.name] = to_add
@@ -43,6 +51,9 @@ class DataBase(object):
     def save(self):
         """ Save the packages in the xml file """
         root = etree.Element("toolchain")
+        if self.build_target:
+            root.set("target", self.build_target)
+            ui.debug("Save target in database xml", self.build_target, "in", self.db_path)
         tree = etree.ElementTree(root)
         for package in self.packages.values():
             element = package.to_xml()
@@ -116,6 +127,8 @@ class DataBase(object):
         """
         feed_parser = qitoolchain.feed.ToolchainFeedParser(self.name)
         feed_parser.parse(feed, branch=branch, name=name)
+        self.build_target = feed_parser.target
+        ui.debug("Update target in database from feedParser", self.build_target)
         remote_packages = feed_parser.get_packages()
         local_packages = self.packages.values()
         to_add = list()
