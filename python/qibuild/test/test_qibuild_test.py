@@ -16,6 +16,9 @@ import qisys.worktree
 import qibuild.worktree
 from qitest.test.conftest import qitest_action
 
+TARGET = "{}-{}".format(platform.system().lower(),
+                        platform.processor().lower())
+
 
 def test_various_outcomes(qibuild_action, record_messages):
     """ Test Various Outcomes """
@@ -132,7 +135,5 @@ def test_setting_build_prefix(qitest_action, qibuild_action, tmpdir):
     qibuild_action("configure", "testme", "--build-prefix", prefix.strpath)
     qibuild_action("make", "testme", "--build-prefix", prefix.strpath)
     qitest_action("run", "testme", "-k", "ok", "--build-prefix", prefix.strpath)
-    test_results = prefix.join("build-sys-%s-%s" % (platform.system().lower(),
-                                                    platform.machine().lower()),
-                               "testme", "sdk", "test-results")
+    test_results = prefix.join("build-sys-%s" % (TARGET), "testme", "sdk", "test-results")
     assert test_results.join("ok.xml").check(file=True)

@@ -16,6 +16,9 @@ import qibuild.config
 import qibuild.profile
 from qibuild.test.conftest import TestBuildWorkTree
 
+TARGET = "{}-{}".format(platform.system().lower(),
+                        platform.processor().lower())
+
 
 def test_clean_build_dir(qibuild_action):
     """ Test Clean Build Dir """
@@ -82,10 +85,7 @@ def test_using_build_prefix_from_cli(qibuild_action, tmpdir):
     qibuild_action.add_test_project("world")
     qibuild_action("configure", "world", "--build-prefix", mybuild.strpath)
     build_dir = mybuild.join(
-        "build-sys-%s-%s" % (
-            platform.system().lower(),
-            platform.machine().lower()
-        ),
+        "build-sys-%s" % (TARGET),
         "world"
     )
     assert build_dir.check(dir=True)

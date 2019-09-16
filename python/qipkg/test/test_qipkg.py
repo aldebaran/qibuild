@@ -11,6 +11,7 @@ import os
 import sys
 import mock
 import pytest
+import platform
 
 import qipkg.builder
 import qipkg.package
@@ -19,6 +20,9 @@ import qisys.command
 from qisys.qixml import etree
 from qisys.test.conftest import record_messages
 from qibuild.test.test_qibuild_deploy import get_ssh_url
+
+TARGET = "{}-{}".format(platform.system().lower(),
+                        platform.processor().lower())
 
 
 def test_ls_package(qipkg_action, record_messages):
@@ -91,8 +95,8 @@ def test_meta(qipkg_action):
     qipkg_action("build", meta_pml)
     pkgs = qipkg_action("make-package", meta_pml)
     expected_paths = [
-        "a-0.1.pkg",
-        "d-0.1.pkg"
+        "a-0.1-{}.pkg".format(TARGET),
+        "d-0.1-{}.pkg".format(TARGET)
     ]
     actual_paths = [os.path.basename(x) for x in pkgs]
     assert actual_paths == expected_paths

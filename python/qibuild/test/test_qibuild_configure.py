@@ -21,6 +21,9 @@ import qibuild.config
 from qibuild.test.conftest import TestBuildWorkTree
 from qipy.test.conftest import qipy_action
 
+TARGET = "{}-{}".format(platform.system().lower(),
+                        platform.processor().lower())
+
 
 def test_simple(qibuild_action):
     """ Test Simple """""
@@ -296,9 +299,7 @@ def test_using_build_prefix_from_command_line(qibuild_action, tmpdir):
     qibuild_action.add_test_project("world")
     prefix = tmpdir.join("mybuild")
     qibuild_action("configure", "world", "--build-prefix", prefix.strpath)
-    expected = prefix.join("build-sys-%s-%s" % (platform.system().lower(),
-                                                platform.machine().lower()),
-                           "world")
+    expected = prefix.join("build-sys-%s" % (TARGET), "world")
     assert expected.join("CMakeCache.txt").check(file=True)
 
 
@@ -311,9 +312,7 @@ def test_using_build_prefix_from_config(qibuild_action, tmpdir):
     qibuild_cfg.write_local_config(build_worktree.qibuild_xml)
     qibuild_action("configure", "world")
     prefix = build_worktree.tmpdir.join("prefix")
-    expected = prefix.join("build-sys-%s-%s" % (platform.system().lower(),
-                                                platform.machine().lower()),
-                           "world")
+    expected = prefix.join("build-sys-%s" % (TARGET), "world")
     assert expected.join("CMakeCache.txt").check(file=True)
 
 

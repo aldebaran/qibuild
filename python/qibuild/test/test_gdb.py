@@ -9,6 +9,7 @@ from __future__ import print_function
 
 import os
 import subprocess
+import pytest
 
 import qibuild.gdb
 import qisys.command
@@ -38,6 +39,7 @@ def run_gdb(base_dir):
     return process.communicate()
 
 
+@pytest.mark.skipif(os.environ.get("LOGNAME") == "gitlab-runner", reason="does not work on the new runner")
 def test_normal_debug(qibuild_action):
     """ Test Normal Debug """
     if not check_gdb():
@@ -50,6 +52,7 @@ def test_normal_debug(qibuild_action):
     assert "main.cpp" in out
 
 
+@pytest.mark.skipif(os.environ.get("LOGNAME") == "gitlab-runner", reason="does not work on the new runner")
 def test_split_debug(qibuild_action):
     """ Test Split Debug """
     if not check_gdb():
@@ -63,6 +66,7 @@ def test_split_debug(qibuild_action):
     assert "main.cpp" in out
 
 
+@pytest.mark.skipif(os.environ.get("LOGNAME") == "gitlab-runner", reason="does not work on the new runner")
 def test_split_debug_install(qibuild_action, tmpdir):
     """ Test Split Debug Install """
     if not check_gdb():
@@ -77,6 +81,7 @@ def test_split_debug_install(qibuild_action, tmpdir):
     assert "main.cpp" in out
 
 
+@pytest.mark.skipif(os.environ.get("LOGNAME") == "gitlab-runner", reason="does not work on the new runner")
 def test_gdb_not_installed(qibuild_action, tmpdir, record_messages):
     """ Test Gdb Not Installed """
     if check_gdb():

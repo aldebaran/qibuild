@@ -85,12 +85,18 @@ class ToolchainFeedParser(object):
     def __init__(self, name):
         """ ToolchainFeedParser Init """
         self.name = name
+        self.build_target = None
         self.packages = list()
         # A list of packages to be blacklisted
         self.blacklist = list()
         # A dict name -> version used to only keep the latest
         # version
         self._versions = dict()
+
+    @property
+    def target(self):
+        """ Build target """
+        return self.build_target
 
     def get_packages(self):
         """ Get the parsed packages """
@@ -126,6 +132,12 @@ class ToolchainFeedParser(object):
         if branch and name:
             feed = open_git_feed(self.name, feed, branch=branch, name=name, first_pass=first_pass)
         tree = tree_from_feed(feed)
+        if not self.build_target:
+            self.build_target = tree.getroot().get("target")
+            ui.debug("Get target from feed xml", self.build_target)
+        else:
+            ui.debug("Target already set from feed xml", self.build_target,
+                     "=>:", tree.getroot().get("target"))
         package_trees = tree.findall("package")
         package_trees.extend(tree.findall("svn_package"))
         for package_tree in package_trees:

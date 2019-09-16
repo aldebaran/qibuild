@@ -33,6 +33,9 @@ import qisys.command
 import qisys.parsers
 from qisys import ui
 
+TARGET = "{}-{}".format(platform.system().lower(),
+                        platform.processor().lower())
+
 
 def read_install_manifest(filepath):
     """ Read Install Manifest """
@@ -598,8 +601,7 @@ The following tools were not found: {missing}\
             return {'known_configs': bdirs, 'unknown_configs': list()}
         # build directory name pattern:
         # 'build-<tc_name>[-<profile>]...[-release]'
-        build_names = ["build-sys-%s-%s" % (platform.system().lower(),
-                                            platform.machine().lower())]
+        build_names = ["build-sys-%s" % (TARGET)]
         qibuild_cfg = qibuild.config.QiBuildConfig()
         qibuild_cfg.read(create_if_missing=True)
         config_names = qibuild_cfg.configs.keys()

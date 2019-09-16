@@ -8,9 +8,13 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 import os
+import platform
 
 import qisys.command
 import qipkg.metabuilder
+
+TARGET = "{}-{}".format(platform.system().lower(),
+                        platform.processor().lower())
 
 
 def test_meta_builder(qipkg_action):
@@ -31,6 +35,9 @@ def test_meta_builder(qipkg_action):
     packages = meta_pml_builder.package(with_breakpad=with_breakpad)
     contents = [os.path.basename(x) for x in packages]
     if with_breakpad:
-        assert contents == ['a-0.1.pkg', 'a-0.1-symbols.zip', 'd-0.1.pkg']
+        assert contents == ['a-0.1-{}.pkg'.format(TARGET),
+                            'a-0.1-symbols-{}.zip'.format(TARGET),
+                            'd-0.1-{}.pkg'.format(TARGET)]
     else:
-        assert contents == ['a-0.1.pkg', 'd-0.1.pkg']
+        assert contents == ['a-0.1-{}.pkg'.format(TARGET),
+                            'd-0.1-{}.pkg'.format(TARGET)]

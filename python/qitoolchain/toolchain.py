@@ -40,7 +40,14 @@ class Toolchain(object):
             with open(db_path, "w") as fp:
                 fp.write("<toolchain />")
         self.db = qitoolchain.database.DataBase(name, db_path)
+        self.build_target = self.db.target
+        ui.debug("Get target from database target", self.build_target)
         self.generate_toolchain_file()
+
+    @property
+    def target(self):
+        """ Build target """
+        return self.build_target
 
     @property
     def packages(self):

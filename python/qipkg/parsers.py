@@ -23,8 +23,8 @@ def pml_parser(parser):
 def pkg_parser(parser):
     """ Pkg Parser """
     parser.add_argument("--with-breakpad", action="store_true")
-    parser.add_argument("--force", action="store_true")
     parser.add_argument("--with-toolchain", action="store_true")
+    parser.add_argument("--force", action="store_true")
     parser.add_argument("--python-minify", action="store_true")
     parser.set_defaults(with_breakpad=False, force=False,
                         with_toolchain=False, python_minify=False)

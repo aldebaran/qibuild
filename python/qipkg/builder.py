@@ -248,10 +248,21 @@ class PMLBuilder(object):
         force = kwargs.get('force', False)
         with_breakpad = kwargs.get('with_breakpad', False)
         python_minify = kwargs.get('python_minify', False)
-        strip = kwargs.get('strip', True)
         install_tc_packages = kwargs.get('install_tc_packages', False)
-        strip_args = kwargs.get('strip_args', None)
+        strip = kwargs.get('strip', True)
         strip_exe = kwargs.get('strip_exe', None)
+        strip_args = kwargs.get('strip_args', None)
+        build_config = kwargs.get('build_config', None)
+        build_target = None
+        if self.cmake_builder and not build_config:
+            build_config = self.cmake_builder.build_config
+            # NOTE: It force to load toolchain target if set in the feed
+            if build_config:
+                build_toolchain = build_config.toolchain
+                if build_toolchain:
+                    ui.debug("Use toolchain target", build_toolchain.target)
+            build_target = build_config.target
+
         # If the package is not valid, do not go further
         if not self.validator.is_valid and not force:
             raise Exception("Given package does not satisfy "
@@ -261,16 +272,23 @@ class PMLBuilder(object):
         qisys.sh.rm(self.stage_path)
         qisys.sh.mkdir(self.stage_path, recursive=True)
         if not output:
-            output = os.path.join(os.getcwd(), self.pkg_name + ".pkg")
+            if build_target:
+                output = os.path.join(os.getcwd(), "{}-{}.pkg".format(self.pkg_name, build_target))
+            else:
+                output = os.path.join(os.getcwd(), "{}.pkg".format(self.pkg_name))
+            ui.debug("With pkg name:", output)
+
         # Add everything from the staged path
         self.install(self.stage_path, install_tc_packages=install_tc_packages, python_minify=python_minify)
         symbols_archive = None
         if with_breakpad and self.build_project:
             ui.info(ui.bold, "-> Generating breakpad symbols ...")
             dirname = os.path.dirname(output)
-            build_config = kwargs.get('build_config', self.cmake_builder.build_config)
             ui.debug("Use breakpad build_config:", build_config)
-            symbols_archive = os.path.join(dirname, self.pkg_name + "-symbols.zip")
+            if build_target:
+                symbols_archive = os.path.join(dirname, "{}-symbols-{}.zip".format(self.pkg_name, build_target))
+            else:
+                symbols_archive = os.path.join(dirname, "{}-symbols.zip".format(self.pkg_name))
             qibuild.breakpad.gen_symbol_archive(base_dir=self.stage_path,
                                                 output=symbols_archive,
                                                 strip=strip,

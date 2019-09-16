@@ -16,6 +16,9 @@ import qibuild.config
 import qibuild.profile
 import qitoolchain
 
+TARGET = "{}-{}".format(platform.system().lower(),
+                        platform.processor().lower())
+
 
 class CMakeBuildConfig(object):
     """
@@ -27,6 +30,7 @@ class CMakeBuildConfig(object):
         """ CMakeBuildConfig Init """
         self.build_worktree = build_worktree
         self.build_type = "Debug"
+        self.build_target = None
         self.active_build_config = None
         self.build_prefix = None
         self.user_flags = list()
@@ -45,6 +49,13 @@ class CMakeBuildConfig(object):
     def profiles(self):
         """ Profiles """
         return self._profiles
+
+    @property
+    def target(self):
+        """ Build target """
+        if not self.build_target:
+            return TARGET
+        return self.build_target
 
     @property
     def local_cmake(self):
@@ -68,11 +79,13 @@ class CMakeBuildConfig(object):
         line or read from the local qibuild settings.
         """
         if self._toolchain:
+            self.build_target = self._toolchain.target
             return self._toolchain
         if self.active_build_config:
             toolchain_name = self.active_build_config.toolchain
             if toolchain_name:
                 self._toolchain = qitoolchain.get_toolchain(toolchain_name)
+                self.build_target = self._toolchain.target
             return self._toolchain
         else:
             return None
@@ -141,8 +154,7 @@ class CMakeBuildConfig(object):
             if self.active_build_config and not system:
                 res += self.active_build_config.name
             else:
-                res += "sys-%s-%s" % (platform.system().lower(),
-                                      platform.machine().lower())
+                res += "sys-%s" % (TARGET)
         return res
 
     @property
