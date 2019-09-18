@@ -40,6 +40,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
 
     def __init__(self, worktree):
         """ GitWorkTree Init """
+        self.branch = "master"
         self.worktree = worktree
         self.root = worktree.root
         self._root_xml = qisys.qixml.read(self.git_xml).getroot()
@@ -47,10 +48,12 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         self.git_projects = list()
         self.load_git_projects()
         self.syncer = qisrc.sync.WorkTreeSyncer(self)
+        self.branch = self.syncer.manifest.branch
 
     def configure_manifest(self, manifest_url, groups=None, all_repos=False,
                            branch="master", ref=None, review=None, force=False):
         """ Add a new manifest to this worktree """
+        self.branch = branch
         return self.syncer.configure_manifest(manifest_url, groups=groups,
                                               branch=branch, ref=ref, review=review,
                                               force=force, all_repos=all_repos)
@@ -143,6 +146,10 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
     def manifest(self):
         """ Manifest """
         return self.syncer.manifest
+
+    def manifest_branch(self):
+        """ Current manifest branch """
+        return self.branch
 
     def snapshot(self):
         """ Return a :py:class`.Snapshot` of the current worktree state """
@@ -264,6 +271,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         ui.info(ui.green, ":: Checkout projects ...")
         errors = list()
         to_checkout = list()
+        self.branch = branch
         for project in self.git_projects:
             if project.default_branch is None:
                 continue
