@@ -442,7 +442,7 @@ def check_is_in_path(executable, env=None):
         raise NotInPath(executable, env=env)
 
 
-def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=False):
+def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=False, build_config=None):
     """
     Execute a command line.
     If ignore_ret_code is False:
@@ -460,7 +460,7 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=False):
       * And a normal exception if cwd is given and is not
         an existing directory.
     """
-    exe_full_path = find_program(cmd[0], env=env)
+    exe_full_path = find_program(cmd[0], env=env, build_config=build_config)
     if not exe_full_path:
         raise NotInPath(cmd[0], env=env)
     cmd[0] = exe_full_path

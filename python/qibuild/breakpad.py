@@ -115,7 +115,7 @@ def strip_binary(binary, strip_executable=None, strip_args=None, build_config=No
     with qisys.sh.PreserveFileMetadata(binary):
         mode_rw = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO
         os.chmod(binary, mode_rw)
-        rc = qisys.command.call(cmd, ignore_ret_code=True)
+        rc = qisys.command.call(cmd, ignore_ret_code=True, build_config=build_config)
     if rc != 0:
         ui.warning("Failed to strip symbols for", binary)
 
