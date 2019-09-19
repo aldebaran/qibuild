@@ -287,7 +287,7 @@ def find_program(executable, env=None, raises=False, build_config=None):
         _LAST_BUILD_CONFIG = build_config
         _FIND_PROGRAM_CACHE = dict()
     if executable in _FIND_PROGRAM_CACHE:
-        ui.debug("find_program() Found in cache")
+        ui.debug("find_program(%s) Found in cache" % executable)
         return _FIND_PROGRAM_CACHE[executable]
     res = None
     if not env:
@@ -299,7 +299,7 @@ def find_program(executable, env=None, raises=False, build_config=None):
         env["PATH"] = os.pathsep.join((toolchain_paths, env.get("PATH", "")))
     for path in env["PATH"].split(os.pathsep):
         res = _find_program_in_path(executable, path)
-        if res and _is_runnable(res):
+        if res and _is_runnable(res, build_config):
             ui.debug("find_program() Use %s from: %s" % (executable, res))
             _FIND_PROGRAM_CACHE[executable] = res
             return res
@@ -324,6 +324,7 @@ def _find_program_in_path_win(executable, path):
 
 def _find_program_in_path(executable, path):
     """ Find Program In Path """
+    ui.debug("Searching %s in %s" % (executable, path))
     if os.name == 'nt':
         return _find_program_in_path_win(executable, path)
     return _check_access(executable, path)
@@ -337,28 +338,54 @@ def _check_access(executable, path):
     return None
 
 
-def _is_runnable(full_path):
+def _is_runnable(full_path, build_config=None):
     """
     Return True if executable:
     - has the same architecture (32/64 bits) than current python executable
     - on linux, each dynamically linked libraries (found with 'ldd') have the minimum required version
     """
+    if not full_path:
+        return False
     if platform.architecture(full_path)[0] != platform.architecture(sys.executable)[0]:
         return False
+
     try:
         process = subprocess.Popen(['ldd', full_path], stdout=subprocess.PIPE, env={str("LANG"): str("C")})
         output = process.communicate()[0]
         if six.PY3:
             output = str(output)
         if process.returncode == 0 and ' not found ' not in output:
-            return True
+            pass
         elif process.returncode == 1 and 'not a dynamic executable' in output:
-            return True
-        return False
+            pass
+        else:
+            return False
     except OSError:
         # TODO: Run an equivalent test on mac and on windows
         ui.warning("ldd not available => assuming {} is runnable".format(full_path))
-        return True
+
+    # if a build config is set then we will check for file format
+    if build_config:
+        try:
+            process = subprocess.Popen(['file', '-L', full_path], stdout=subprocess.PIPE, env={str("LANG"): str("C")})
+            output = process.communicate()[0]
+            if six.PY3:
+                output = str(output)
+            ui.debug("Testing %s in %s" % (platform.processor(), output.split(',')))
+            if "ASCII text executable" not in output:
+                try:
+                    bin_proc = output.split(',')[1]
+                    if platform.processor() not in bin_proc and platform.processor().replace("_", "-") not in bin_proc:
+                        ui.debug("%s not compatible" % (full_path))
+                        return False
+                except IndexError:
+                    return True
+            return True
+        except OSError:
+            # TODO: Run an equivalent test on mac and on windows
+            ui.warning("file not available => assuming {} is compatible".format(full_path))
+            return True
+    return True
 
 
 # Implementation widely inspired by the python-2.7 one.
