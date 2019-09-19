@@ -20,6 +20,7 @@ import qibuild.config
 from qisys import ui
 
 # Cache for find_program()
+_LAST_BUILD_CONFIG = None
 _FIND_PROGRAM_CACHE = dict()
 SIGINT_EVENT = threading.Event()
 
@@ -68,8 +69,8 @@ class Process(object):
         """ Run Process """
         def target():
             """ Target """
-            ui.debug("Starting thread.")
-            ui.debug("Calling:", subprocess.list2cmdline(self.cmd))
+            ui.debug("Process.run() Starting thread.")
+            ui.debug("Process.run() Calling:", subprocess.list2cmdline(self.cmd))
             try:
                 opts = dict()
                 if os.name == 'posix':
@@ -109,9 +110,9 @@ class Process(object):
                 self._reading_thread.join(1)
             self.returncode = self._process.returncode
             if self.returncode == 0:
-                ui.debug("Setting return code to Process.OK")
+                ui.debug("Process.run() Setting return code to Process.OK")
                 self.return_type = Process.OK
-            ui.debug("Thread terminated.")
+            ui.debug("Process.run() Thread terminated.")
         self._thread = threading.Thread(target=target)
         self._thread.start()
         while ((timeout is None or timeout > 0)
@@ -125,7 +126,7 @@ class Process(object):
         elif SIGINT_EVENT.is_set():
             self._interrupt()
         else:
-            ui.debug("Process timed out")
+            ui.debug("Process.run() Process timed out")
             self._kill_subprocess()
 
     def _kill_subprocess(self):
@@ -279,7 +280,14 @@ def find_program(executable, env=None, raises=False, build_config=None):
     :return: None if program was not found,
       the full path to executable otherwise
     """
+    ui.debug("Search %s with build_config %s" % (executable, build_config))
+    global _LAST_BUILD_CONFIG
+    global _FIND_PROGRAM_CACHE
+    if _LAST_BUILD_CONFIG != build_config:
+        _LAST_BUILD_CONFIG = build_config
+        _FIND_PROGRAM_CACHE = dict()
     if executable in _FIND_PROGRAM_CACHE:
+        ui.debug("find_program() Found in cache")
         return _FIND_PROGRAM_CACHE[executable]
     res = None
     if not env:
@@ -292,7 +300,7 @@ def find_program(executable, env=None, raises=False, build_config=None):
     for path in env["PATH"].split(os.pathsep):
         res = _find_program_in_path(executable, path)
         if res and _is_runnable(res):
-            ui.debug("Use %s from: %s" % (executable, res))
+            ui.debug("find_program() Use %s from: %s" % (executable, res))
             _FIND_PROGRAM_CACHE[executable] = res
             return res
     if raises:
