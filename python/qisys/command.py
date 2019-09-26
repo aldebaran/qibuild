@@ -297,11 +297,18 @@ def find_program(executable, env=None, raises=False, build_config=None):
     toolchain_paths = get_toolchain_binary_paths(build_config)
     if toolchain_paths:
         env["PATH"] = os.pathsep.join((toolchain_paths, env.get("PATH", "")))
+
+    if build_config:
+        res = _find_program_in_toolchain_path(executable, build_config)
+        if res:
+            # _FIND_PROGRAM_CACHE[executable] = res
+            return res
+
     for path in env["PATH"].split(os.pathsep):
         res = _find_program_in_path(executable, path)
         if res and _is_runnable(res, build_config):
-            ui.debug("find_program() Use %s from: %s" % (executable, res))
-            _FIND_PROGRAM_CACHE[executable] = res
+            ui.debug("find_program(%s) Use: %s" % (executable, res))
+            # _FIND_PROGRAM_CACHE[executable] = res
             return res
     if raises:
         raise NotInPath(executable, env=env)
@@ -319,6 +326,34 @@ def _find_program_in_path_win(executable, path):
         res = _check_access(candidate, path)
         if res:
             return res
+    return None
+
+
+def _find_program_in_toolchain_path(executable, build_config=None):
+    try:
+        path = build_config.toolchain.toolchain_path
+    except Exception:
+        return None
+    executable = os.path.basename(executable)
+    ui.debug("_find_program_in_toolchain_path(%s): %s" % (executable, path))
+    try:
+        env = {str("LANG"): str("C")}
+        process = subprocess.Popen(['find', path, '-name', executable], stdout=subprocess.PIPE, env=env)
+        output = process.communicate()[0]
+        if six.PY3:
+            output = str(output)
+        splitted = output.split()
+        splitted.sort(key=len)
+        for p in splitted:
+            ui.debug("_find_program_in_toolchain_path(%s): Testing %s" % (executable, os.path.dirname(p)))
+            res = _check_access(executable, os.path.dirname(p))
+            if res and _is_runnable(res, build_config):
+                return res
+    except OSError:
+        # TODO: Run an equivalent test on mac and on windows
+        ui.warning("find not available => assuming {} is not in the toolchain".format(executable))
+        return None
+
     return None
 
 

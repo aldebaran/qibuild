@@ -29,6 +29,7 @@ class Toolchain(object):
         self.config_path = qisys.sh.get_config_path("qi", "toolchains", "%s.xml" % self.name)
         self.register()
         self.load()
+        self.toolchain_path = os.path.join(qisys.sh.get_share_path("qi", "toolchains"), self.name)
         self.toolchain_file = qisys.sh.get_share_path(
             "qi",
             "toolchains",
