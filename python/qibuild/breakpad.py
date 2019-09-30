@@ -67,13 +67,13 @@ def dump_symbols_from_binary(binary, pool_dir, build_config=None):
         cmd = [dump_syms, dsym]
     else:
         cmd = [dump_syms, binary]
-    ui.debug(cmd)
+    ui.debug("dump_symbols_from_binary() cmd: %s" % cmd)
     try:
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
     except OSError as e:
         ui.error("Could not dump symbols", cmd, e)
-        return
+        return False
     dump_ok = True
     (out, err) = process.communicate()
     if process.returncode != 0:
@@ -82,7 +82,7 @@ def dump_symbols_from_binary(binary, pool_dir, build_config=None):
     if sys.platform == "darwin":
         qisys.sh.rm(dsym)
     if not dump_ok:
-        return
+        return False
     # First line looks like:
     # MODULE Linux x86_64  ID  foo on linux
     # MODULE windows x86 ID foo.pdb on windows
@@ -102,6 +102,7 @@ def dump_symbols_from_binary(binary, pool_dir, build_config=None):
     with open(os.path.join(to_make, basename + ".sym"), "w") as fp:
         fp.write(out)
     fp.close()
+    return True
 
 
 def strip_binary(binary, strip_executable=None, strip_args=None, build_config=None):
@@ -115,7 +116,7 @@ def strip_binary(binary, strip_executable=None, strip_args=None, build_config=No
     with qisys.sh.PreserveFileMetadata(binary):
         mode_rw = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO
         os.chmod(binary, mode_rw)
-        rc = qisys.command.call(cmd, ignore_ret_code=True)
+        rc = qisys.command.call(cmd, ignore_ret_code=True, build_config=build_config)
     if rc != 0:
         ui.warning("Failed to strip symbols for", binary)
 
@@ -141,8 +142,8 @@ def dump_symbols_from_directory(root_dir, pool_dir, strip=True,
                 continue
             if can_be_dumped(full_path):
                 ui.info("dumping", full_path)
-                dump_symbols_from_binary(full_path, pool_dir, build_config=build_config)
-                if strip and os.name == "posix":
+                dumped = dump_symbols_from_binary(full_path, pool_dir, build_config=build_config)
+                if dumped and strip and os.name == "posix":
                     if sys.platform == "darwin":
                         strip_args = ["-u", "-r"]
                     else:

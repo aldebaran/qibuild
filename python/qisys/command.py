@@ -20,6 +20,7 @@ import qibuild.config
 from qisys import ui
 
 # Cache for find_program()
+_LAST_BUILD_CONFIG = None
 _FIND_PROGRAM_CACHE = dict()
 SIGINT_EVENT = threading.Event()
 
@@ -68,8 +69,8 @@ class Process(object):
         """ Run Process """
         def target():
             """ Target """
-            ui.debug("Starting thread.")
-            ui.debug("Calling:", subprocess.list2cmdline(self.cmd))
+            ui.debug("Process.run() Starting thread.")
+            ui.debug("Process.run() Calling:", subprocess.list2cmdline(self.cmd))
             try:
                 opts = dict()
                 if os.name == 'posix':
@@ -109,9 +110,9 @@ class Process(object):
                 self._reading_thread.join(1)
             self.returncode = self._process.returncode
             if self.returncode == 0:
-                ui.debug("Setting return code to Process.OK")
+                ui.debug("Process.run() Setting return code to Process.OK")
                 self.return_type = Process.OK
-            ui.debug("Thread terminated.")
+            ui.debug("Process.run() Thread terminated.")
         self._thread = threading.Thread(target=target)
         self._thread.start()
         while ((timeout is None or timeout > 0)
@@ -125,7 +126,7 @@ class Process(object):
         elif SIGINT_EVENT.is_set():
             self._interrupt()
         else:
-            ui.debug("Process timed out")
+            ui.debug("Process.run() Process timed out")
             self._kill_subprocess()
 
     def _kill_subprocess(self):
@@ -279,7 +280,14 @@ def find_program(executable, env=None, raises=False, build_config=None):
     :return: None if program was not found,
       the full path to executable otherwise
     """
+    ui.debug("Search %s with build_config %s" % (executable, build_config))
+    global _LAST_BUILD_CONFIG
+    global _FIND_PROGRAM_CACHE
+    if _LAST_BUILD_CONFIG != build_config:
+        _LAST_BUILD_CONFIG = build_config
+        _FIND_PROGRAM_CACHE = dict()
     if executable in _FIND_PROGRAM_CACHE:
+        ui.debug("find_program(%s) Found in cache" % executable)
         return _FIND_PROGRAM_CACHE[executable]
     res = None
     if not env:
@@ -289,11 +297,18 @@ def find_program(executable, env=None, raises=False, build_config=None):
     toolchain_paths = get_toolchain_binary_paths(build_config)
     if toolchain_paths:
         env["PATH"] = os.pathsep.join((toolchain_paths, env.get("PATH", "")))
+
+    if build_config:
+        res = _find_program_in_toolchain_path(executable, build_config)
+        if res:
+            # _FIND_PROGRAM_CACHE[executable] = res
+            return res
+
     for path in env["PATH"].split(os.pathsep):
         res = _find_program_in_path(executable, path)
-        if res and _is_runnable(res):
-            ui.debug("Use %s from: %s" % (executable, res))
-            _FIND_PROGRAM_CACHE[executable] = res
+        if res and _is_runnable(res, build_config):
+            ui.debug("find_program(%s) Use: %s" % (executable, res))
+            # _FIND_PROGRAM_CACHE[executable] = res
             return res
     if raises:
         raise NotInPath(executable, env=env)
@@ -314,8 +329,37 @@ def _find_program_in_path_win(executable, path):
     return None
 
 
+def _find_program_in_toolchain_path(executable, build_config=None):
+    try:
+        path = build_config.toolchain.toolchain_path
+    except Exception:
+        return None
+    executable = os.path.basename(executable)
+    ui.debug("_find_program_in_toolchain_path(%s): %s" % (executable, path))
+    try:
+        env = {str("LANG"): str("C")}
+        process = subprocess.Popen(['find', path, '-name', executable], stdout=subprocess.PIPE, env=env)
+        output = process.communicate()[0]
+        if six.PY3:
+            output = str(output)
+        splitted = output.split()
+        splitted.sort(key=len)
+        for p in splitted:
+            ui.debug("_find_program_in_toolchain_path(%s): Testing %s" % (executable, os.path.dirname(p)))
+            res = _check_access(executable, os.path.dirname(p))
+            if res and _is_runnable(res, build_config):
+                return res
+    except OSError:
+        # TODO: Run an equivalent test on mac and on windows
+        ui.warning("find not available => assuming {} is not in the toolchain".format(executable))
+        return None
+
+    return None
+
+
 def _find_program_in_path(executable, path):
     """ Find Program In Path """
+    ui.debug("Searching %s in %s" % (executable, path))
     if os.name == 'nt':
         return _find_program_in_path_win(executable, path)
     return _check_access(executable, path)
@@ -329,28 +373,54 @@ def _check_access(executable, path):
     return None
 
 
-def _is_runnable(full_path):
+def _is_runnable(full_path, build_config=None):
     """
     Return True if executable:
     - has the same architecture (32/64 bits) than current python executable
     - on linux, each dynamically linked libraries (found with 'ldd') have the minimum required version
     """
+    if not full_path:
+        return False
     if platform.architecture(full_path)[0] != platform.architecture(sys.executable)[0]:
         return False
+
     try:
         process = subprocess.Popen(['ldd', full_path], stdout=subprocess.PIPE, env={str("LANG"): str("C")})
         output = process.communicate()[0]
         if six.PY3:
             output = str(output)
         if process.returncode == 0 and ' not found ' not in output:
-            return True
+            pass
         elif process.returncode == 1 and 'not a dynamic executable' in output:
-            return True
-        return False
+            pass
+        else:
+            return False
     except OSError:
         # TODO: Run an equivalent test on mac and on windows
         ui.warning("ldd not available => assuming {} is runnable".format(full_path))
-        return True
+
+    # if a build config is set then we will check for file format
+    if build_config:
+        try:
+            process = subprocess.Popen(['file', '-L', full_path], stdout=subprocess.PIPE, env={str("LANG"): str("C")})
+            output = process.communicate()[0]
+            if six.PY3:
+                output = str(output)
+            ui.debug("Testing %s in %s" % (platform.processor(), output.split(',')))
+            if "ASCII text executable" not in output:
+                try:
+                    bin_proc = output.split(',')[1]
+                    if platform.processor() not in bin_proc and platform.processor().replace("_", "-") not in bin_proc:
+                        ui.debug("%s not compatible" % (full_path))
+                        return False
+                except IndexError:
+                    return True
+            return True
+        except OSError:
+            # TODO: Run an equivalent test on mac and on windows
+            ui.warning("file not available => assuming {} is compatible".format(full_path))
+            return True
+    return True
 
 
 # Implementation widely inspired by the python-2.7 one.
@@ -442,7 +512,7 @@ def check_is_in_path(executable, env=None):
         raise NotInPath(executable, env=env)
 
 
-def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=False):
+def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=False, build_config=None):
     """
     Execute a command line.
     If ignore_ret_code is False:
@@ -460,7 +530,7 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=False):
       * And a normal exception if cwd is given and is not
         an existing directory.
     """
-    exe_full_path = find_program(cmd[0], env=env)
+    exe_full_path = find_program(cmd[0], env=env, build_config=build_config)
     if not exe_full_path:
         raise NotInPath(cmd[0], env=env)
     cmd[0] = exe_full_path
