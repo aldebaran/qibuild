@@ -1,0 +1,53 @@
+v3.14
+=====
+
+
+misc
+----
+
+* Fix unicode support in python3.
+* GCC flag -fPIE must be defined in the toolchain and is not set by qibuild.
+* Disable test_gdb when testing on gitlab runner (qibuild miss a compatible runner).
+
+qisrc
+-----
+
+* Add a command method to make the difference between a dev branch and a release branch.
+* Qisrc new always remove deleted remote branches when fetching.
+
+qisys
+-----
+
+* Find_program check for binary compatibility before returning a path.
+* Add support for large zip archive.
+
+qipkg
+-----------
+
+* Add python minification to use obfuscation on python files (disbled by default).
+* libqi become optionnal and is loaded only to deploy packages.
+* The build target is used to name the output packages by default.
+
+qibuild
+-------
+
+* Patch swig/python.cmake to prevent fail if swig is not found when configuring.
+* Update the way librairies are found by find_libs.
+
+qilinguist
+----------
+
+* Use lrelease only if there are something to translate before creating a pkg.
+* Generate more stable .po{,t} files
+
+qitest
+------
+
+* Add an option to qitest run to exit 0 if there is no test to run.
+* qitest skip empty test runner if --allow-no-test.
+
+qitoolchain
+-----------
+
+* The build target can be define in the toolchain feed in the toolchain tag.
+* The build target is now used in the project builder.
