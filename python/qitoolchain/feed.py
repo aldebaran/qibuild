@@ -53,7 +53,10 @@ def tree_from_feed(feed_location, branch=None, name=None):
         tree = ElementTree.ElementTree()
         tree.parse(fp)
     except Exception as e:
-        ui.error(e.message)
+        if six.PY3:
+            ui.error(e)
+        else:
+            ui.error(e.message)
         raise
     finally:
         if fp:
