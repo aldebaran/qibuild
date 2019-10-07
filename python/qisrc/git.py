@@ -617,8 +617,10 @@ class Transaction(object):
         self.output = ""
 
 
-def get_status(git, local_ref, remote_ref):
+def get_status(git, local_ref, remote_ref, with_message=False):
     """ Check if local_ref is ahead and / or behind remote_ref. """
+    status = None
+    message = str()
     behind = 0
     ahead = 0
     (ret, out) = git.call("rev-list", "--left-right",
@@ -630,11 +632,23 @@ def get_status(git, local_ref, remote_ref):
     if ret == 0:
         behind = len(out.split())
     if not ahead and not behind:
-        return "no-diff"
+        message = "<no changes>"
+        status = "no-diff"
     if ahead and not behind:
-        return "ahead"
+        message = "%i commit(s) to merge in %s\n" % (ahead, remote_ref)
+        _, out = git.call("log", "%s...%s" % (remote_ref, local_ref),
+                          "--format=%h %s", raises=False)
+        message += out
+        status = "ahead"
     if behind and not ahead:
-        return "behind"
+        message = "%i commit(s) late from %s\n" % (behind, local_ref)
+        _, out = git.call("log", "%s...%s" % (local_ref, remote_ref),
+                          "--format=%h %s", raises=False)
+        message += out
+        status = "behind"
     if ahead and behind:
-        return "diverged"
-    return None
+        message = "Branches have diverged: -%i / +%i" % (behind, ahead)
+        status = "diverged"
+    if with_message:
+        return status, message
+    return status
