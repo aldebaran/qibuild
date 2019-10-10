@@ -329,11 +329,12 @@ def rm(name):
     * won't fail if the file does not exist
     Please avoid using shutil.rmtree ...
     """
+
     if not os.path.lexists(name):
         return
     if os.path.isdir(name) and not os.path.islink(name):
         ui.debug("Removing directory:", name)
-        rmtree(name)
+        rmtree(name.encode('ascii', "ignore"))
     else:
         ui.debug("Removing", name)
         os.remove(name)
