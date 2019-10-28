@@ -120,7 +120,10 @@ Please set only one of these two options to 'True'
             sys.stdout.flush()
         if display_progress:
             ui.info_progress(i, len(to_add), "Done")
-        zip_call(attr, content.encode('ascii', "ignore"))
+        if six.PY3:
+            zip_call(attr, content)
+        else:
+            zip_call(attr, content.encode('ascii', "ignore"))
     archive.close()
     return output
 

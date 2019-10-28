@@ -284,9 +284,12 @@ def check_root_cmake_list(cmake_list_file):
     suggested_project_name = os.path.basename(dirname)
     message = ""
     lines = list()
-    with open(cmake_list_file, "r") as fp:
-        lines = fp.readlines()
-    fp.close()
+    if six.PY3:
+        with open(cmake_list_file, "r", encoding='utf-8') as fp:
+            lines = fp.readlines()
+    else:
+        with open(cmake_list_file, "r") as fp:
+            lines = fp.readlines()
     project_line_number = None
     find_qibuild_line_number = None
     minimum_required_found = False

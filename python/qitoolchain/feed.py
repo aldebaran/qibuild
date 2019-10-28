@@ -51,9 +51,15 @@ def tree_from_feed(feed_location, branch=None, name=None):
         else:
             raise Exception("Could not parse %s: Feed location is not an existing path nor an url" % feed_location)
         tree = ElementTree.ElementTree()
-        tree.parse(fp)
+        if six.PY3:
+            tree.parse(fp, parser=ElementTree.XMLParser(encoding='utf-8'))
+        else:
+            tree.parse(fp)
     except Exception as e:
-        ui.error(e.message)
+        if six.PY3:
+            ui.error(e)
+        else:
+            ui.error(e.message)
         raise
     finally:
         if fp:

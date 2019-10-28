@@ -218,7 +218,7 @@ def _handle_files(src, dest, root, files, filter_fun, quiet):
             if os.path.lexists(fdest) and os.path.isdir(fdest):
                 raise Exception("Expecting a file but found a directory: %s" % fdest)
             if not quiet:
-                print("-- Installing %s" % fdest)
+                print("-- Installing %s" % fdest.encode('ascii', "ignore"))
             mkdir(new_root, recursive=True)
             # We do not want to fail if dest exists but is read only
             # (following what `install` does, but not what `cp` does)
@@ -329,11 +329,12 @@ def rm(name):
     * won't fail if the file does not exist
     Please avoid using shutil.rmtree ...
     """
+
     if not os.path.lexists(name):
         return
     if os.path.isdir(name) and not os.path.islink(name):
         ui.debug("Removing directory:", name)
-        rmtree(name)
+        rmtree(name.encode('ascii', "ignore"))
     else:
         ui.debug("Removing", name)
         os.remove(name)

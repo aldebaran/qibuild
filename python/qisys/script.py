@@ -153,7 +153,10 @@ def main_wrapper(module, args):
                 sys.exit(0)
         if args.backtrace:
             raise
-        message = str(e).decode("utf-8", errors="ignore")
+        if six.PY3:
+            message = str(e)
+        else:
+            message = str(e).decode("utf-8", errors="ignore")
         if message.endswith("\n"):
             message = message[:-1]
         ui.error(e.__class__.__name__, message)
