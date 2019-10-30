@@ -306,7 +306,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         """ Make sure a Junit XML compatible file is written. """
         # Arbitrary limit output (~700 lines) to prevent from crashing on read
         res.out = res.out[-16384:]
-        res.out = re.sub('\x1b[^m]*m', "", res.out)
+        res.out = re.sub(r'\x1b[^m]*m', "", str(res.out))
         message_as_string = " ".join(str(x) for x in res.message
                                      if not isinstance(x, ui._Color))
         # Windows output is most likely code page 850
@@ -315,11 +315,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             encoding = "ascii"
         else:
             encoding = "UTF-8"
-        try:
-            res.out = res.out.decode(encoding, "ignore")
-            message_as_string = message_as_string.decode(encoding, "ignore")
-        except UnicodeDecodeError:
-            pass
+
         # Make sure there are no invalid data in the XML
         res.out = qisys.qixml.sanitize_xml(res.out)
         if res.ok:
