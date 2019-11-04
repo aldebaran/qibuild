@@ -307,6 +307,10 @@ class GitProject(object):
         """ Return True If other is Not Equal to self """
         return not self.__eq__(other)
 
+    def __hash__(self):
+        """ Return a hash of the project, corresponding to its path """
+        return self.path.__hash__()
+
     def __repr__(self):
         """ Representation """
         return "<GitProject in %s>" % self.src
