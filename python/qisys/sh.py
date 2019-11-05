@@ -315,8 +315,8 @@ def copy_git_src(src, dest):
                                stdout=subprocess.PIPE)
     (out, _) = process.communicate()
     for filename in out.splitlines():
-        src_file = os.path.join(src, filename)
-        dest_file = os.path.join(dest, filename)
+        src_file = os.path.join(src, filename.decode('ascii'))
+        dest_file = os.path.join(dest, filename.decode('ascii'))
         install(src_file, dest_file, quiet=True)
 
 
