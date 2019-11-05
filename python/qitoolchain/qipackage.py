@@ -220,8 +220,7 @@ class QiPackage(object):
             self.cross_gdb = os.path.join(self.path, self.cross_gdb)
 
     def post_add(self):
-        """
-        Run the post-add script if it exists.
+        """ Run the post-add script if it exists.
         Raises:
             * CommandFailedException if the post-add script fails
         """
@@ -247,23 +246,88 @@ class QiPackage(object):
             res += " in %s" % self.path
         return res
 
-    def __cmp__(self, other):
-        """
-        QiPackage Comarison
-        TODO: Update for Pyhon 3
-        https://portingguide.readthedocs.io/en/latest/comparisons.html#rich-comparisons
-        """
-        if self.name == other.name:
-            if self.version is None and other.version is not None:
-                return -1
-            if self.version is not None and other.version is None:
-                return 1
-            if self.version is None and other.version is None:
-                return 0
-            return qisys.version.compare(self.version, other.version)
-        else:
-            return cmp(self.name, other.name)
+    def __eq__(self, other):
+        """ QiPackage Comparison """
+        if self.name == other.name and self.version == other.version:
+                return True
+        return False
 
+    def __ne__(self, other):
+        """ QiPackage Comparison """
+        if self.name != other.name or self.version != other.version:
+            return True
+        return False
+
+    def __lt__(self, other):
+        """ QiPackage Comparison """
+        if self.name == other.name:
+            if self.version is None and other.version is None:
+                return True
+            if self.version is not None and other.version is None:
+                return True
+            if self.version is not None and other.version is not None:
+                current_version = version_str_to_int(self.version)
+                other_version = version_str_to_int(other.version)
+                if self.version == other.version:
+                    return True
+                if current_version <= other_version:
+                    return True
+        return False
+
+    def __le__(self, other):
+        """ QiPackage Comparison """
+        if self.name == other.name:
+            if self.version is None and other.version is None:
+                return True
+            if self.version is not None and other.version is None:
+                return True
+            if self.version is not None and other.version is not None:
+                current_version = version_str_to_int(self.version)
+                other_version = version_str_to_int(other.version)
+                if self.version == other.version:
+                    return True
+                if current_version <= other_version:
+                    return True
+        return False
+
+    def __gt__(self, other):
+        """ QiPackage Comparison """
+        if self.name == other.name:
+            if self.version is None and other.version is None:
+                return True
+            if self.version is not None and other.version is None:
+                return True
+            if self.version is not None and other.version is not None:
+                current_version = version_str_to_int(self.version)
+                other_version = version_str_to_int(other.version)
+                if self.version == other.version:
+                    return True
+                if current_version > other_version:
+                    return True
+        return False
+
+    def __ge__(self, other):
+        """ QiPackage Comparison """
+        if self.name == other.name:
+            if self.version is None and other.version is None:
+                return True
+            if self.version is not None and other.version is None:
+                return True
+            if self.version is not None and other.version is not None:
+                current_version = version_str_to_int(self.version)
+                other_version = version_str_to_int(other.version)
+                if self.version == other.version:
+                    return True
+                if current_version >= other_version:
+                    return True
+        return False
+
+def version_str_to_int(version):
+    """ Convert a version string to an integer for comparison """
+    version = version.replace(".", "")
+    if version.find("-"):
+        return int(version.split("-")[0])
+    return int(version)
 
 def from_xml(element):
     """ Load a Package From an XML File """
