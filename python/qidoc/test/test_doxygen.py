@@ -39,7 +39,7 @@ def test_bad_doxyfile(tmpdir):
     doxyfile.write(""""\nFOO = 1\nBAR += 2\n""")
     with pytest.raises(Exception) as e:
         qidoc.doxygen.read_doxyfile(doxyfile.strpath)
-    assert "does not match" in e.value.message
+    assert "does not match" in str(e)
 
 
 def test_appending_values(tmpdir):

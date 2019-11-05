@@ -167,7 +167,7 @@ def test_no_worktre_bad_pml(tmpdir, monkeypatch):
     monkeypatch.chdir(tmpdir)
     with pytest.raises(Exception) as error:
         _package = qisys.script.run_action("qipkg.actions.make_package", [pml_path.strpath])
-    assert "not in a worktree" in error.value.message
+    assert "not in a worktree" in str(error)
 
 
 def test_translations(qipkg_action, tmpdir):

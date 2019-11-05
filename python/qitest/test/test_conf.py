@@ -41,14 +41,14 @@ def test_errors(tmpdir):
     qitest_json_path = tmpdir.join("qitest.json").strpath
     with pytest.raises(Exception) as e:
         qitest.conf.add_test(qitest_json_path, name="foo")
-    assert "Should provide a test cmd" in e.value.message
+    assert "Should provide a test cmd" in str(e)
     with pytest.raises(Exception) as e:
         qitest.conf.add_test(qitest_json_path, cmd="foo")
-    assert "Should provide a test name" in e.value.message
+    assert "Should provide a test name" in str(e)
     qitest.conf.add_test(qitest_json_path, name="foo", cmd=["/path/to/foo"])
     with pytest.raises(Exception) as e:
         qitest.conf.add_test(qitest_json_path, name="foo", cmd=["/path/to/bar"])
-    assert "A test named 'foo' already exists" in e.value.message
+    assert "A test named 'foo' already exists" in str(e)
 
 
 def test_relocate():

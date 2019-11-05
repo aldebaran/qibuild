@@ -52,7 +52,7 @@ def test_raise_when_no_project_given_outside_a_worktree(tmpdir, monkeypatch):
     monkeypatch.chdir(tmpdir)
     with pytest.raises(Exception) as e:
         qisys.script.run_action("qilinguist.actions.release")
-    assert "outside a worktree" in e.value.message
+    assert "outside a worktree" in str(e)
 
 
 def test_non_translated_messages_gettext(qilinguist_action, record_messages):

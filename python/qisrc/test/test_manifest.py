@@ -88,7 +88,7 @@ def test_no_remotes_attr(tmpdir):
 """)
     with pytest.raises(qisrc.manifest.ManifestError) as e:
         qisrc.manifest.Manifest(manifest_xml.strpath)
-    assert e.value.message == "Missing 'remotes' attribute"
+    assert str(e) == "Missing 'remotes' attribute"
 
 
 def test_several_reviews(tmpdir):
@@ -116,7 +116,7 @@ def test_no_matching_remote(tmpdir):
 """)
     with pytest.raises(qisrc.manifest.ManifestError) as e:
         qisrc.manifest.Manifest(manifest_xml.strpath)
-    assert e.value.message == "No matching remote: invalid for repo foo/bar.git"
+    assert str(e) == "No matching remote: invalid for repo foo/bar.git"
 
 
 def test_repo_branch(tmpdir):

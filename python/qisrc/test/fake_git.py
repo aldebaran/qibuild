@@ -41,7 +41,7 @@ def test_wrong_setup():
     git.checkout("-f", "master")
     with pytest.raises(Exception) as e:
         git.fetch()
-    assert "Unexpected call to fetch" in e.value.message
+    assert "Unexpected call to fetch" in str(e)
 
 
 def test_configured_but_not_called_enough():
@@ -52,8 +52,8 @@ def test_configured_but_not_called_enough():
     git.checkout("next")
     with pytest.raises(Exception) as e:
         git.check()
-    assert "checkout was configured to be called 2 times" in e.value.message
-    assert "was only called 1 times" in e.value.message
+    assert "checkout was configured to be called 2 times" in str(e)
+    assert "was only called 1 times" in str(e)
 
 
 def test_configured_but_not_called():
@@ -64,7 +64,7 @@ def test_configured_but_not_called():
     git.checkout(raises=False)
     with pytest.raises(Exception) as e:
         git.check()
-    assert "reset was added as result but never called" in e.value.message
+    assert "reset was added as result but never called" in str(e)
 
 
 def test_commands_are_logged():

@@ -47,7 +47,7 @@ def test_rebase_conflict(git_server, qisrc_action):
     git.fetch()
     with pytest.raises(Exception) as e:
         qisrc_action("rebase", "--branch", "master", "--all")
-    assert " * foo" in e.value.message
+    assert " * foo" in str(e)
     _, after = git.call("show", raises=False)
     assert after == before
 

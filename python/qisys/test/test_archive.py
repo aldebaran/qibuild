@@ -83,7 +83,7 @@ def test_extract_invalid_empty(tmpdir):
     archive.write("")
     with pytest.raises(Exception) as e:
         qisys.archive.extract(archive.strpath, destdir.strpath)
-    assert "tar failed" in e.value.message
+    assert "tar failed" in str(e)
 
 
 def test_extract_invalid_no_topdir(tmpdir):

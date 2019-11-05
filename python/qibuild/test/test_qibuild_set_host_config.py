@@ -25,4 +25,4 @@ def test_set_host_config_no_such_config(qibuild_action):
     """ Test Set Host Config No Such Config """
     with pytest.raises(Exception) as e:
         qibuild_action("set-host-config", "foo")
-    assert "No such config" in e.value.message
+    assert "No such config" in str(e)

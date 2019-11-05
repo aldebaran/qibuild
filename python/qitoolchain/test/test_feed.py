@@ -33,8 +33,8 @@ def test_parse_non_exising_path():
     """ Test Parse non Existing Path """
     with pytest.raises(Exception) as e:
         tree_from_feed("does/not/exists")
-    assert "not an existing path" in e.value.message
-    assert "nor an url" in e.value.message
+    assert "not an existing path" in str(e)
+    assert "nor an url" in str(e)
 
 
 def _generic_test_git(git_server, _feed, full_xml, oss_xml, third_part_xml):
@@ -60,9 +60,9 @@ def test_git_missing_url_and_path(git_server, feed):
     full_xml = """<feed>\n    <feed name="oss" />\n    <feed name="3rdpart" url="3rdpart.xml" />\n</feed>\n"""
     with pytest.raises(AssertionError) as e:
         _generic_test_git(git_server, feed, full_xml, default_oss_xml, default_third_part_xml)
-    assert "attributes must be set" in e.value.message
-    assert "url" in e.value.message
-    assert "path" in e.value.message
+    assert "attributes must be set" in str(e)
+    assert "url" in str(e)
+    assert "path" in str(e)
 
 
 def test_git_bad_url(git_server, feed):
@@ -76,6 +76,6 @@ def test_git_bad_url(git_server, feed):
 </feed>\n"""
     with pytest.raises(Exception) as e:
         _generic_test_git(git_server, feed, full_xml, default_oss_xml, default_third_part_xml)
-    assert "not parse" in e.value.message
-    assert "not an existing path" in e.value.message
-    assert "nor an url" in e.value.message
+    assert "not parse" in str(e)
+    assert "not an existing path" in str(e)
+    assert "nor an url" in str(e)

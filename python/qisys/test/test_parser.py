@@ -109,4 +109,4 @@ def test_using_dash_all_with_dash_single(worktree, args):
     args.single = True
     with pytest.raises(Exception) as e:
         qisys.parsers.get_projects(worktree, args)
-    assert "--single with --all" in e.value.message
+    assert "--single with --all" in str(e)
