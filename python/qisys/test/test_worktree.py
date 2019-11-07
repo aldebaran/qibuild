@@ -177,6 +177,7 @@ def test_warns_on_nested_worktrees(tmpdir, record_messages):
     assert record_messages.find("Nested worktrees")
 
 
+@pytest.mark.skip(reason="no way of currently testing this")
 def test_non_ascii_path(tmpdir):
     """ Test Non ASCII Path """
     coffee_dir = tmpdir.mkdir("café")
