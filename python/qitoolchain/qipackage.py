@@ -249,7 +249,7 @@ class QiPackage(object):
     def __eq__(self, other):
         """ QiPackage Comparison """
         if self.name == other.name and self.version == other.version:
-                return True
+            return True
         return False
 
     def __ne__(self, other):
@@ -322,12 +322,14 @@ class QiPackage(object):
                     return True
         return False
 
+
 def version_str_to_int(version):
     """ Convert a version string to an integer for comparison """
     version = version.replace(".", "")
     if version.find("-"):
         return int(version.split("-")[0])
     return int(version)
+
 
 def from_xml(element):
     """ Load a Package From an XML File """

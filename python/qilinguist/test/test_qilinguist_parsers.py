@@ -41,8 +41,7 @@ def test_names_no_worktree(cd_to_tmpdir, args):
     args.projects = ["foo"]
     with pytest.raises(Exception) as e:
         qilinguist.parsers.get_linguist_projects(args)
-    assert str(e) == "Cannot use project names when running " \
-        "outside a worktree"
+    assert str(e) == "Cannot use project names when running outside a worktree"
 
 
 def test_no_worktree_no_args(cd_to_tmpdir, args):
@@ -50,8 +49,7 @@ def test_no_worktree_no_args(cd_to_tmpdir, args):
     args.projects = list()
     with pytest.raises(Exception) as e:
         qilinguist.parsers.get_linguist_projects(args)
-    assert str(e) == "You should specify at least a pml path " \
-                              "when running outside a worktree"
+    assert str(e) == "You should specify at least a pml path when running outside a worktree"
 
 
 def test_names_and_pml_from_worktree(linguist_worktree, args, monkeypatch):
