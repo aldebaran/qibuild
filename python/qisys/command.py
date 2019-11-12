@@ -351,9 +351,9 @@ def _find_program_in_toolchain_path(executable, build_config=None):
                 return res
     except OSError:
         # TODO: Run an equivalent test on mac and on windows
-        ui.warning("find not available => assuming {} is not in the toolchain".format(executable))
+        if sys.platform.startswith("linux"):
+            ui.warning("find not available => assuming {} is not in the toolchain".format(executable))
         return None
-
     return None
 
 
@@ -397,7 +397,8 @@ def _is_runnable(full_path, build_config=None):
             return False
     except OSError:
         # TODO: Run an equivalent test on mac and on windows
-        ui.warning("ldd not available => assuming {} is runnable".format(full_path))
+        if sys.platform.startswith("linux"):
+            ui.warning("ldd not available => assuming {} is runnable".format(full_path))
 
     # if a build config is set then we will check for file format
     if build_config:
@@ -418,7 +419,8 @@ def _is_runnable(full_path, build_config=None):
             return True
         except OSError:
             # TODO: Run an equivalent test on mac and on windows
-            ui.warning("file not available => assuming {} is compatible".format(full_path))
+            if sys.platform.startswith("linux"):
+                ui.warning("file not available => assuming {} is compatible".format(full_path))
             return True
     return True
 
