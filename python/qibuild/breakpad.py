@@ -55,13 +55,14 @@ def can_be_dumped(filename):
     return False
 
 
-def dump_symbols_from_binary(binary, pool_dir, build_config=None):
+def dump_symbols_from_binary(binary, pool_dir, build_config=None, dump_syms=None):
     """
     Dump symbols from the binary.
     Results can be found in
     <pool_dir>/<binary name>/<id>/<binary name>.sym
     """
-    dump_syms = qisys.command.find_program("dump_syms", raises=True, build_config=build_config)
+    if not dump_syms:
+        dump_syms = qisys.command.find_program("dump_syms", raises=True, build_config=build_config)
     if sys.platform == "darwin":
         dsym = gen_dsym(binary)
         cmd = [dump_syms, dsym]
@@ -128,7 +129,7 @@ def gen_dsym(binary):
     return binary + ".dSYM"
 
 
-def dump_symbols_from_directory(root_dir, pool_dir, strip=True,
+def dump_symbols_from_directory(root_dir, pool_dir, dump_exe=None, strip=True,
                                 strip_exe=None, strip_args=None, build_config=None):
     """
     Dump symbols for every binary in the root dir.
@@ -142,7 +143,7 @@ def dump_symbols_from_directory(root_dir, pool_dir, strip=True,
                 continue
             if can_be_dumped(full_path):
                 ui.info("dumping", full_path)
-                dumped = dump_symbols_from_binary(full_path, pool_dir, build_config=build_config)
+                dumped = dump_symbols_from_binary(full_path, pool_dir, build_config=build_config, dump_syms=dump_exe)
                 if dumped and strip and os.name == "posix":
                     if sys.platform == "darwin":
                         strip_args = ["-u", "-r"]
@@ -154,11 +155,11 @@ def dump_symbols_from_directory(root_dir, pool_dir, strip=True,
     return pool_dir
 
 
-def gen_symbol_archive(base_dir=None, output=None, strip=True,
+def gen_symbol_archive(base_dir=None, output=None, dump_exe=None, strip=True,
                        strip_exe=None, strip_args=None, build_config=None):
     """ Generate a symbol archive from all the binaries in the base_dir """
     with qisys.sh.TempDir() as pool_dir:
-        dump_symbols_from_directory(base_dir, pool_dir, strip=strip,
+        dump_symbols_from_directory(base_dir, pool_dir, dump_exe=dump_exe, strip=strip,
                                     strip_exe=strip_exe, strip_args=strip_args, build_config=build_config)
         qisys.archive.compress(pool_dir, output=output, flat=True)
     return output
