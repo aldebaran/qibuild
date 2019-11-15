@@ -351,9 +351,9 @@ def _find_program_in_toolchain_path(executable, build_config=None):
                 return res
     except OSError:
         # TODO: Run an equivalent test on mac and on windows
-        ui.warning("find not available => assuming {} is not in the toolchain".format(executable))
+        if sys.platform.startswith("linux"):
+            ui.warning("find not available => assuming {} is not in the toolchain".format(executable))
         return None
-
     return None
 
 
@@ -384,21 +384,6 @@ def _is_runnable(full_path, build_config=None):
     if platform.architecture(full_path)[0] != platform.architecture(sys.executable)[0]:
         return False
 
-    try:
-        process = subprocess.Popen(['ldd', full_path], stdout=subprocess.PIPE, env={str("LANG"): str("C")})
-        output = process.communicate()[0]
-        if six.PY3:
-            output = str(output)
-        if process.returncode == 0 and ' not found ' not in output:
-            pass
-        elif process.returncode == 1 and 'not a dynamic executable' in output:
-            pass
-        else:
-            return False
-    except OSError:
-        # TODO: Run an equivalent test on mac and on windows
-        ui.warning("ldd not available => assuming {} is runnable".format(full_path))
-
     # if a build config is set then we will check for file format
     if build_config:
         try:
@@ -418,8 +403,25 @@ def _is_runnable(full_path, build_config=None):
             return True
         except OSError:
             # TODO: Run an equivalent test on mac and on windows
-            ui.warning("file not available => assuming {} is compatible".format(full_path))
+            if sys.platform.startswith("linux"):
+                ui.warning("file not available => assuming {} is compatible".format(full_path))
             return True
+    else:
+        try:
+            process = subprocess.Popen(['ldd', full_path], stdout=subprocess.PIPE, env={str("LANG"): str("C")})
+            output = process.communicate()[0]
+            if six.PY3:
+                output = str(output)
+            if process.returncode == 0 and ' not found ' not in output:
+                pass
+            elif process.returncode == 1 and 'not a dynamic executable' in output:
+                pass
+            else:
+                return False
+        except OSError:
+            # TODO: Run an equivalent test on mac and on windows
+            if sys.platform.startswith("linux"):
+                ui.warning("ldd not available => assuming {} is runnable".format(full_path))
     return True
 
 

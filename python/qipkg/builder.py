@@ -249,6 +249,7 @@ class PMLBuilder(object):
         with_breakpad = kwargs.get('with_breakpad', False)
         python_minify = kwargs.get('python_minify', False)
         install_tc_packages = kwargs.get('install_tc_packages', False)
+        dump_exe = kwargs.get('dump_exe', None)
         strip = kwargs.get('strip', True)
         strip_exe = kwargs.get('strip_exe', None)
         strip_args = kwargs.get('strip_args', None)
@@ -291,6 +292,7 @@ class PMLBuilder(object):
                 symbols_archive = os.path.join(dirname, "{}-symbols.zip".format(self.pkg_name))
             qibuild.breakpad.gen_symbol_archive(base_dir=self.stage_path,
                                                 output=symbols_archive,
+                                                dump_exe=dump_exe,
                                                 strip=strip,
                                                 strip_exe=strip_exe,
                                                 strip_args=strip_args,
