@@ -43,7 +43,8 @@ def do(args):
     package_path = args.package_path
     legacy = False
     try:
-        if urlparse.urlparse(package_path).scheme:
+        if not os.path.isfile(package_path) and \
+           urlparse.urlparse(package_path).scheme:
             package_path = qisys.remote.download(package_path, ".")
         archive = zipfile.ZipFile(package_path, allowZip64=True)
         archive.read("package.xml")
