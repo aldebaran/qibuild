@@ -70,6 +70,10 @@ endfunction()
 #
 # Arguments are the same as :cmake:function:`qi_create_lib`
 function(qi_create_test_lib target_name)
+  if(NOT QI_WITH_TESTS)
+    return()
+  endif()
+
   qi_create_lib(${target_name} ${ARGN} NO_INSTALL)
 
   if(WIN32)
