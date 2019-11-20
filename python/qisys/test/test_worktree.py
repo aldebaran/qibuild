@@ -139,7 +139,7 @@ def test_check_subprojects_exist(tmpdir):
 """)
     with pytest.raises(qisys.worktree.WorkTreeError) as e:
         wt.add_project("a")
-    assert "invalid sub project" in str(e)
+    assert "invalid sub project" in str(e.value)
 
 
 def test_observers_are_notified(worktree):

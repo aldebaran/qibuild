@@ -55,7 +55,7 @@ class Svn(object):
         __rc, out = self.call("status", raises=False)
         for line in out.splitlines():
             line = line.strip()
-            filename = line[8:].encode("UTF-8")
+            filename = line[8:]
             if line.startswith("!"):
                 self.call("remove", filename)
             if line.startswith("?"):
