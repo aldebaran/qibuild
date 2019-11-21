@@ -9,6 +9,7 @@ from __future__ import print_function
 
 import os
 import subprocess
+import six
 
 import qisys.command
 from qisys import ui
@@ -56,14 +57,14 @@ class Svn(object):
         for line in out.splitlines():
             line = line.strip()
             filename = line[8:]
-            if line.startswith("!"):
+            if line.startswith(b"!"):
                 self.call("remove", filename)
-            if line.startswith("?"):
+            if line.startswith(b"?"):
                 self.call("add", filename)
             # Prevent 'Node has unexpectedly changed kind' error
             # when a file is replaced by a symlink.
             # see http://antoniolorusso.com/blog/2008/09/29/svn-entry-has-unexpectedly-changed-special-status/
-            if line.startswith("~"):
+            if line.startswith(b"~"):
                 full_path = os.path.join(self.path, filename)
                 if os.path.islink(full_path):
                     target = os.readlink(full_path)  # pylint:disable=no-member
