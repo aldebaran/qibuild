@@ -49,7 +49,7 @@ def test_make_package(qipkg_action, qipy_action):
     expected_paths = [
         "manifest.xml",
         "lib/libfoo.so",
-        "lib/python2.7/site-packages/b.py",
+        "lib/python/site-packages/b.py",
         "c_behavior/behavior.xar",
     ]
     for path in expected_paths:

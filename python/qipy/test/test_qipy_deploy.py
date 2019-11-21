@@ -15,4 +15,4 @@ def test_simple(qipy_action, tmpdir):
     url = get_ssh_url(tmpdir)
     qipy_action.add_test_project("a_lib")
     qipy_action("deploy", "a", "--url", url)
-    assert tmpdir.join("lib", "python2.7", "site-packages", "a.py").check(file=True)
+    assert tmpdir.join("lib", "python", "site-packages", "a.py").check(file=True)
