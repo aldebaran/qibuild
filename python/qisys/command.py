@@ -542,7 +542,7 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=False, build_conf
             # so always raise.
             raise Exception("Trying to run %s in non-existing %s" %
                             (" ".join(cmd), cwd))
-    ui.debug("Calling:", " ".join(cmd))
+    ui.debug("Calling:", " ".join([str(c) for c in cmd]))
     if env:
         env = dict(((str(key), str(val)) for key, val in env.items()))
     call_kwargs = {"env": env, "cwd": cwd}
