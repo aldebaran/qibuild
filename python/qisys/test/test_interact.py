@@ -14,8 +14,9 @@ import mock
 import qisys.interact
 from qisys.test.fake_interact import FakeInteract
 
-PATCHED_INPUT = "__builtin__.input"
-if six.PY2:
+if six.PY3:
+    PATCHED_INPUT = "builtins.input"
+else:
     PATCHED_INPUT = "__builtin__.raw_input"
 
 
