@@ -9,10 +9,12 @@ from __future__ import print_function
 
 import os
 import pytest
+import six
 
 import qipy.parsers
 
 
+@pytest.mark.skipif(six.PY3, reason="Only testable with python 2.7")
 def test_simple(qipy_action, args):
     """ Test Simple """
     # ipython 5 is the last version compatible with Python 2.7
