@@ -10,6 +10,7 @@ from __future__ import print_function
 import io
 import copy
 import functools
+import collections
 import six
 
 import qisys.sh
@@ -138,7 +139,7 @@ Found two projects sharing the same sources:
                 groups = [default_group.name]
             else:
                 return self.repos
-        repos = dict()
+        repos = collections.OrderedDict()
         for group in groups:
             try:
                 project_names = self.groups.projects(group)
