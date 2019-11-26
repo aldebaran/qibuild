@@ -10,6 +10,7 @@ from __future__ import print_function
 import io
 import copy
 import functools
+import six
 
 import qisys.sh
 import qisys.qixml
@@ -151,7 +152,12 @@ Found two projects sharing the same sources:
                     raise ManifestError("""When reading group {0}:
 No such project: {1}
 """.format(group, project_name))
-        return repos.values()
+        values = list()
+        if six.PY3:
+            values = list(repos.values())
+        else:
+            values = repos.values()
+        return values
 
     def get_repo(self, project):
         """ Get a repository given the project name (foo/bar.git) """
