@@ -32,7 +32,7 @@ def check_ssh_connection():
 
 def get_ssh_url(tmpdir):
     """ Get Ssh Url """
-    username = os.environ.get("LOGNAME")
+    username = os.environ.get("LOGNAME", os.environ.get("USER", "opennao"))
     url = "%s@localhost:%s" % (username, tmpdir.strpath)
     return url
 
