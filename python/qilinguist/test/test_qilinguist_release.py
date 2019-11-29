@@ -83,4 +83,4 @@ def test_invalid_po_file(qilinguist_action):
     with open(fr_FR_po, "a") as fp:
         fp.write("""\n#: broken\nsyntax-error\n""")
     error = qilinguist_action("release", "translate", raises=True)
-    assert "failed" in error
+    assert "failed" in str(error)

@@ -39,7 +39,7 @@ def do(args):
     target = qisys.qixml.parse_required_attr(root, "target")
     parts = [name, target, version]
     archive_name = "-".join(parts) + ".zip"
-    output = os.path.join(output, archive_name.encode())
+    output = os.path.join(output, archive_name)
     res = qisys.archive.compress(input_directory, flat=True, output=output)
     ui.info(ui.green, "Package generated in", res)
     return res
