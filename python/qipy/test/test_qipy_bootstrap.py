@@ -8,11 +8,14 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 import os
+import pytest
+import six
 
 import qisys.sh
 from qibuild.test.conftest import qibuild_action
 
 
+@pytest.mark.skipif(six.PY3, reason="Only testable with python 2.7")
 def test_simple(qipy_action):
     """ Test Simple """
     _a_project = qipy_action.add_test_project("a_lib")
@@ -23,6 +26,7 @@ def test_simple(qipy_action):
     qipy_action("run", "--no-exec", "--", "python", "-m", "foo.bar.baz")
 
 
+@pytest.mark.skipif(six.PY3, reason="Only testable with python 2.7")
 def test_cpp(qipy_action, qibuild_action):
     """ Test Cpp """
     qipy_action.add_test_project("c_swig")
@@ -33,6 +37,7 @@ def test_cpp(qipy_action, qibuild_action):
     qipy_action("run", "--no-exec", "--", "python", "-c", "import eggs")
 
 
+@pytest.mark.skipif(six.PY3, reason="Only testable with python 2.7")
 def test_with_deps(qipy_action):
     """ Test With Deps """
     qipy_action.add_test_project("with_deps")
@@ -41,6 +46,7 @@ def test_with_deps(qipy_action):
     qipy_action("run", "--no-exec", "--", "python", "-c", "import markdown")
 
 
+@pytest.mark.skipif(six.PY3, reason="Only testable with python 2.7")
 def test_with_distutils(qipy_action):
     """ Test With DistUtils """
     qipy_action.add_test_project("with_distutils")
@@ -49,6 +55,7 @@ def test_with_distutils(qipy_action):
     qipy_action("run", "--no-exec", "foo")
 
 
+@pytest.mark.skipif(six.PY3, reason="Only testable with python 2.7")
 def test_qimodule(qipy_action):
     """ Test QiModule """
     qipy_action.add_test_project("foomodules")
