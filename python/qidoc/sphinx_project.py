@@ -9,6 +9,7 @@ from __future__ import print_function
 
 import os
 import sys
+import six
 
 import qidoc.project
 import qisys.sh
@@ -59,7 +60,10 @@ class SphinxProject(qidoc.project.DocProject):
         from_conf = dict()
         try:
             # quick hack if conf.in.py used __file__
-            from_conf[b"__file__"] = in_conf_py.encode("utf-8")
+            if six.PY3:
+                from_conf["__file__"] = in_conf_py
+            else:
+                from_conf[b"__file__"] = in_conf_py.encode("utf-8")
             exec(conf, from_conf)
             conf = conf.replace("__file__", 'r"%s"' % in_conf_py)
         except Exception as e:
