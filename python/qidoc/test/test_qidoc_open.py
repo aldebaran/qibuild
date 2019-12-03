@@ -9,6 +9,7 @@ from __future__ import print_function
 
 import os
 import mock
+import six
 
 
 def test_simple(qidoc_action):
@@ -35,5 +36,9 @@ def test_open_translated(qidoc_action):
         qidoc_action("open", "translateme", "--language", "fr")
         index_html = mock_open.call_args[0][0]
         assert os.path.exists(index_html)
-        with open(index_html, "r") as fp:
-            assert "Cette page" in fp.read().decode("utf-8")
+        if six.PY3:
+            with open(index_html, "r", encoding='utf-8') as fp:
+                assert "Cette page" in fp.read()
+        else:
+            with open(index_html, "r") as fp:
+                assert "Cette page" in fp.read().decode('utf-8')
