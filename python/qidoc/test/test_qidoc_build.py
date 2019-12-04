@@ -9,6 +9,7 @@ from __future__ import print_function
 
 import os
 import mock
+import six
 
 
 def test_simple_build(qidoc_action):
@@ -25,17 +26,24 @@ def test_translated_project(qidoc_action):
     expected_index_html = os.path.join(translateme_proj.path,
                                        "build-doc", "html", "en", "index.html")
     assert os.path.exists(expected_index_html)
-    with open(expected_index_html, "r") as fp:
-        contents = fp.read().decode("utf-8")
-        assert "This Page" in contents
+    if six.PY3:
+        with open(expected_index_html, "r", encoding='utf-8') as fp:
+            assert "This Page" in fp.read()
+    else:
+        with open(expected_index_html, "r") as fp:
+            assert "This Page" in fp.read().decode("utf-8")
+
     # should build the french version
     qidoc_action("build", "translateme", "--language", "fr")
     expected_index_html = os.path.join(translateme_proj.path,
                                        "build-doc", "html", "fr", "index.html")
     assert os.path.exists(expected_index_html)
-    with open(expected_index_html, "r") as fp:
-        contents = fp.read().decode("utf-8")
-        assert "Cette page" in contents
+    if six.PY3:
+        with open(expected_index_html, "r", encoding='utf-8') as fp:
+            assert "Cette page" in fp.read()
+    else:
+        with open(expected_index_html, "r") as fp:
+            assert "Cette page" in fp.read().decode("utf-8")
 
 
 def write_french_po(proj_path):
@@ -80,9 +88,12 @@ def test_full_translation_workflow(qidoc_action):
     expected_index_html = os.path.join(translateme_proj.path,
                                        "build-doc", "html", "fr", "index.html")
     assert os.path.exists(expected_index_html)
-    with open(expected_index_html, "r") as fp:
-        contents = fp.read().decode("utf-8")
-        assert "Bienvenue" in contents
+    if six.PY3:
+        with open(expected_index_html, "r", encoding='utf-8') as fp:
+            assert "Bienvenue" in fp.read()
+    else:
+        with open(expected_index_html, "r") as fp:
+            assert "Bienvenue" in fp.read().decode("utf-8")
 
 
 def test_language_not_in_qiproject(qidoc_action):
@@ -109,9 +120,12 @@ def test_breathe(qidoc_action):
     world_breathe = qidoc_action.add_test_project("world-breathe")
     qidoc_action("build", "world-breathe")
     index_html = os.path.join(world_breathe.html_dir, "index.html")
-    with open(index_html, "r") as fp:
-        contents = fp.read().decode("utf-8")
-    assert "the answer" in contents
+    if six.PY3:
+        with open(index_html, "r", encoding='utf-8') as fp:
+            assert "the answer" in fp.read()
+    else:
+        with open(index_html, "r") as fp:
+            assert "the answer" in fp.read().decode("utf-8")
 
 
 def test_missing_deps(qidoc_action):
