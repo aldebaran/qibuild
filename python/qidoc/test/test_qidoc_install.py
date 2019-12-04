@@ -20,7 +20,7 @@ def test_install_translated(qidoc_action, tmpdir):
     write_french_po(translateme_proj.path)
     qidoc_action("install", "translateme", tmpdir.strpath, "--language", "fr")
     index_html = tmpdir.join("index.html")
-    assert "Bienvenue" in index_html.read().decode("utf-8")
+    assert "Bienvenue" in index_html.read_text("utf-8")
 
 
 def test_cleans_install_dir(qidoc_action, tmpdir):
