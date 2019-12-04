@@ -70,4 +70,3 @@ function(qi_error)
   #use "" to force the use of ; when displaying list
   message(FATAL_ERROR "")
 endfunction()
-

@@ -6,7 +6,6 @@ misc
 ----
 
 * Fix unicode support in python3.
-* GCC flag -fPIE must be defined in the toolchain and is not set by qibuild.
 * Disable test_gdb when testing on gitlab runner (qibuild miss a compatible runner).
 
 qisrc
@@ -32,6 +31,8 @@ qibuild
 -------
 
 * Patch swig/python.cmake to prevent fail if swig is not found when configuring.
+* Add an option (QI_WITH_HARDENING) to enable compiler flags for code hardening.
+* GCC flag -fPIE must be defined in the toolchain and is not set by qibuild (except with hardening flags).
 * Update the way librairies are found by find_libs.
 
 qilinguist

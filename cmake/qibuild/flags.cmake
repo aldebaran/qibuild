@@ -103,6 +103,13 @@ if (QI_FORCE_32_BITS)
   _qi_add_flags(CMAKE_CXX_FLAGS "-m32")
 endif()
 
+if(QI_WITH_HARDENING)
+  qi_info("Enabling hardening")
+  set(hardening_flags "-pie -fPIE -Wl,-z,relro,-z,now -Wformat -Wformat-security -Werror=format-security -fstack-protector-strong")
+  _qi_add_flags(CMAKE_C_FLAGS ${hardening_flags})
+  _qi_add_flags(CMAKE_CXX_FLAGS ${hardening_flags})
+endif()
+
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
   if(NOT QI_WITH_DEBUG_INFO)
     # This makes it possible to remove warnings about missing .pdb
@@ -123,4 +130,10 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
       _qi_add_flags(CMAKE_CXX_FLAGS "-g -ggdb -gdwarf-2")
     endif()
   endif()
+
+  if(QI_WITH_HARDENING)
+    qi_verbose("Add hardening definition")
+    add_definitions("-D_FORTIFY_SOURCE=2")
+  endif()
+
 endif()
