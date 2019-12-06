@@ -10,6 +10,7 @@ from __future__ import print_function
 import io
 import unittest
 import mock
+import six
 
 import qibuild.actions.open
 
@@ -50,9 +51,8 @@ class OpenTestCase(unittest.TestCase):
         except Exception as e:
             error = e
         self.assertFalse(error is None)
-        self.assertFalse("Could not find any IDE in configuration" in
-                         error.message)
-        self.assertTrue("`qibuild open` only supports" in error.message)
+        self.assertFalse("Could not find any IDE in configuration" in str(error))
+        self.assertTrue("`qibuild open` only supports" in str(error))
 
     def test_two_ides(self):
         """ Test Two IDEs """
@@ -71,7 +71,9 @@ class OpenTestCase(unittest.TestCase):
         call_args_list = self.ask_mock.call_args_list
         self.assertEqual(len(call_args_list), 1)
         (choices, _question) = call_args_list[0][0]
-        self.assertEqual(choices, ['Visual Studio', 'QtCreator'])
+        self.assertEqual(len(choices), 2)
+        self.assertIn('Visual Studio', choices)
+        self.assertIn('QtCreator', choices)
 
     def test_two_ides_matching_default_conf(self):
         """ Test Two IDEs Matching Default Conf """
