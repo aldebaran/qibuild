@@ -203,7 +203,10 @@ class TestWorker(threading.Thread):
     def message_for_exception(exception):
         """ Message For Exception """
         tb = sys.exc_info()[2]
-        iostr = io.StringIO()
+        if six.PY3:
+            iostr = io.StringIO()
+        else:
+            iostr = io.BytesIO()
         traceback.print_tb(tb, file=iostr)
         return (ui.red, "Python exception during tests:\n",
                 exception.__class__.__name__,
