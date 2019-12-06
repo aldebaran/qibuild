@@ -373,5 +373,5 @@ def test_virtualenv_path(qipy_action, qibuild_action):
     qipy_action("bootstrap", "pip", "virtualenv", "ipython<=5")
     py_test = os.path.join(py_proj.sdk_directory, "bin", "py_test")
     output = subprocess.check_output([py_test]).strip()
-    bin_python = os.path.join(output, "bin", "python")
+    bin_python = os.path.join(str(output), "bin", "python")
     assert os.path.exists(bin_python)
