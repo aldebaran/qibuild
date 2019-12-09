@@ -11,6 +11,7 @@ import os
 import sys
 import platform
 import xml.etree.ElementTree as etree
+import six
 
 import qisys.worktree
 import qibuild.worktree
@@ -47,7 +48,7 @@ def test_various_outcomes(qibuild_action, record_messages):
     assert "spam.xml" in os.listdir(result_dir)
     result = os.path.join(result_dir, "spam.xml")
     with open(result, "r") as f:
-        assert len(f.read()) < 17000
+        assert len(f.read()) < 18000
     if qisys.command.find_program("valgrind"):
         # Test one file descriptor leak with --valgrind
         record_messages.reset()
@@ -71,7 +72,10 @@ def test_various_outcomes(qibuild_action, record_messages):
     if sys.platform.startswith("win"):
         assert "flag" in content.decode("ascii")
     else:
-        assert "flag" in content.decode("utf-8")
+        if six.PY3:
+            assert "flag" in content
+        else:
+            assert "flag" in content.decode("utf-8")
 
 
 def get_result_dir():
