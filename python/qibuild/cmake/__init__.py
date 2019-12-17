@@ -42,7 +42,7 @@ Please install it if necessary and re-run `qibuild config --wizard`\
         # handle lines like that:
         # Generator = "blalblalba"
         #       files.
-        if six.PY3:
+        if isinstance(line, bytes):
             line = line.decode()
         if len(line) >= 3:
             if line[2] == ' ' and "=" not in line:
