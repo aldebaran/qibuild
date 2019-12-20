@@ -13,6 +13,7 @@ from __future__ import print_function
 import os
 import io
 import unittest
+import six
 
 import qibuild
 import qibuild.config
@@ -20,7 +21,12 @@ import qibuild.config
 
 def cfg_from_string(input_str, user_config=None):
     """ Config From String """
-    cfg_loc = io.BytesIO(input_str.encode("utf-8"))
+    if six.PY3:
+        if isinstance(input_str, str):
+            input_str = input_str.encode()
+        cfg_loc = io.BytesIO(input_str)
+    else:
+        cfg_loc = io.BytesIO(input_str.encode("utf-8"))
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read(cfg_loc)
     if user_config:
@@ -105,7 +111,12 @@ class QiBuildConfig(unittest.TestCase):
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml)
-        qibuild_cfg.read_local_config(io.BytesIO(local_xml.encode("utf-8")))
+        if six.PY3:
+            if isinstance(local_xml, str):
+                local_xml = local_xml.encode()
+            qibuild_cfg.read_local_config(io.BytesIO(local_xml))
+        else:
+            qibuild_cfg.read_local_config(io.BytesIO(local_xml.encode("utf-8")))
         self.assertEquals(qibuild_cfg.local.defaults.config, "linux32")
         self.assertEquals(qibuild_cfg.env.path, "/path/to/swig32")
 
@@ -127,7 +138,12 @@ class QiBuildConfig(unittest.TestCase):
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml, user_config="linux64")
-        qibuild_cfg.read_local_config(io.BytesIO(local_xml.encode("utf-8")))
+        if six.PY3:
+            if isinstance(local_xml, str):
+                local_xml = local_xml.encode()
+            qibuild_cfg.read_local_config(io.BytesIO(local_xml))
+        else:
+            qibuild_cfg.read_local_config(io.BytesIO(local_xml.encode("utf-8")))
         self.assertEquals(qibuild_cfg.local.defaults.config, "linux32")
         self.assertEquals(qibuild_cfg.env.path, "/path/to/swig32")
 
@@ -251,7 +267,12 @@ class QiBuildConfig(unittest.TestCase):
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml)
-        qibuild_cfg.read_local_config(io.BytesIO(local_xml.encode("utf-8")))
+        if six.PY3:
+            if isinstance(local_xml, str):
+                local_xml = local_xml.encode()
+            qibuild_cfg.read_local_config(io.BytesIO(local_xml))
+        else:
+            qibuild_cfg.read_local_config(io.BytesIO(local_xml.encode("utf-8")))
         self.assertEquals(qibuild_cfg.cmake.generator, "Unix Makefiles")
         qibuild_cfg.set_default_config("win32-vs2010")
         local_xml = local_cfg_to_string(qibuild_cfg)
@@ -353,7 +374,12 @@ class QiBuildConfig(unittest.TestCase):
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml)
-        qibuild_cfg.read_local_config(io.BytesIO(local_xml.encode("utf-8")))
+        if six.PY3:
+            if isinstance(local_xml, str):
+                local_xml = local_xml.encode()
+            qibuild_cfg.read_local_config(io.BytesIO(local_xml))
+        else:
+            qibuild_cfg.read_local_config(io.BytesIO(local_xml.encode("utf-8")))
         self.assertEqual(qibuild_cfg.local.build.sdk_dir, "/path/to/sdk")
         self.assertEqual(qibuild_cfg.local.build.prefix, "/path/to/build")
 
