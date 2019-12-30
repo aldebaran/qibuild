@@ -157,7 +157,10 @@ def test_git_version(qibuild_action):
     testversion = qibuild.find.find_bin([proj.sdk_directory], "testversion")
     process = subprocess.Popen(testversion, stdout=subprocess.PIPE)
     out, _ = process.communicate()
-    assert out.strip() == "v0.1"
+    if isinstance(out, str):
+        assert out.strip() == "v0.1"
+    if isinstance(out, bytes):
+        assert out.strip() == "v0.1".encode()
 
 
 def test_submodule(qibuild_action):
