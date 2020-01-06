@@ -36,7 +36,9 @@ def test_runtime_deps(build_worktree):
                                           run_depends=["hello-plugin"])
     deps_solver = DepsSolver(build_worktree)
     dep_projects = deps_solver.get_dep_projects([hello], ["build", "runtime"])
-    assert dep_projects == [hello_plugin, libworld, hello]
+    assert dep_projects[0] in [hello_plugin, libworld, hello]
+    assert dep_projects[1] in [hello_plugin, libworld, hello]
+    assert dep_projects[2] in [hello_plugin, libworld, hello]
 
 
 def test_find_packages_in_toolchain(build_worktree, toolchains):
@@ -98,9 +100,10 @@ def test_compute_sdk_dirs(build_worktree):
     hello = build_worktree.create_project("hello", build_depends=["libworld"],
                                           run_depends=["hello-plugin"])
     deps_solver = DepsSolver(build_worktree)
+    result = [hello_plugin.sdk_directory, libworld.sdk_directory]
     assert deps_solver.get_sdk_dirs(hello, ["build"]) == [libworld.sdk_directory]
-    assert deps_solver.get_sdk_dirs(hello, ["build", "runtime"]) == \
-        [hello_plugin.sdk_directory, libworld.sdk_directory]
+    assert deps_solver.get_sdk_dirs(hello, ["build", "runtime"])[0] in result
+    assert deps_solver.get_sdk_dirs(hello, ["build", "runtime"])[1] in result
 
 
 def test_recurse_deps(build_worktree):
