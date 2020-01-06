@@ -203,10 +203,16 @@ class CommandFailedException(Exception):
         mess = mess.format(cmd=self.cmd, returncode=self.returncode, cwd=self.cwd)
         if self.stdout:
             mess += "Stdout: \n"
-            mess = "\n".join("    " + line for line in self.stderr.decode().split("\n"))
+            if isinstance(self.stdout, bytes):
+                mess = "\n".join("    " + line for line in self.stdout.decode().split("\n"))
+            if isinstance(self.stdout, str):
+                mess = "\n".join("    " + line for line in self.stdout.split("\n"))
         if self.stderr:
             mess += "Stderr: \n"
-            mess = "\n".join("    " + line for line in self.stderr.decode().split("\n"))
+            if isinstance(self.stderr, bytes):
+                mess = "\n".join("    " + line for line in self.stderr.decode().split("\n"))
+            if isinstance(self.stderr, str):
+                mess = "\n".join("    " + line for line in self.stderr.split("\n"))
         return mess
 
 
