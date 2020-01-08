@@ -387,8 +387,11 @@ def _is_runnable(full_path, build_config=None):
     """
     if not full_path:
         return False
-    if platform.architecture(full_path)[0] != platform.architecture(sys.executable)[0]:
-        return False
+    try:
+        if platform.architecture(full_path)[0] != platform.architecture(sys.executable)[0]:
+            return False
+    except Exception:
+        pass
 
     # if a build config is set then we will check for file format
     if build_config:
