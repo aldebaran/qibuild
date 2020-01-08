@@ -7,6 +7,8 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 from __future__ import print_function
 
+import six
+
 import qisys.sort
 from qisys.qixml import etree
 
@@ -79,7 +81,10 @@ class DepsSolver(object):
             host_deps = host_deps.union(project.host_depends)
         host_projects = [self.build_worktree.get_build_project(x, raises=False)
                          for x in host_deps]
-        host_projects = filter(None, host_projects)
+        if six.PY3:
+            host_projects = list(filter(None, host_projects))
+        else:
+            host_projects = filter(None, host_projects)
         return host_projects
 
     def _get_sorted_names(self, projects, dep_types, reverse=False):
