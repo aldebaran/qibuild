@@ -58,7 +58,7 @@ def split_debug(src, objcopy=None, objdump=None):
             qisys.command.check_output(cmd, stderr=subprocess.STDOUT)
         ui.info("-- Debug info extracted for", src)
     except qisys.command.CommandFailedException as e:
-        ui.error("Error while extracting debug for %s" % src)
+        ui.error("Error while Extracting package debug for %s" % src)
         ui.error(str(e))
     # After the commands have run, utime of the file has changed, causing
     # cmake to re-install the libraries. Which is not cool ...
