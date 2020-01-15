@@ -1,4 +1,4 @@
-# Copyright (c) 2018 SoftBank Robotics. All rights reserved.
+# Copyright (c) 2020 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
 """ Update a package by replacing python source files by their byte-code equivalent """

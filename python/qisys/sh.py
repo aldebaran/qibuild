@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2012-2019 SoftBank Robotics. All rights reserved.
+# Copyright (c) 2012-2020 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license (see the COPYING file).
 """ Common filesystem operations """
 from __future__ import absolute_import
@@ -141,11 +141,11 @@ def configure_file__legacy(in_path, out_path, copy_only=False,
     If not, we will use the args and kwargs parameter as in::
         in_content.format(*args, **kwargs)
     """
-    # This function seems to be never called, and has been renamed with __legacy suffix (2018-02-07)
+    # This function seems to be never called, and has been renamed with __legacy suffix (2020-02-07)
     # If nobody complains, remove this function in the next release
     warnings.warn(
         "Deprecated function: "
-        "This function seems to be never called, and has been renamed with __legacy suffix (2018-02-07)\n"
+        "This function seems to be never called, and has been renamed with __legacy suffix (2020-02-07)\n"
         "If nobody complains, remove this function in the next release, else, deals with its bad args/kwargs signature",
         DeprecationWarning)
     mkdir(os.path.dirname(os.path.abspath(out_path)), recursive=True)

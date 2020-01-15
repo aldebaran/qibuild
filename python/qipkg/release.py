@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2012-2019 SoftBank Robotics. All rights reserved.
+# Copyright (c) 2012-2020 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license (see the COPYING file).
 """ Update a package by replacing python source files by their byte-code equivalent """
 from __future__ import absolute_import
