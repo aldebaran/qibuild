@@ -43,7 +43,7 @@ def parse_cmake_log(input_file, qibuild_dir):
             profile[filename][line_no] += 1
     dirname = os.path.dirname(input_file)
     profile_pickle = os.path.join(dirname, "profile.pickle")
-    with open(profile_pickle, "w") as fp:
+    with open(profile_pickle, "wb") as fp:
         pickle.dump(profile, fp)
     return profile
 

@@ -203,10 +203,16 @@ class CommandFailedException(Exception):
         mess = mess.format(cmd=self.cmd, returncode=self.returncode, cwd=self.cwd)
         if self.stdout:
             mess += "Stdout: \n"
-            mess = "\n".join("    " + line for line in self.stdout.split("\n"))
+            if isinstance(self.stdout, bytes):
+                mess = "\n".join("    " + line for line in self.stdout.decode().split("\n"))
+            if isinstance(self.stdout, str):
+                mess = "\n".join("    " + line for line in self.stdout.split("\n"))
         if self.stderr:
             mess += "Stderr: \n"
-            mess = "\n".join("    " + line for line in self.stderr.split("\n"))
+            if isinstance(self.stderr, bytes):
+                mess = "\n".join("    " + line for line in self.stderr.decode().split("\n"))
+            if isinstance(self.stderr, str):
+                mess = "\n".join("    " + line for line in self.stderr.split("\n"))
         return mess
 
 
@@ -381,8 +387,11 @@ def _is_runnable(full_path, build_config=None):
     """
     if not full_path:
         return False
-    if platform.architecture(full_path)[0] != platform.architecture(sys.executable)[0]:
-        return False
+    try:
+        if platform.architecture(full_path)[0] != platform.architecture(sys.executable)[0]:
+            return False
+    except Exception:
+        pass
 
     # if a build config is set then we will check for file format
     if build_config:
@@ -542,7 +551,7 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=False, build_conf
             # so always raise.
             raise Exception("Trying to run %s in non-existing %s" %
                             (" ".join(cmd), cwd))
-    ui.debug("Calling:", " ".join(cmd))
+    ui.debug("Calling:", " ".join([str(c) for c in cmd]))
     if env:
         env = dict(((str(key), str(val)) for key, val in env.items()))
     call_kwargs = {"env": env, "cwd": cwd}

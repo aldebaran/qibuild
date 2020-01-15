@@ -25,7 +25,7 @@ def test_using_dash_c(toolchains, args):
     args.config = "baz"
     with pytest.raises(Exception) as e:
         qitoolchain.parsers.get_toolchain(args)
-    assert "config baz has no toolchain" in e.value.message
+    assert "config baz has no toolchain" in str(e)
 
 
 def test_using_defaut_config(toolchains, args, build_worktree):

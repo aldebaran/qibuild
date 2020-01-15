@@ -126,7 +126,7 @@ def test_nothing_to_test(args, cd_to_tmpdir):
     """ Test Nothing To Test """
     with pytest.raises(Exception) as e:
         qitest.parsers.get_test_runners(args)
-    assert e.value.message == "Nothing found to test"
+    assert "Nothing found to test" in str(e)
 
 
 def test_coverage_in_build_worktree(args, build_worktree, monkeypatch):

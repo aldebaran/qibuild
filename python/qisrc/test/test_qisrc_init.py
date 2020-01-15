@@ -180,7 +180,7 @@ def test_manifest_branch_does_not_exist(qisrc_action, git_server):
     _manifest_url = git_server.manifest_url
     with pytest.raises(Exception) as e:
         qisrc_action("init", git_server.manifest_url, "--branch", "devel")
-    assert "origin/devel" in e.value.message
+    assert "origin/devel" in str(e.value)
 
 
 def test_relative_path(qisrc_action, tmpdir):

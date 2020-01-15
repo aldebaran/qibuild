@@ -51,7 +51,7 @@ def test_check_root_cmake_no_cmake_minimum_required(tmpdir):
     cmake_list.write("""\nproject(foo)\nfind_package(qibuild)\n""")
     with pytest.raises(qibuild.cmake.IncorrectCMakeLists) as e:
         qibuild.cmake.check_root_cmake_list(cmake_list.strpath)
-    assert "Missing call to cmake_minimum_required" in e.value.message
+    assert "Missing call to cmake_minimum_required" in str(e.value)
 
 
 def test_check_root_cmake_find_package_before_project(tmpdir):
@@ -64,7 +64,7 @@ project(foo)
 """)
     with pytest.raises(qibuild.cmake.IncorrectCMakeLists) as e:
         qibuild.cmake.check_root_cmake_list(cmake_list.strpath)
-    assert "The call to find_package(qibuild) should be AFTER" in e.value.message
+    assert "The call to find_package(qibuild) should be AFTER" in str(e.value)
 
 
 def test_check_root_cmake_no_project(tmpdir):
@@ -73,7 +73,7 @@ def test_check_root_cmake_no_project(tmpdir):
     cmake_list.write("""\ncmake_minimum_required(VERSION 2.8)\nfind_package(qibuild)\n""")
     with pytest.raises(qibuild.cmake.IncorrectCMakeLists) as e:
         qibuild.cmake.check_root_cmake_list(cmake_list.strpath)
-    assert "Missing call to project()" in e.value.message
+    assert "Missing call to project()" in str(e.value)
 
 
 def test_get_known_generators():

@@ -12,6 +12,7 @@ import re
 import sys
 import datetime
 import multiprocessing
+import six
 
 import qibuild
 import qitest.conf
@@ -304,22 +305,27 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
     @staticmethod
     def _write_xml(res, test, out_xml):
         """ Make sure a Junit XML compatible file is written. """
-        # Arbitrary limit output (~700 lines) to prevent from crashing on read
-        res.out = res.out[-16384:]
-        res.out = re.sub('\x1b[^m]*m', "", res.out)
-        message_as_string = " ".join(str(x) for x in res.message
-                                     if not isinstance(x, ui._Color))
         # Windows output is most likely code page 850
         # TODO: I need to check that, at least on Win 10
         if sys.platform.startswith("win"):
             encoding = "ascii"
         else:
             encoding = "UTF-8"
-        try:
-            res.out = res.out.decode(encoding, "ignore")
-            message_as_string = message_as_string.decode(encoding, "ignore")
-        except UnicodeDecodeError:
-            pass
+
+        # Arbitrary limit output (~700 lines) to prevent from crashing on read
+        res.out = res.out[-16384:]
+        if six.PY3:
+            res.out = re.sub(r'\x1b[^m]*m', "", str(res.out))
+            message_as_string = " ".join(str(x) for x in res.message if not isinstance(x, ui._Color))
+        else:
+            res.out = re.sub('\x1b[^m]*m', "", res.out)
+            message_as_string = " ".join(str(x) for x in res.message if not isinstance(x, ui._Color))
+            try:
+                res.out = res.out.decode(encoding, "ignore")
+                message_as_string = message_as_string.decode(encoding, "ignore")
+            except UnicodeDecodeError:
+                pass
+
         # Make sure there are no invalid data in the XML
         res.out = qisys.qixml.sanitize_xml(res.out)
         if res.ok:

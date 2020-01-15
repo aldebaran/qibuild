@@ -80,6 +80,6 @@ def generate_qm_file(input_file, output):
     ui.info(out.strip())
     if process.returncode != 0:
         return False, "lrelease failed"
-    if "untranslated" in out:
+    if "untranslated" in out.decode():
         return False, "untranslated messages were found"
     return True, ""

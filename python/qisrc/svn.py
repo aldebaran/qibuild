@@ -9,6 +9,7 @@ from __future__ import print_function
 
 import os
 import subprocess
+import six
 
 import qisys.command
 from qisys import ui
@@ -19,13 +20,13 @@ class Svn(object):
 
     def __init__(self, path):
         """ Svn Init """
-        self.path = path
+        self.path = path.encode('ascii')
 
     def call(self, *args, **kwargs):
         """ Call """
         if "cwd" not in kwargs.keys():
             kwargs["cwd"] = self.path
-        ui.debug("svn", " ".join(args), "in", kwargs["cwd"])
+        ui.debug("svn", " ".join([str(a) for a in args]), "in", kwargs["cwd"])
         if "quiet" not in kwargs.keys():
             kwargs["quiet"] = False
         svn = qisys.command.find_program("svn", raises=True)
@@ -41,7 +42,7 @@ class Svn(object):
                                        **kwargs)
             out = process.communicate()[0]
             # Don't want useless blank lines
-            out = out.rstrip("\n")
+            out = out.rstrip('\n'.encode('ascii'))
             ui.debug("out:", out)
             return process.returncode, out
         else:
@@ -56,14 +57,14 @@ class Svn(object):
         for line in out.splitlines():
             line = line.strip()
             filename = line[8:]
-            if line.startswith("!"):
+            if line.startswith(b"!"):
                 self.call("remove", filename)
-            if line.startswith("?"):
+            if line.startswith(b"?"):
                 self.call("add", filename)
             # Prevent 'Node has unexpectedly changed kind' error
             # when a file is replaced by a symlink.
             # see http://antoniolorusso.com/blog/2008/09/29/svn-entry-has-unexpectedly-changed-special-status/
-            if line.startswith("~"):
+            if line.startswith(b"~"):
                 full_path = os.path.join(self.path, filename)
                 if os.path.islink(full_path):
                     target = os.readlink(full_path)  # pylint:disable=no-member

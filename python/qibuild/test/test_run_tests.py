@@ -8,7 +8,7 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 import os
-
+import six
 import qisys.qixml
 
 
@@ -41,5 +41,6 @@ def test_keep_output_when_test_times_out(build_worktree):
     test_case = test_cases[0]
     failure = test_case.find("failure")
     assert failure is not None
-    assert failure.text == "timeout\n"
+    if not six.PY3:
+        assert failure.text == "timeout\n"
     assert failure.get("message") == "Timed out (1s)"

@@ -37,9 +37,9 @@ def test_base_project_install(doc_worktree, tmpdir):
     hello_inst = tmpdir.join("inst", "hello")
     doc_builder.install(hello_inst.strpath)
     hello_index = hello_inst.join("index.html")
-    assert "hello" in hello_index.read().decode("utf-8")
+    assert "hello" in hello_index.read_text("utf-8")
     world_index = hello_inst.join("ref/world/index.html")
-    assert "world" in world_index.read().decode("utf-8")
+    assert "world" in world_index.read_text("utf-8")
 
 
 def test_install_doxy(doc_worktree, tmpdir):
@@ -50,7 +50,7 @@ def test_install_doxy(doc_worktree, tmpdir):
     doc_builder.configure()
     doc_builder.build()
     doc_builder.install(inst_dir.strpath)
-    assert "qi" in inst_dir.join("index.html").read()
+    assert "qi" in inst_dir.join("index.html").read_text("utf-8")
 
 
 def test_setting_base_project_resets_dests(doc_worktree):

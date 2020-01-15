@@ -78,7 +78,7 @@ class Git(object):
         if "raises" in kwargs:
             del kwargs["raises"]
         env = os.environ.copy()
-        for key in env.keys():
+        for key in os.environ.keys():
             if key.startswith("GIT_"):
                 del env[key]
         env_str = {}

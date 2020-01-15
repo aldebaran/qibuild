@@ -48,8 +48,8 @@ def test_normal_debug(qibuild_action):
     qibuild_action("configure", "debugme")
     qibuild_action("make", "debugme")
     (out, _) = run_gdb(proj.sdk_directory)
-    assert "in foo () at " in out
-    assert "main.cpp" in out
+    assert "in foo () at " in out.decode()
+    assert "main.cpp" in out.decode()
 
 
 @pytest.mark.skipif(os.environ.get("LOGNAME") == "gitlab-runner", reason="does not work on the new runner")
@@ -62,8 +62,8 @@ def test_split_debug(qibuild_action):
     qibuild_action("make", "debugme")
     qibuild.gdb.split_debug(os.path.join(proj.sdk_directory, "bin", "debugme"))
     (out, _) = run_gdb(proj.sdk_directory)
-    assert "in foo () at " in out
-    assert "main.cpp" in out
+    assert "in foo () at " in out.decode()
+    assert "main.cpp" in out.decode()
 
 
 @pytest.mark.skipif(os.environ.get("LOGNAME") == "gitlab-runner", reason="does not work on the new runner")
@@ -77,8 +77,8 @@ def test_split_debug_install(qibuild_action, tmpdir):
     qibuild_action("make", "debugme")
     qibuild_action("install", "--runtime", "--split-debug", "debugme", tmpdir)
     (out, _) = run_gdb(tmpdir)
-    assert "in foo () at " in out
-    assert "main.cpp" in out
+    assert "in foo () at " in out.decode()
+    assert "main.cpp" in out.decode()
 
 
 @pytest.mark.skipif(os.environ.get("LOGNAME") == "gitlab-runner", reason="does not work on the new runner")

@@ -11,6 +11,7 @@ import os
 import py
 import bs4
 import pytest
+import six
 
 import qidoc.worktree
 import qisys.qixml
@@ -110,8 +111,12 @@ class QiDocAction(TestAction):
 
 def find_link(html_path, text):
     """ Find Link """
-    with open(html_path, "r") as fp:
-        data = fp.read()
+    if six.PY3:
+        with open(html_path, "r", encoding='utf-8') as fp:
+            data = fp.read()
+    else:
+        with open(html_path, "r") as fp:
+            data = fp.read()
     soup = bs4.BeautifulSoup(data, "html.parser")
     link = soup.find("a", text=text)
     target = link.attrs["href"]

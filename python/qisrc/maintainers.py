@@ -104,10 +104,6 @@ def clear(project):
 
 def add(project, name=None, email=None):
     """ Add """
-    if isinstance(name, str):
-        name = name.decode("utf-8")
-    if isinstance(email, str):
-        email = email.decode("utf-8")
     if exists(project, name=name, email=email):
         return
     tree = get_xml_tree(project)

@@ -47,7 +47,7 @@ def parse_tests(conf_path):
         if test_env:
             for key, value in test_env.items():
                 del test_env[key]
-                test_env[key.encode("UTF-8")] = value.encode("UTF-8")
+                test_env[key] = value
     return res
 
 

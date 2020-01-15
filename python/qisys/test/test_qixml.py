@@ -117,7 +117,7 @@ def test_required_attr():
     foo_parser = FooParser(food)
     with pytest.raises(Exception) as e:
         foo_parser.parse(tree)
-    assert e.value.message == "Node 'foo' must have a 'bar' attribute"
+    assert "Node 'foo' must have a 'bar' attribute" in str(e)
 
 
 def test_complex_xml_parser():

@@ -29,4 +29,4 @@ for line in os.environ["LD_LIBRARY_PATH"].split():
     out, err = process.communicate()
     assert not err
     lines = out.splitlines()
-    assert os.path.join(foo_proj.sdk_directory, "lib") in lines
+    assert os.path.join(foo_proj.sdk_directory, "lib").encode() in lines

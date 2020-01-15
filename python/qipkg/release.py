@@ -37,8 +37,8 @@ def _compile_python_files(base_dir):
             file_path = os.path.join(root, filename)
             # Compile Python files if the user asked for it
             _, ext = os.path.splitext(file_path)
-            if ext == str(".py"):
-                py_compile.compile(file_path, doraise="True")
+            if str(ext) == str(".py"):
+                py_compile.compile(file_path, cfile=file_path + 'c', doraise="True")
                 qisys.sh.rm(file_path)
 
 

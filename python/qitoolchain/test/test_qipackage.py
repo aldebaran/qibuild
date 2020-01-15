@@ -211,6 +211,15 @@ def test_post_add_does_not_exist(tmpdir):
         package.post_add()
 
 
+def test_version_str_to_int(tmpdir):
+    """ Test version converter """
+    assert qitoolchain.qipackage.version_str_to_int("1") == 1
+    assert qitoolchain.qipackage.version_str_to_int("1.0") == 10
+    assert qitoolchain.qipackage.version_str_to_int("1.0.2") == 102
+    assert qitoolchain.qipackage.version_str_to_int("1.5.4") == 154
+    assert qitoolchain.qipackage.version_str_to_int("1.5.0-r152") == 150
+
+
 @skip_on_win
 def test_post_add(tmpdir):
     """ Test Post Add """

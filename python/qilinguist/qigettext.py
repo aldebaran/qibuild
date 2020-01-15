@@ -163,7 +163,7 @@ class GettextProject(qilinguist.project.LinguistProject):
                                    stderr=subprocess.PIPE)
         __out, err = process.communicate()
         ui.info(err.strip())
-        if "untranslated" in err:
+        if "untranslated" in str(err):
             return False, "Some untranslated messages were found"
         if process.returncode != 0:
             return False, "msgfmt failed"

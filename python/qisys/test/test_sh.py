@@ -36,10 +36,10 @@ def test_install_on_self(tmpdir):
     a_file.write("")
     with pytest.raises(Exception) as e:
         qisys.sh.install(a_file.strpath, tmpdir.strpath)
-    assert "are the same file" in e.value.message
+    assert "are the same file" in str(e)
     with pytest.raises(Exception) as e:
         qisys.sh.install(tmpdir.strpath, tmpdir.strpath)
-    assert "are the same directory" in e.value.message
+    assert "are the same directory" in str(e)
 
 
 def test_filter_hidden(tmpdir):

@@ -98,7 +98,7 @@ def test_host_tools_no_host_config(build_worktree, fake_ctc):
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree)
     with pytest.raises(Exception) as e:
         cmake_builder.get_host_dirs(usefootool_proj)
-    assert "`qibuild set-host-config`" in e.value.message
+    assert "`qibuild set-host-config`" in str(e.value)
 
 
 def test_host_tools_host_tools_not_built(build_worktree, fake_ctc):
@@ -110,7 +110,7 @@ def test_host_tools_host_tools_not_built(build_worktree, fake_ctc):
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree)
     with pytest.raises(Exception) as e:
         cmake_builder.get_host_dirs(usefootool_proj)
-    assert "(Using 'foo' build config)" in e.value.message
+    assert "(Using 'foo' build config)" in str(e.value)
 
 
 @patch('qibuild.cmake_builder.ui')

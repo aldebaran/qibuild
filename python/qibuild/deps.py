@@ -7,6 +7,8 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 from __future__ import print_function
 
+import six
+
 import qisys.sort
 from qisys.qixml import etree
 
@@ -79,7 +81,10 @@ class DepsSolver(object):
             host_deps = host_deps.union(project.host_depends)
         host_projects = [self.build_worktree.get_build_project(x, raises=False)
                          for x in host_deps]
-        host_projects = filter(None, host_projects)
+        if six.PY3:
+            host_projects = list(filter(None, host_projects))
+        else:
+            host_projects = filter(None, host_projects)
         return host_projects
 
     def _get_sorted_names(self, projects, dep_types, reverse=False):
@@ -137,15 +142,15 @@ def read_deps_from_xml(target, xml_elem):
 def dump_deps_to_xml(subject, xml_elem):
     """ Dump Dependencies To XML """
     if subject.build_depends:
-        build_dep_elem = etree.SubElement(xml_elem, tag="depends")
+        build_dep_elem = etree.SubElement(xml_elem, "depends")
         build_dep_elem.set("buildtime", "true")
         build_dep_elem.set("names", " ".join(subject.build_depends))
     if subject.run_depends:
-        runtime_dep_elem = etree.SubElement(xml_elem, tag="depends")
+        runtime_dep_elem = etree.SubElement(xml_elem, "depends")
         runtime_dep_elem.set("runtime", "true")
         runtime_dep_elem.set("names", " ".join(subject.run_depends))
     if subject.test_depends:
-        test_dep_elem = etree.SubElement(xml_elem, tag="depends")
+        test_dep_elem = etree.SubElement(xml_elem, "depends")
         test_dep_elem.set("testtime", "true")
         test_dep_elem.set("names", " ".join(subject.test_depends))
 

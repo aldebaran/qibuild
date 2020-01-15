@@ -52,7 +52,7 @@ def test_raise_when_no_project_given_outside_a_worktree(tmpdir, monkeypatch):
     monkeypatch.chdir(tmpdir)
     with pytest.raises(Exception) as e:
         qisys.script.run_action("qilinguist.actions.release")
-    assert "outside a worktree" in e.value.message
+    assert "outside a worktree" in str(e)
 
 
 def test_non_translated_messages_gettext(qilinguist_action, record_messages):
@@ -83,4 +83,4 @@ def test_invalid_po_file(qilinguist_action):
     with open(fr_FR_po, "a") as fp:
         fp.write("""\n#: broken\nsyntax-error\n""")
     error = qilinguist_action("release", "translate", raises=True)
-    assert "failed" in error
+    assert "failed" in str(error)
