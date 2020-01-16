@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.abspath('../tools'))
 sys.path.insert(0, os.path.abspath('../../python'))
 
 project = "qiBuild"
-version = "3.13"
+version = "3.14"
 release = version
 extensions = list()
 extensions.append("cmakedomain")
