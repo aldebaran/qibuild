@@ -27,7 +27,8 @@ def get_qibuild_cmake_files():
 
 setup(
     name="qibuild",
-    version="3.13",
+    version="3.14",
+    license="BSD",
     description="The Meta Build Framework",
     url="http://doc.aldebaran.com/qibuild",
     author="SoftBank Robotics",
@@ -35,6 +36,7 @@ setup(
     py_modules=["qicd"],
     packages=find_packages("python"),
     package_dir={"": str("python")},
+    data_files=get_qibuild_cmake_files(),
     include_package_data=True,
     install_requires=[
         "six>=1.11",
@@ -44,8 +46,20 @@ setup(
         "virtualenv>=16",
         "python-minifier>=2.1",
     ],
-    data_files=get_qibuild_cmake_files(),
-    license="BSD",
+    classifiers=[
+          'Development Status :: 5 - Production/Stable',
+          'Environment :: Console',
+          'Intended Audience :: End Users/Desktop',
+          'Intended Audience :: Developers',
+          'Intended Audience :: Science/Research',
+          'Operating System :: MacOS :: MacOS X',
+          'Operating System :: Microsoft :: Windows',
+          'Operating System :: POSIX',
+          'Programming Language :: Python :: 2',
+          'Programming Language :: Python :: 3',
+          'Topic :: Software Development :: Build Tools',
+          'Topic :: Software Development :: Version Control :: Git'
+          ],
     entry_points={
         "console_scripts": [
             "qidoc        = qisys.main:main",

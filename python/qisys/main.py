@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2012-2019 SoftBank Robotics. All rights reserved.
+# Copyright (c) 2012-2020 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license (see the COPYING file).
 """ Entry point for most of qibuild scripts """
 from __future__ import absolute_import
@@ -19,7 +19,7 @@ import qisys.script
 def print_version(script_name):
     """ Print QiBuild Version """
     # TODO: Version number should be at one place only
-    sys.stdout.write("%s version 3.13\n" % script_name)
+    sys.stdout.write("%s version 3.14\n" % script_name)
     qibuild_dir = os.path.dirname(qibuild.__file__)
     python_dir = os.path.dirname(qibuild_dir)
     print("Using Python code from", python_dir)
