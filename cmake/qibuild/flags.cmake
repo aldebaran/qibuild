@@ -103,7 +103,7 @@ if (QI_FORCE_32_BITS)
   _qi_add_flags(CMAKE_CXX_FLAGS "-m32")
 endif()
 
-if(QI_WITH_HARDENING)
+if(QI_WITH_HARDENING AND UNIX AND NOT APPLE)
   qi_info("Enabling hardening")
   set(hardening_flags "-pie -fPIE -Wl,-z,relro,-z,now -Wformat -Wformat-security -Werror=format-security -fstack-protector-strong")
   _qi_add_flags(CMAKE_C_FLAGS ${hardening_flags})
