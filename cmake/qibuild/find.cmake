@@ -290,7 +290,15 @@ function(export_lib_pkgconfig prefix)
   qi_verbose("  libraries  : ${${prefix}_LIBRARIES}" )
   qi_verbose("  definitions: ${${prefix}_DEFINITIONS}" )
 
-  _qi_call_fphsa(${prefix})
+  # If include directory is /usr/include (that is often the case when
+  # cross-compiling), pkg_check_modules does not set INCLUDE_DIRS variable.
+  # So we check that the module exist and in this case we tell
+  # _qi_call_fphsa not to check INCLUDE_DIRS.
+  if(${prefix}_FOUND AND "${${prefix}_INCLUDE_DIRS}" STREQUAL "")
+      _qi_call_fphsa(${prefix} LIBRARIES)
+  else()
+      _qi_call_fphsa(${prefix})
+  endif()
 endfunction()
 
 
@@ -342,14 +350,18 @@ endfunction()
 #                      only ${prefix}_INCLUDE_DIRS will be set.
 # \flag: EXECUTABLE : just an executable was searched,
 #                      only ${prefix}_EXECUTABLE will be set.
+# \flag: LIBRARIES :   only ${prefix}_LIBRARIES will be checked.
+#
 function(_qi_call_fphsa prefix)
-  cmake_parse_arguments(ARG "HEADER;EXECUTABLE" "" "" ${ARGN})
+  cmake_parse_arguments(ARG "HEADER;EXECUTABLE;LIBRARIES" "" "" ${ARGN})
 
   set(_to_check)
   if(ARG_HEADER)
     set(_to_check ${prefix}_INCLUDE_DIRS)
   elseif(ARG_EXECUTABLE)
     set(_to_check ${prefix}_EXECUTABLE)
+  elseif(ARG_LIBRARIES)
+    set(_to_check ${prefix}_LIBRARIES)
   else()
     set(_to_check ${prefix}_LIBRARIES ${prefix}_INCLUDE_DIRS)
   endif()
