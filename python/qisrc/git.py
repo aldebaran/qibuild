@@ -231,6 +231,16 @@ class Git(object):
                     if raises:
                         raise Exception(mess)
                     return mess
+            # if the module is dirty then sync
+            if submodule_info_split[0].startswith('+'):
+                res, out = self.submodule("sync", "--recursive", raises=False)
+                if res == 0:
+                    return None
+                mess = "Failed to sync submodules\n"
+                mess += out
+                if raises:
+                    raise Exception(mess)
+                return mess
 
         res, out = self.submodule("update", "--init", "--recursive", raises=False)
         if res == 0:
