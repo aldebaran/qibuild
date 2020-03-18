@@ -34,6 +34,7 @@ setup(
     author="SoftBank Robotics",
     author_email="qibuild-dev@aldebaran-robotics.com",
     py_modules=["qicd"],
+    zip_safe=False,
     packages=find_packages("python"),
     package_dir={"": str("python")},
     data_files=get_qibuild_cmake_files(),
