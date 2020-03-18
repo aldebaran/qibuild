@@ -15,17 +15,19 @@ def configure_parser(parser):
     """ Configure parser for this action """
     qipkg.parsers.pml_parser(parser)
     parser.add_argument("-o", "--output")
+    parser.add_argument("--with-snapshot", action="store_true", default=False)
     qipkg.parsers.pkg_parser(parser)
 
 
 def do(args):
     """ Main entry point """
     output = args.output
-    with_breakpad = args.with_breakpad
     force = args.force
+    with_snapshot = args.with_snapshot
+    with_breakpad = args.with_breakpad
     with_toolchain = args.with_toolchain
     python_minify = args.python_minify
     pml_builder = qipkg.parsers.get_pml_builder(args)
     return pml_builder.package(output=output, with_breakpad=with_breakpad,
                                force=force, install_tc_packages=with_toolchain,
-                               python_minify=python_minify)
+                               python_minify=python_minify, with_snapshot=with_snapshot)

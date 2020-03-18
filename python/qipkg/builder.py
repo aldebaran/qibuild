@@ -11,6 +11,8 @@ import os
 import tempfile
 import python_minifier
 
+import qisrc.snapshot
+import qisrc.worktree
 import qipkg.manifest
 import qipy.worktree
 import qipy.python_builder
@@ -56,6 +58,7 @@ class PMLBuilder(object):
         self.base_dir = os.path.dirname(self.pml_path)
         self.worktree = worktree
         if self.worktree:
+            self.git_worktree = qisrc.worktree.GitWorkTree(self.worktree)
             self.build_worktree = qibuild.worktree.BuildWorkTree(self.worktree)
             self.cmake_builder = qibuild.cmake_builder.CMakeBuilder(self.build_worktree)
             self.python_worktree = qipy.worktree.PythonWorkTree(self.worktree)
@@ -66,6 +69,7 @@ class PMLBuilder(object):
             self.linguist_builder = qilinguist.builder.QiLinguistBuilder()
             self.builders = [self.cmake_builder, self.python_builder, self.linguist_builder]
         else:
+            self.git_worktree = None
             self.cmake_builder = None
             self.build_worktree = None
             self.python_builder = None
@@ -195,7 +199,7 @@ class PMLBuilder(object):
         for builder in self.builders:
             builder.build()
 
-    def install(self, destination, install_tc_packages=False, python_minify=False):
+    def install(self, destination, install_tc_packages=False, python_minify=False, with_snapshot=False):
         """ Install every project to the given destination """
         qisys.sh.mkdir(destination, recursive=True)
         # Copy the manifest
@@ -227,6 +231,11 @@ class PMLBuilder(object):
                 extension = os.path.splitext(rel_src)[1].strip().lower()
                 if extension == ".py":
                     minify_python(full_dest)
+        if with_snapshot:
+            ui.info(ui.bold, "-> Generating snapshot ...")
+            qisrc.snapshot.generate_snapshot(self.git_worktree,
+                                             os.path.join(destination, "snapshot.json"),
+                                             deprecated_format=False)
         # Generate and install translations
         ui.info(ui.bold, "-> Generating translations ...")
         pml_translator = qilinguist.pml_translator.PMLTranslator(self.pml_path)
@@ -246,6 +255,7 @@ class PMLBuilder(object):
         """
         output = kwargs.get('output', None)
         force = kwargs.get('force', False)
+        with_snapshot = kwargs.get('with_snapshot', False)
         with_breakpad = kwargs.get('with_breakpad', False)
         python_minify = kwargs.get('python_minify', False)
         install_tc_packages = kwargs.get('install_tc_packages', False)
@@ -280,7 +290,8 @@ class PMLBuilder(object):
             ui.debug("With pkg name:", output)
 
         # Add everything from the staged path
-        self.install(self.stage_path, install_tc_packages=install_tc_packages, python_minify=python_minify)
+        self.install(self.stage_path, install_tc_packages=install_tc_packages,
+                     python_minify=python_minify, with_snapshot=with_snapshot)
         symbols_archive = None
         if with_breakpad and self.build_project:
             ui.info(ui.bold, "-> Generating breakpad symbols ...")
