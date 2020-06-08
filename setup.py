@@ -27,7 +27,7 @@ def get_qibuild_cmake_files():
 
 setup(
     name="qibuild",
-    version="3.14.1",
+    version="3.15",
     license="BSD",
     description="The Meta Build Framework",
     url="http://doc.aldebaran.com/qibuild",
