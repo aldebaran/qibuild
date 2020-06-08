@@ -340,6 +340,8 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         cmake_qibuild_dir = os.path.join(cmake_qibuild_dir, "qibuild")
         cmake_qibuild_dir = qisys.sh.to_posix_path(cmake_qibuild_dir)
         cmake_args.append("-Dqibuild_DIR=%s" % cmake_qibuild_dir)
+        if self.build_config.toolchain:
+            cmake_args.append("-DQI_TOOLCHAIN_TARGET=%s" % self.build_config.toolchain.target)
         try:
             qibuild.cmake.cmake(self.path, self.build_directory,
                                 cmake_args, env=self.build_env, **kwargs)
