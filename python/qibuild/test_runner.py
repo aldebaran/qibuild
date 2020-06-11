@@ -396,9 +396,9 @@ def parse_valgrind(valgrind_log, res):
     invalid_read_regex = re.compile(r"==\d+== Invalid read of size (\d+)")
     with open(valgrind_log, "r") as f:
         lines = f.readlines()
-    for l in lines:
-        res.out += l
-        r = leak_fd_regex.search(l)
+    for line in lines:
+        res.out += line
+        r = leak_fd_regex.search(line)
         if r:
             fdopen = int(r.group(1))
             # 4: in/out/err + valgrind_log
@@ -406,7 +406,7 @@ def parse_valgrind(valgrind_log, res):
                 res.ok = False
                 message += "Error file descriptor leaks: " + str(fdopen - 4) + "\n"
             continue
-        r = invalid_read_regex.search(l)
+        r = invalid_read_regex.search(line)
         if r:
             res.ok = False
             message += "Invalid read " + r.group(1) + "\n"

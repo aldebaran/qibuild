@@ -316,7 +316,7 @@ class Git(object):
         out = self.get_status(untracked)
         if out is None:
             return None
-        lines = [l for l in out.splitlines() if len(l.strip()) != 0]
+        lines = [line for line in out.splitlines() if len(line.strip()) != 0]
         if lines:
             return False
         return True

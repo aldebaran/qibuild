@@ -319,7 +319,7 @@ def debug(*tokens, **kwargs):
 
 def indent_iterable(elems, num=2):
     """ Indent an iterable. """
-    return [" " * num + l for l in elems]
+    return [" " * num + elem for elem in elems]
 
 
 def indent(text, num=2):
