@@ -25,6 +25,7 @@ def is_elf(filename):
     fp.close()
     return data == b'\x7fELF'
 
+
 def is_macho(filename):
     """ Check that a file is in the Mach-O format. """
     with open(filename, "rb") as fp:
