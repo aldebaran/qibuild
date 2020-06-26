@@ -23,7 +23,7 @@ def is_elf(filename):
     with open(filename, "rb") as fp:
         data = fp.read(4)
     fp.close()
-    return data == "\x7fELF"
+    return data == b'\x7fELF'
 
 
 def is_macho(filename):
@@ -84,6 +84,7 @@ def dump_symbols_from_binary(binary, pool_dir, build_config=None, dump_syms=None
         qisys.sh.rm(dsym)
     if not dump_ok:
         return False
+    out = out.decode("utf-8")
     # First line looks like:
     # MODULE Linux x86_64  ID  foo on linux
     # MODULE windows x86 ID foo.pdb on windows
