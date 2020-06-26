@@ -65,10 +65,27 @@ def convert_from_conan(package_path, name, version="0.0.1"):
         _generate_conan_share_cmake(package_path, deps)
     if sys.platform == "darwin":
         _fix_rpaths(os.path.join(package_path, "lib"))
-    _add_conan_package_xml(package_path, name, info, version)
+    add_package_xml(package_path, name, version, settings.get("os"))
     res = _compress_package(package_path, name, settings, version)
     ui.info(ui.green, "Archive generated in", res)
     return res
+
+
+def add_package_xml(package_path, name, version, target, licence):
+    """ Write an xml file to descibe the package. """
+    package_xml = os.path.join(package_path, "package.xml")
+    ui.info(" -> Create package.xml for {} v{}".format(name, version))
+    root = etree.Element('package')
+    root.set("name", name)
+    root.set("version", version)
+    if target:
+        ui.info(" -> For target {}".format(target))
+        root.set("target", target)
+    if licence:
+        ui.info(" -> With license {}".format(licence))
+        child = etree.Element("licence", text=licence)
+        root.append(child)
+    qisys.qixml.write(root, package_xml)
 
 
 def _generate_conan_share_cmake(package_path, deps):
@@ -78,19 +95,6 @@ def _generate_conan_share_cmake(package_path, deps):
     qisys.sh.mkdir(cmake_path, recursive=True)
     cmake_path = qibuild.cmake.modules.generate_cmake_module(package_path, name, deps)
     ui.info(ui.green, "CMake module generated in", ui.reset, ui.bold, cmake_path)
-
-
-def _add_conan_package_xml(package_path, name, info, version):
-    """ Write an xml file to descibe the package. """
-    package_xml = os.path.join(package_path, "package.xml")
-    ui.info(" -> Create package.xml for {}".format(name))
-    root = etree.Element('package')
-    root.set("name", name)
-    root.set("version", version)
-    root.set("target", info.get("settings").get("os"))
-    child = etree.Element("licence", text="BSD")
-    root.append(child)
-    qisys.qixml.write(root, package_xml)
 
 
 def _compress_package(package_path, name, settings, version):
