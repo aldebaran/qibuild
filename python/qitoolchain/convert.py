@@ -71,7 +71,7 @@ def convert_from_conan(package_path, name, version="0.0.1"):
     return res
 
 
-def add_package_xml(package_path, name, version, target, licence):
+def add_package_xml(package_path, name, version, target, licence=None):
     """ Write an xml file to descibe the package. """
     package_xml = os.path.join(package_path, "package.xml")
     ui.info(" -> Create package.xml for {} v{}".format(name, version))
