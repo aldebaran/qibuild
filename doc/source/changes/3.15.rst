@@ -1,0 +1,35 @@
+v3.15
+=====
+
+qipkg
+-----
+
+* Add argument to add the worktree snapshot inside the pkg.
+
+qibuild
+-------
+
+* Restrict hardening to Unix systems.
+* find.cmake: Fix export_lib_pkgconfig for cross-compiling.
+* The target defined in the toolchain feed is now propagated to cmake in C++ macros.
+To use it in your cmakelist:
+
+```
+if(QI_TOOLCHAIN_TARGET)
+  string(TOUPPER ${QI_TOOLCHAIN_TARGET} QI_TOOLCHAIN_TARGET_VALUE)
+  message(STATUS "Toolchain target macro available: QI_TOOLCHAIN_TARGET_${QI_TOOLCHAIN_TARGET_VALUE}")
+else()
+  message(STATUS "Without toolchain target")
+endif()
+```
+
+To use it in your code:
+
+```
+#ifdef QI_TOOLCHAIN_TARGET_ATOM
+  qiLogInfo() << "Compiled for target atom";
+#endif
+#ifdef QI_TOOLCHAIN_TARGET_LINUX64
+  qiLogInfo() << "Compiled for target linux64";
+#endif
+```
