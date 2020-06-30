@@ -7,6 +7,7 @@ clean(PYTHON3)
 
 #do not include python3 this is not the real python library.
 set(_pyt_version
+  "python3.8"
   "python3.7m" "python3.7"
   "python3.6m" "python3.6"
   "python3.5m" "python3.5"
