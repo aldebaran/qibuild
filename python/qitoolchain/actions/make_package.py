@@ -26,6 +26,8 @@ def configure_parser(parser):
     parser.add_argument("--version", help="Version of the toolchain package")
     parser.add_argument("--target", help="Target of the toolchain package")
     parser.add_argument("--license", help="License of the toolchain package")
+    parser.add_argument("--auto", dest="auto", action="store_true",
+                        help="Do not prompt for cmake module edition")
 
 
 def do(args):
@@ -49,8 +51,10 @@ def do(args):
     target = qisys.qixml.parse_required_attr(root, "target")
     package_cmake = os.path.join(args.directory, "share", "cmake", name.lower(), "{}-config.cmake".format(name.lower()))
     if not os.path.exists(package_cmake):
+        ui.warning("Generating {}".format(package_cmake))
         module = generate_cmake_module(args.directory, name)
-        edit_module(module)
+        if not args.auto:
+            edit_module(module)
     parts = [name, target, version]
     archive_name = "-".join(parts) + ".zip"
     output = os.path.join(output, archive_name)
