@@ -1,10 +1,15 @@
 v3.15
 =====
 
+qisys
+-----
+
+* Fix ordinal not in range error.
+
 qipkg
 -----
 
-* Add argument to add the worktree snapshot inside the pkg.
+* Add switch to add the worktree snapshot inside the pkg.
 
 qibuild
 -------
@@ -33,3 +38,9 @@ To use it in your code:
   qiLogInfo() << "Compiled for target linux64";
 #endif
 ```
+
+qitoolchain
+-----------
+
+* Update toolchain package name convention when make-package is used.
+* Add support to make-package from directory.
