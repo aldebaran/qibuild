@@ -8,10 +8,11 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 import os
-
 import qisys.archive
 import qisys.parsers
 from qisys import ui
+from qitoolchain.convert import add_package_xml
+from qibuild.cmake.modules import generate_cmake_module, edit_module
 
 
 def configure_parser(parser):
@@ -21,6 +22,10 @@ def configure_parser(parser):
     parser.add_argument("-o", "--output",
                         help="Base directory in which to create the archive. "
                              "Defaults to current working directory")
+    parser.add_argument("--name", help="Name of the toolchain package")
+    parser.add_argument("--version", help="Version of the toolchain package")
+    parser.add_argument("--target", help="Target of the toolchain package")
+    parser.add_argument("--license", help="License of the toolchain package")
 
 
 def do(args):
@@ -28,8 +33,13 @@ def do(args):
     input_directory = args.directory
     output = args.output or os.getcwd()
     package_xml = os.path.join(args.directory, "package.xml")
-    if not os.path.exists(package_xml):
+    if not os.path.exists(package_xml) and not args.name:
         raise Exception("Expecting a package.xml at the root of the package")
+    if args.name:
+        if not args.version:
+            raise Exception("A version must be specified if name present")
+        else:
+            add_package_xml(args.directory, args.name, args.version, args.target, args.license)
     tree = qisys.qixml.read(package_xml)
     root = tree.getroot()
     if root.tag != "package":
@@ -37,6 +47,10 @@ def do(args):
     name = qisys.qixml.parse_required_attr(root, "name")
     version = qisys.qixml.parse_required_attr(root, "version")
     target = qisys.qixml.parse_required_attr(root, "target")
+    package_cmake = os.path.join(args.directory, "share", "cmake", name.lower(), "{}-config.cmake".format(name.lower()))
+    if not os.path.exists(package_cmake):
+        module = generate_cmake_module(args.directory, name)
+        edit_module(module)
     parts = [name, target, version]
     archive_name = "-".join(parts) + ".zip"
     output = os.path.join(output, archive_name)
