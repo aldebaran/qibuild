@@ -26,7 +26,7 @@ def test_create_extract(qitoolchain_action, tmpdir):
         "--auto",
         food.strpath
     )
-    assert package_path == tmpdir.join("foo-linux64-0.1.zip").strpath
+    assert package_path == tmpdir.join("foo-0.1-linux64.zip").strpath
     dest = tmpdir.join("dest")
     extracted = qitoolchain_action(
         "extract-package",

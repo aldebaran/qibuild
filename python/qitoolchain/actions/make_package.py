@@ -55,7 +55,7 @@ def do(args):
         module = generate_cmake_module(args.directory, name)
         if not args.auto:
             edit_module(module)
-    parts = [name, target, version]
+    parts = [name, version, target]
     archive_name = "-".join(parts) + ".zip"
     output = os.path.join(output, archive_name)
     res = qisys.archive.compress(input_directory, flat=True, output=output)
