@@ -36,7 +36,7 @@ def fix_file(filename):
                 end_header = i
                 was_in_header = False
                 continue
-    header_lines = [l + "\n" for l in HEADER.splitlines()]
+    header_lines = [header_line + "\n" for header_line in HEADER.splitlines()]
     if not seen_header:
         if seen_shebang:
             new_lines = [lines[0]] + header_lines + lines[1:]
