@@ -41,8 +41,6 @@ setup(
     include_package_data=True,
     install_requires=[
         "six>=1.11",
-        "sphinx<=1.3.1",
-        "sphinx_intl<=0.9.5",
         "tabulate>=0.8",
         "virtualenv>=16",
         "python-minifier>=2.1",
