@@ -67,7 +67,7 @@ in the qiproject.xml file
             qisys.sh.mkdir(script_dest, recursive=True)
             script_src = os.path.join(self.path, script.src)
             qisys.sh.install(script_src, script_dest)
-        site_packages = os.path.join(dest, "lib", "python", "site-packages")
+        site_packages = os.path.join(dest, "lib", "python2.7", "site-packages")
         qisys.sh.mkdir(site_packages, recursive=True)
         for module in self.modules:
             full_src = os.path.join(self.path, module.src, module.name + ".py")
