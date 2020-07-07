@@ -13,7 +13,7 @@ def test_install(qipy_action, tmpdir):
     _big_project = qipy_action.add_test_project("big_project")
     dest = tmpdir.join("dest")
     qipy_action("install", "big_project", dest.strpath)
-    site_packages = dest.join("lib", "python", "site-packages")
+    site_packages = dest.join("lib", "python2.7", "site-packages")
     assert site_packages.join("spam.py").check(file=True)
     assert site_packages.join("foo", "bar", "baz.py").check(file=True)
     assert dest.join("bin", "script.py").check(file=True)
