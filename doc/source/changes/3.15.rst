@@ -16,6 +16,12 @@ qibuild
 
 * Restrict hardening to Unix systems.
 * find.cmake: Fix export_lib_pkgconfig for cross-compiling.
+* Add method to get the absolute path of a project with:
+
+```
+qibuild info --path <project>
+```
+
 * The target defined in the toolchain feed is now propagated to cmake in C++ macros.
 To use it in your cmakelist:
 
