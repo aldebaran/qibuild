@@ -7,6 +7,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 from __future__ import print_function
 
+import os
 import qisrc.parsers
 import qibuild.parsers
 import qisys.parsers
@@ -17,6 +18,8 @@ def configure_parser(parser):
     """ Configure parser for this action. """
     qisys.parsers.worktree_parser(parser)
     parser.add_argument("name", nargs="?")
+    parser.add_argument("--path", "-p", action="store_true",
+                        help="Return only the absolute path to the projects")
 
 
 def do(args):
@@ -31,8 +34,11 @@ def do(args):
     git_worktree = qisrc.parsers.get_git_worktree(args)
     git_project = qisys.parsers.find_parent_project(git_worktree.git_projects,
                                                     build_project.path)
-    mess = "Build project: %s\n" % build_project.name
-    mess += "src: %s\n" % build_project.src
-    if git_project:
-        mess += "repo: %s" % git_project.name
-    ui.info(mess)
+    if args.path:
+        ui.info(os.path.join(build_worktree.root, build_project.src))
+    else:
+        mess = "Build project: %s\n" % build_project.name
+        mess += "src: %s\n" % build_project.src
+        if git_project:
+            mess += "repo: %s" % git_project.name
+        ui.info(mess)
