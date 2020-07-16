@@ -18,32 +18,35 @@ qibuild
 * find.cmake: Fix export_lib_pkgconfig for cross-compiling.
 * Add method to get the absolute path of a project with:
 
-```
-qibuild info --path <project>
-```
+  .. code-block:: console
+
+    qibuild info --path <project>
+
 
 * The target defined in the toolchain feed is now propagated to cmake in C++ macros.
-To use it in your cmakelist:
+  To use it in your cmakelist:
 
-```
-if(QI_TOOLCHAIN_TARGET)
-  string(TOUPPER ${QI_TOOLCHAIN_TARGET} QI_TOOLCHAIN_TARGET_VALUE)
-  message(STATUS "Toolchain target macro available: QI_TOOLCHAIN_TARGET_${QI_TOOLCHAIN_TARGET_VALUE}")
-else()
-  message(STATUS "Without toolchain target")
-endif()
-```
+  .. code-block:: cmake
 
-To use it in your code:
+    if(QI_TOOLCHAIN_TARGET)
+      string(TOUPPER ${QI_TOOLCHAIN_TARGET} QI_TOOLCHAIN_TARGET_VALUE)
+      message(STATUS "Toolchain target macro available: QI_TOOLCHAIN_TARGET_${QI_TOOLCHAIN_TARGET_VALUE}")
+    else()
+      message(STATUS "Without toolchain target")
+    endif()
 
-```
-#ifdef QI_TOOLCHAIN_TARGET_ATOM
-  qiLogInfo() << "Compiled for target atom";
-#endif
-#ifdef QI_TOOLCHAIN_TARGET_LINUX64
-  qiLogInfo() << "Compiled for target linux64";
-#endif
-```
+
+  To use it in your code:
+
+  .. code-block:: cpp
+
+    #ifdef QI_TOOLCHAIN_TARGET_ATOM
+      qiLogInfo() << "Compiled for target atom";
+    #endif
+    #ifdef QI_TOOLCHAIN_TARGET_LINUX64
+      qiLogInfo() << "Compiled for target linux64";
+    #endif
+
 
 qitoolchain
 -----------
