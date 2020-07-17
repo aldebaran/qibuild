@@ -123,7 +123,27 @@ endfunction()
 
 #! Create a python extension
 function(qi_create_python_ext target)
-  add_library(${target} SHARED ${ARGN})
+  cmake_parse_arguments(ARG "" "VERSION" "" ${ARGN})
+
+  if ("${ARG_VERSION}" STREQUAL "3")
+    set(_python_target PYTHON3)
+  else()
+    set(_python_target PYTHON)
+  endif()
+
+  add_library(${target} SHARED ${ARG_UNPARSED_ARGUMENTS})
+
+  qi_use_lib(${target} ${_python_target})
+  qi_install_python(TARGETS ${target} COMPONENT runtime VERSION "${ARG_VERSION}")
+
+  if(${_python_target}_INCLUDE_DIRS MATCHES "python([0-9]\\.[0-9]+)")
+    set(_python_version_major "${CMAKE_MATCH_1}")
+  else()
+    message(WARNING "Could not deduce Python major version \
+from its include directories ${${_python_target}_INCLUDE_DIRS}, defaulting to \"2.7\".")
+    set(_python_version_major "2.7")
+  endif()
+
   message(STATUS "Python extension: ${target}")
   set_target_properties(${target}
     PROPERTIES PREFIX ""
@@ -131,7 +151,7 @@ function(qi_create_python_ext target)
   if(UNIX)
     set_target_properties(${target} PROPERTIES
       SUFFIX ".so"
-      LIBRARY_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages
+      LIBRARY_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${QI_SDK_LIB}/python${_python_version_major}/site-packages
     )
   endif()
 
@@ -146,16 +166,13 @@ function(qi_create_python_ext target)
   if(WIN32)
     set_target_properties(${target} PROPERTIES
       SUFFIX ".pyd"
-      RUNTIME_OUTPUT_DIRECTORY_RELEASE ${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages
-      RUNTIME_OUTPUT_DIRECTORY_DEBUG ${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages
+      RUNTIME_OUTPUT_DIRECTORY_RELEASE ${QI_SDK_DIR}/${QI_SDK_LIB}/python${_python_version_major}/site-packages
+      RUNTIME_OUTPUT_DIRECTORY_DEBUG ${QI_SDK_DIR}/${QI_SDK_LIB}/python${_python_version_major}/site-packages
     )
   endif()
 
-  qi_use_lib(${target} PYTHON)
-  qi_install_python(TARGETS ${target} COMPONENT runtime)
-
   # Register the target into the build dir for qipy
   file(WRITE ${QI_SDK_DIR}/qi.pth
-    "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages/\n"
+    "${QI_SDK_DIR}/${QI_SDK_LIB}/python${_python_version_major}/site-packages/\n"
   )
 endfunction()
