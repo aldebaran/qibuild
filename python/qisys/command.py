@@ -347,7 +347,7 @@ def _find_program_in_toolchain_path(executable, build_config=None):
         process = subprocess.Popen(['find', path, '-name', executable], stdout=subprocess.PIPE, env=env)
         output = process.communicate()[0]
         if six.PY3:
-            output = str(output)
+            output = output.decode()
         splitted = output.split()
         splitted.sort(key=len)
         for p in splitted:
@@ -399,7 +399,7 @@ def _is_runnable(full_path, build_config=None):
             process = subprocess.Popen(['file', '-L', full_path], stdout=subprocess.PIPE, env={str("LANG"): str("C")})
             output = process.communicate()[0]
             if six.PY3:
-                output = str(output)
+                output = output.decode()
             ui.debug("Testing %s in %s" % (platform.processor(), output.split(',')))
             if "ASCII text executable" not in output:
                 try:
@@ -420,7 +420,7 @@ def _is_runnable(full_path, build_config=None):
             process = subprocess.Popen(['ldd', full_path], stdout=subprocess.PIPE, env={str("LANG"): str("C")})
             output = process.communicate()[0]
             if six.PY3:
-                output = str(output)
+                output = output.decode()
             if process.returncode == 0 and ' not found ' not in output:
                 pass
             elif process.returncode == 1 and 'not a dynamic executable' in output:
