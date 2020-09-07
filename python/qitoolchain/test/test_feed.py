@@ -27,6 +27,7 @@ def test_is_url():
     assert not is_url(r"c:\foo\bar")
     assert is_url("http://foo.com/bar.xml")
     assert is_url("ftp://foo.com.bar.xml")
+    assert is_url("file:///tmp/bar.xml")
 
 
 def test_parse_non_exising_path():
@@ -76,6 +77,46 @@ def test_git_bad_url(git_server, feed):
 </feed>\n"""
     with pytest.raises(Exception) as e:
         _generic_test_git(git_server, feed, full_xml, default_oss_xml, default_third_part_xml)
+    assert "not parse" in str(e)
+    assert "not an existing path" in str(e)
+    assert "nor an url" in str(e)
+
+
+def _generic_test_local(tmpdir, full_xml):
+    """ Test creating a toolchain from path to a local feed xml """
+    d = tmpdir.mkdir("feeds")
+    p = d.join("oss.xml")
+    p.write(default_oss_xml)
+    p = d.join("full.xml")
+    p.write(full_xml)
+
+    parser = ToolchainFeedParser("foo")
+    # Note: passing the `branch` param is quite unexpected for a local feed,
+    # but it is what qitoolchain does in real life.
+    parser.parse(str(p), branch="master")
+    names = [x.name for x in parser.packages]
+    assert names == ["boost"]
+
+
+def test_local_relative_url(tmpdir):
+    """ Test creating a toolchain from path to a local feed xml """
+    full = '<feed>\n<feed url="oss.xml" />\n</feed>\n'
+    _generic_test_local(tmpdir, full)
+
+
+def test_local_file_url(tmpdir):
+    """ Test creating a toolchain from path to a local feed xml """
+    full = '<feed>\n<feed url="file://' + str(tmpdir) + '/feeds/oss.xml" />\n</feed>\n'
+    print(tmpdir)
+    print(full)
+    _generic_test_local(tmpdir, full)
+
+
+def test_local_bad_relative_url(tmpdir):
+    """ Test creating a toolchain from path to a local feed xml """
+    full = '<feed>\n<feed url="feed/oss.xml" />\n</feed>\n'
+    with pytest.raises(Exception) as e:
+        _generic_test_local(tmpdir, full)
     assert "not parse" in str(e)
     assert "not an existing path" in str(e)
     assert "nor an url" in str(e)
