@@ -17,8 +17,8 @@ default_third_part_xml = """<feed>\n  <package name="oracle-jdk" url="jdk.zip" /
 
 # feed url is either absolute or relative to the parent feed url
 default_full_xml = """<feed>
-    <feed name="oss" path="feeds/oss.xml" />
-    <feed name="3rdpart" url="3rdpart.xml" />
+    <feed path="feeds/oss.xml" />
+    <feed url="3rdpart.xml" />
 </feed>\n"""
 
 
@@ -57,7 +57,7 @@ def test_git(git_server, feed):
 
 def test_git_missing_url_and_path(git_server, feed):
     """ Test Git Missing Url and Path """
-    full_xml = """<feed>\n    <feed name="oss" />\n    <feed name="3rdpart" url="3rdpart.xml" />\n</feed>\n"""
+    full_xml = """<feed>\n    <feed />\n    <feed url="3rdpart.xml" />\n</feed>\n"""
     with pytest.raises(AssertionError) as e:
         _generic_test_git(git_server, feed, full_xml, default_oss_xml, default_third_part_xml)
     assert "attributes must be set" in str(e)
@@ -71,8 +71,8 @@ def test_git_bad_url(git_server, feed):
     # The resulting built URL will end with share/qi/toolchains/foo.git/feeds/feeds/3rdpart.xml
     # and the double feeds/feeds/ makes it unknown
     full_xml = """<feed>
-<feed name="oss" path="feeds/oss.xml" />
-<feed name="3rdpart" url="feeds/3rdpart.xml" />
+<feed path="feeds/oss.xml" />
+<feed url="feeds/3rdpart.xml" />
 </feed>\n"""
     with pytest.raises(Exception) as e:
         _generic_test_git(git_server, feed, full_xml, default_oss_xml, default_third_part_xml)
