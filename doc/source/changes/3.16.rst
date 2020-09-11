@@ -9,4 +9,9 @@ qisys
 qibuild
 -------
 
-* Handle python version for build/installation paths
+* Handle python version for build/installation paths.
+
+qitoolchain
+-----------
+
+* Add an option to filter registered libs in -config.cmake when make-package is called.
