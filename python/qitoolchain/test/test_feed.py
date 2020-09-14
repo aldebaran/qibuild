@@ -17,7 +17,7 @@ default_third_part_xml = """<feed>\n  <package name="oracle-jdk" url="jdk.zip" /
 
 # feed url is either absolute or relative to the parent feed url
 default_full_xml = """<feed>
-    <feed path="feeds/oss.xml" />
+    <feed url="oss.xml" />
     <feed url="3rdpart.xml" />
 </feed>\n"""
 
@@ -56,14 +56,13 @@ def test_git(git_server, feed):
     _generic_test_git(git_server, feed, default_full_xml, default_oss_xml, default_third_part_xml)
 
 
-def test_git_missing_url_and_path(git_server, feed):
-    """ Test Git Missing Url and Path """
+def test_git_missing_url(git_server, feed):
+    """ Test Git Missing Url """
     full_xml = """<feed>\n    <feed />\n    <feed url="3rdpart.xml" />\n</feed>\n"""
-    with pytest.raises(AssertionError) as e:
+    with pytest.raises(Exception) as e:
         _generic_test_git(git_server, feed, full_xml, default_oss_xml, default_third_part_xml)
-    assert "attributes must be set" in str(e)
-    assert "url" in str(e)
-    assert "path" in str(e)
+    assert "not parse" in str(e)
+    assert "Non-root 'feed' element must have an 'url' attribute" in str(e)
 
 
 def test_git_bad_url(git_server, feed):
@@ -72,7 +71,6 @@ def test_git_bad_url(git_server, feed):
     # The resulting built URL will end with share/qi/toolchains/foo.git/feeds/feeds/3rdpart.xml
     # and the double feeds/feeds/ makes it unknown
     full_xml = """<feed>
-<feed path="feeds/oss.xml" />
 <feed url="feeds/3rdpart.xml" />
 </feed>\n"""
     with pytest.raises(Exception) as e:
@@ -120,3 +118,12 @@ def test_local_bad_relative_url(tmpdir):
     assert "not parse" in str(e)
     assert "not an existing path" in str(e)
     assert "nor an url" in str(e)
+
+
+def test_local_missing_url(tmpdir):
+    """ Test creating a toolchain from path to a local feed xml """
+    full = '<feed>\n<feed />\n</feed>\n'
+    with pytest.raises(Exception) as e:
+        _generic_test_local(tmpdir, full)
+    assert "not parse" in str(e)
+    assert "Non-root 'feed' element must have an 'url' attribute" in str(e)

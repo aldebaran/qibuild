@@ -30,15 +30,6 @@ def is_url(location):
     return location and "://" in location
 
 
-def raise_parse_error(package_tree, feed, message):
-    """ Raise a nice parsing error about the given package_tree element. """
-    as_str = ElementTree.tostring(package_tree)
-    mess = "Error when parsing feed: '%s'\n" % feed
-    mess += "Could not parse:\t%s\n" % as_str
-    mess += message
-    raise Exception(mess)
-
-
 def tree_from_feed(feed_location, branch=None, name=None):
     """ Returns an ElementTree object from an feed location """
     fp = None
@@ -158,18 +149,14 @@ class ToolchainFeedParser(object):
                 self.append_package(subpkg_tree)
         feeds = tree.findall("feed")
         for feed_tree in feeds:
-            # feed_name = feed_tree.get("name")
             feed_url = feed_tree.get("url")
-            feed_path = feed_tree.get("path")
-            assert feed_path or feed_url, "Either 'url' or 'path' attributes must be set in a 'feed' non-root element"
-            # feed_url can be relative to feed:
-            if feed_path and branch:
-                feed_path = os.path.join(tc_path + ".git", feed_tree.get("path"))
-                self.parse(feed_path)
-            elif feed_url:
+            if feed_url:
                 if not is_url(feed_url):
+                    # feed_url is relative to feed:
                     feed_url = urlparse.urljoin(feed, feed_url)
                 self.parse(feed_url)
+            else:
+                raise Exception("Could not parse %s: Non-root 'feed' element must have an 'url' attribute" % feed)
         select_tree = tree.find("select")
         if select_tree is not None:
             blacklist_trees = select_tree.findall("blacklist")
