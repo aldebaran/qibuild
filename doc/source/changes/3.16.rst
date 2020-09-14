@@ -1,0 +1,17 @@
+v3.16
+=====
+
+qisys
+-----
+
+* python3: decode binary string into unicode.
+
+qibuild
+-------
+
+* Handle python version for build/installation paths.
+
+qitoolchain
+-----------
+
+* Add an option to filter registered libs in -config.cmake when make-package is called.

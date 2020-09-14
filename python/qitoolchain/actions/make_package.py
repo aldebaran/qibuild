@@ -28,6 +28,10 @@ def configure_parser(parser):
     parser.add_argument("--license", help="License of the toolchain package")
     parser.add_argument("--auto", dest="auto", action="store_true",
                         help="Do not prompt for cmake module edition")
+    parser.add_argument("--shared-only", dest="shared", action="store_true",
+                        help="Only register shared lib in the cmake config file")
+    parser.add_argument("--static-only", dest="static", action="store_true",
+                        help="Only register static lib in the cmake config file")
 
 
 def do(args):
@@ -50,9 +54,16 @@ def do(args):
     version = qisys.qixml.parse_required_attr(root, "version")
     target = qisys.qixml.parse_required_attr(root, "target")
     package_cmake = os.path.join(args.directory, "share", "cmake", name.lower(), "{}-config.cmake".format(name.lower()))
+    ui.debug("with package_cmake:", package_cmake)
     if not os.path.exists(package_cmake):
         ui.warning("Generating {}".format(package_cmake))
-        module = generate_cmake_module(args.directory, name)
+        if args.shared:
+            exclude_ext = ".a"
+        elif args.static:
+            exclude_ext = ".so .dylib .dll"
+        else:
+            exclude_ext = None
+        module = generate_cmake_module(args.directory, name, exclude_ext=exclude_ext)
         if not args.auto:
             edit_module(module)
     parts = [name, version, target]

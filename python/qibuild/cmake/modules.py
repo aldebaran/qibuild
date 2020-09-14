@@ -42,13 +42,24 @@ def find_libs(directory, info=None):
     return sorted(res)
 
 
-def generate_cmake_module(directory, name, info=None):
-    """ Generate CMake Module """
+def generate_cmake_module(directory, name, info=None, exclude_ext=None):
+    """ Generate CMake Module
+        filter: space separated list of extension
+    """
     libraries = find_libs(directory, info)
     libs_string = ""
+    ui.debug("generate_cmake_module with exclude_ext:", exclude_ext)
     if libraries:
         for library in libraries:
-            libs_string += "  ${_root}/%s\n" % library
+            good = True
+            if exclude_ext:
+                for ext in exclude_ext.split(" "):
+                    if library.endswith(ext):
+                        ui.debug(" -> exclude:", library, "for", ext)
+                        good = False
+            if good:
+                ui.debug(" -> register:", library)
+                libs_string += "  ${_root}/%s\n" % library
     else:
         ui.warning("No library found: no path set in the config.cmake file")
     libs_string = libs_string[:-1]  # remove trailing \n
