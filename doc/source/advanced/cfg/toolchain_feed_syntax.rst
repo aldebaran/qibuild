@@ -47,7 +47,7 @@ This lets you include feeds inside other feeds.
 
     <!-- in feeds/full.xml  -->
     <toolchain>
-      <feed url = "feeds/included.xml" />
+      <feed url = "included.xml" />
     </toolchain>
 
 .. code-block:: xml
