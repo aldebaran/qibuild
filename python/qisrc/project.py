@@ -307,6 +307,22 @@ class GitProject(object):
         """ Return True If other is Not Equal to self """
         return not self.__eq__(other)
 
+    def __lt__(self, other):
+        """ Return True If other is Greater to self """
+        return self.src < other.src
+
+    def __le__(self, other):
+        """ Return True If other is Greater or equal to self """
+        return self.__eq__(other) or self.__lt__(other)
+
+    def __gt__(self, other):
+        """ Return True If other is Lower to self """
+        return self.src > other.src
+
+    def __ge__(self, other):
+        """ Return True If other is Lower or equal to self """
+        return self.__eq__(other) or self.__gt__(other)
+
     def __hash__(self):
         """ Return a hash of the project, corresponding to its path """
         return self.path.__hash__()
