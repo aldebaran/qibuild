@@ -15,7 +15,9 @@ import zipfile
 
 import qisrc.license
 import qibuild.deps
+import qibuild.solibs
 import qisys.version
+from qisys import ui
 from qisys.qixml import etree
 
 
@@ -220,10 +222,13 @@ class QiPackage(object):
             self.cross_gdb = os.path.join(self.path, self.cross_gdb)
 
     def post_add(self):
-        """ Run the post-add script if it exists.
+        """ After installing elements we need to fix linux libs of the package
+        and run the post-add script if it exists.
         Raises:
             * CommandFailedException if the post-add script fails
         """
+        toolchain_root = os.path.abspath(os.path.join(self.path, ".."))
+        qibuild.solibs.fix_solibs(toolchain_root)
         if not self._post_add:
             return
         # Make sure the script is found in the package directory

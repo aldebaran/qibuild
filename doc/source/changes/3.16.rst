@@ -15,3 +15,4 @@ qitoolchain
 -----------
 
 * Add an option to filter registered libs in -config.cmake when make-package is called.
+* Fix rpath of all toolchain .so files when adding a new package to the toolchain (for ubuntu >=18.04 compat)

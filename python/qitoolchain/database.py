@@ -222,7 +222,7 @@ class DataBase(object):
                 message=(ui.green, "Downloading", ui.reset, ui.blue, package.url)
             )
             dest = os.path.join(self.packages_path, package.name)
-            message = [ui.green, "Extracting", ui.reset, ui.blue, package.name]
+            message = [ui.green, "Extracting package", ui.reset, ui.blue, package.name]
             if package.version:
                 message.append(package.version)
             ui.info(*message)
