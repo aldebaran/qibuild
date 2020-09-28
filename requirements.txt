@@ -23,7 +23,6 @@ sphinx-intl==0.9.5
 
 # For Python Syntax Checking:
 astroid==1.6.5
-logilab-astng==0.24.3
 pylint==1.9.3
 pycodestyle==2.4.0
 pyflakes==2.0.0
