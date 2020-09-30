@@ -49,7 +49,7 @@ def test_run_system(qibuild_action):
                                   FakeProcess(0, '', '')]
         with mock.patch("os.execve") as execve_mock:
             qibuild_action("run", "ls")
-    assert popen_mock.call_args_list[-1][0][0][0] == 'ldd'
+    assert popen_mock.call_args_list[-1][0][0][0] == 'file'
     binary = execve_mock.call_args_list[-1][0][0]
     assert os.path.isabs(binary)
     assert os.path.basename(binary) == "ls"

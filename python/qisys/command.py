@@ -307,15 +307,17 @@ def find_program(executable, env=None, raises=False, build_config=None):
     if build_config:
         res = _find_program_in_toolchain_path(executable, build_config)
         if res:
+            ui.debug("find_program(%s) Use from toolchain path: %s" % (executable, res))
             # _FIND_PROGRAM_CACHE[executable] = res
             return res
 
     for path in env["PATH"].split(os.pathsep):
-        res = _find_program_in_path(executable, path)
-        if res and _is_runnable(res, build_config):
-            ui.debug("find_program(%s) Use: %s" % (executable, res))
-            # _FIND_PROGRAM_CACHE[executable] = res
-            return res
+        if path:
+            res = _find_program_in_path(executable, path)
+            if res and _is_runnable(res, build_config):
+                ui.debug("find_program(%s) Use: %s" % (executable, res))
+                # _FIND_PROGRAM_CACHE[executable] = res
+                return res
     if raises:
         raise NotInPath(executable, env=env)
     return None
@@ -389,14 +391,20 @@ def _is_runnable(full_path, build_config=None):
         return False
     try:
         if platform.architecture(full_path)[0] != platform.architecture(sys.executable)[0]:
+            ui.debug("_is_runnable(%s) Use: %s != %s" % (full_path, platform.architecture(full_path)[0],
+                                                         platform.architecture(sys.executable)[0]))
             return False
     except Exception:
         pass
 
+    if os.path.splitext(full_path)[1] in [".sh", ".py"]:
+        return True
+
     # if a build config is set then we will check for file format
     if build_config:
         try:
-            process = subprocess.Popen(['file', '-L', full_path], stdout=subprocess.PIPE, env={str("LANG"): str("C")})
+            process = subprocess.Popen(['file', '-L', full_path], stderr=subprocess.PIPE,
+                                       stdout=subprocess.PIPE, env={str("LANG"): str("C")})
             output = process.communicate()[0]
             if six.PY3:
                 output = output.decode()
@@ -415,22 +423,6 @@ def _is_runnable(full_path, build_config=None):
             if sys.platform.startswith("linux"):
                 ui.warning("file not available => assuming {} is compatible".format(full_path))
             return True
-    else:
-        try:
-            process = subprocess.Popen(['ldd', full_path], stdout=subprocess.PIPE, env={str("LANG"): str("C")})
-            output = process.communicate()[0]
-            if six.PY3:
-                output = output.decode()
-            if process.returncode == 0 and ' not found ' not in output:
-                pass
-            elif process.returncode == 1 and 'not a dynamic executable' in output:
-                pass
-            else:
-                return False
-        except OSError:
-            # TODO: Run an equivalent test on mac and on windows
-            if sys.platform.startswith("linux"):
-                ui.warning("ldd not available => assuming {} is runnable".format(full_path))
     return True
 
 
