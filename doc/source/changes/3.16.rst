@@ -1,19 +1,35 @@
 v3.16
 =====
 
+Misc
+----
+
+* Use universal_newlines=True with Popen().
+* Remove logilab-astng from requirements.
+
+qisrc
+-----
+
+* Add comparison operators to gitProject class.
+
 qisys
 -----
 
-* python3: decode binary string into unicode.
+* Python3: decode binary string into unicode.
+* Check if a command is runnable with file only when a build config is provided, drop support of check with ldd.
 
 qibuild
 -------
 
 * Handle python version for build/installation paths.
 * Fix qibuild config --wizard (cmake magic_line changed in newest versions)
+* Add CMake config file for Qt Charts.
+* Make sure install DESTDIR is a string before calling cmake.
 
 qitoolchain
 -----------
 
 * Add an option to filter registered libs in -config.cmake when make-package is called.
-* Fix rpath of all toolchain .so files when adding a new package to the toolchain (for ubuntu >=18.04 compat)
+* Fix rpath of all toolchain .so files when adding a new package to the toolchain (for ubuntu >=18.04 compat).
+* Remove support for feed's undocumented ``path`` attribute.
+  Use the ``url`` attribute instead.

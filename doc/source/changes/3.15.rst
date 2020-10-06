@@ -53,5 +53,3 @@ qitoolchain
 
 * Update toolchain package name convention when make-package is used.
 * Add support to make-package from directory.
-* Remove support for feed's undocumented ``path`` attribute.
-  Use the ``url`` attribute instead.
