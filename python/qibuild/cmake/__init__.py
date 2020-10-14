@@ -37,7 +37,7 @@ Please install it if necessary and re-run `qibuild config --wizard`\
     (out, _err) = process.communicate()
     intersting = False
     intersting_lines = list()
-    magic_line = "The following generators are available on this platform:"
+    magic_line = "The following generators are available on this platform"
     for line in out.splitlines():
         # handle lines like that:
         # Generator = "blalblalba"
@@ -47,7 +47,7 @@ Please install it if necessary and re-run `qibuild config --wizard`\
         if len(line) >= 3:
             if line[2] == ' ' and "=" not in line:
                 continue
-        if line == magic_line:
+        if line.startswith(magic_line):
             intersting = True
             continue
         if intersting:
@@ -63,6 +63,7 @@ Please install it if necessary and re-run `qibuild config --wizard`\
     res = list()
     for line in to_parse.splitlines():
         generator = line.split("=")[0]
+        generator = generator.replace("* ", "")
         res.append(generator.strip())
     # Fix Visual Studio generators:
     fixed_list = list()

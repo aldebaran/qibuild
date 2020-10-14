@@ -10,6 +10,7 @@ qibuild
 -------
 
 * Handle python version for build/installation paths.
+* Fix qibuild config --wizard (cmake magic_line changed in newest versions)
 
 qitoolchain
 -----------
