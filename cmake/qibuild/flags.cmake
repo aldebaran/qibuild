@@ -118,6 +118,10 @@ if(QI_WITH_HARDENING AND UNIX AND NOT APPLE)
   _qi_add_flags(CMAKE_CXX_FLAGS ${hardening_flags})
 endif()
 
+if(QI_WITH_TESTS)
+  qi_info("Enabling tests build")
+endif()
+
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
   if(NOT QI_WITH_DEBUG_INFO)
     # This makes it possible to remove warnings about missing .pdb
