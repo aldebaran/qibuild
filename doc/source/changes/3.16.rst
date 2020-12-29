@@ -30,6 +30,7 @@ qitoolchain
 -----------
 
 * Add an option to filter registered libs in -config.cmake when make-package is called.
+* Expose the path of the cmake toolchain file in the lib with the property cmake_file.
 * Fix rpath of all toolchain .so files when adding a new package to the toolchain (for ubuntu >=18.04 compat).
 * Remove support for feed's undocumented ``path`` attribute.
   Use the ``url`` attribute instead.

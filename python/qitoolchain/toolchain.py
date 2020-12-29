@@ -51,6 +51,11 @@ class Toolchain(object):
         return self.build_target
 
     @property
+    def cmake_file(self):
+        """ Return the toolchain cmakefile path """
+        return self.toolchain_file
+
+    @property
     def packages(self):
         """ Retrun the QiPackages Sorted by Name """
         return sorted(self.db.packages.values(), key=operator.attrgetter("name"))
