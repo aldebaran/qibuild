@@ -107,6 +107,7 @@ class EnvSetter(object):
         result = {}
         process = subprocess.Popen('"%s"& set' % (bat_file),
                                    stdout=subprocess.PIPE,
+                                   universal_newlines=True,
                                    shell=True)
         (out, err) = process.communicate()
         if process.returncode != 0:
