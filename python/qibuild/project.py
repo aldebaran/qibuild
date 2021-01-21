@@ -451,7 +451,10 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         # dest = /tmp/foo/usr/local
         destdir = qisys.sh.to_native_path(destdir)
         build_env = self.build_env.copy()
-        build_env["DESTDIR"] = destdir
+        if isinstance(destdir, bytes):
+            build_env["DESTDIR"] = destdir.decode()
+        else:
+            build_env["DESTDIR"] = destdir
         # Must make sure prefix is not seen as an absolute path here:
         dest = os.path.join(destdir, prefix[1:])
         dest = qisys.sh.to_native_path(dest)
@@ -486,10 +489,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
     def _install_component(self, destdir, component):
         """ INstall Component """
         build_env = self.build_env.copy()
-        if sys.platform.startswith("win"):
-            build_env["DESTDIR"] = destdir.encode('ascii')
-        else:
-            build_env["DESTDIR"] = destdir
+        build_env["DESTDIR"] = str(destdir)
         cmake_args = list()
         cmake_args += ["-DBUILD_TYPE=%s" % self.build_type]
         cmake_args += ["-DCOMPONENT=%s" % component]
