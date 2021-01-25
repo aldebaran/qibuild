@@ -9,6 +9,7 @@ doitall:
     locales: 'en_US.UTF-8 fr_FR.UTF-8'
     packages: >
       libpython2.7-dev
+      python-pip
       wget
       openssh-server
       subversion
@@ -61,9 +62,7 @@ doitall:
     - export LC_ALL=en_US.UTF-8
 
     # Always use an up-to-date version of pip
-    - wget https://bootstrap.pypa.io/get-pip.py
-    - python get-pip.py --user
-    - rm -f get-pip.py
+    - python -m pip install --user "pip<21" wheel --upgrade
     - export PATH=$HOME/.local/bin:$PATH
     - pip install -r requirements.txt --user
     - pip install -e . --user

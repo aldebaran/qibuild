@@ -1,4 +1,4 @@
-## Copyright (c) 2012-2020 SoftBank Robotics. All rights reserved.
+## Copyright (c) 2012-2021 SoftBank Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
@@ -116,6 +116,10 @@ if(QI_WITH_HARDENING AND UNIX AND NOT APPLE)
   set(hardening_flags "-pie -fPIE -Wl,-z,relro,-z,now -Wformat -Wformat-security -Werror=format-security -fstack-protector-strong")
   _qi_add_flags(CMAKE_C_FLAGS ${hardening_flags})
   _qi_add_flags(CMAKE_CXX_FLAGS ${hardening_flags})
+endif()
+
+if(QI_WITH_TESTS)
+  qi_info("Enabling tests build")
 endif()
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")

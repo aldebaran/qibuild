@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2012-2020 SoftBank Robotics. All rights reserved.
+# Copyright (c) 2012-2021 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license (see the COPYING file).
 """ Toolchain """
 from __future__ import absolute_import
@@ -49,6 +49,11 @@ class Toolchain(object):
     def target(self):
         """ Build target """
         return self.build_target
+
+    @property
+    def cmake_file(self):
+        """ Return the toolchain cmakefile path """
+        return self.toolchain_file
 
     @property
     def packages(self):
