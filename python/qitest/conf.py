@@ -41,13 +41,6 @@ def parse_tests(conf_path):
     res = list()
     with open(conf_path, "r") as fp:
         res = json.load(fp)
-    # Make sure environment is a dict string -> string
-    for test in res:
-        test_env = test.get("environment")
-        if test_env:
-            for key, value in test_env.items():
-                del test_env[key]
-                test_env[key] = value
     return res
 
 
