@@ -69,6 +69,6 @@ def do(args):
     parts = [name, version, target]
     archive_name = "-".join(parts) + ".zip"
     output = os.path.join(output, archive_name)
-    res = qisys.archive.compress(input_directory, flat=True, output=output)
+    res = qisys.archive.compress(input_directory, flat=True, output=output, quiet=args.quiet)
     ui.info(ui.green, "Package generated in", res)
     return res
