@@ -2,7 +2,7 @@
 cmake>=3.11.4.post1
 
 # For QiPy
-virtualenv==16.0.0
+virtualenv==20.26.6
 
 # For QiPkg ls-package
 tabulate==0.8.2
